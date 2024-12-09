@@ -33,9 +33,6 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
   };
 
   const validationSchema = Yup.object().shape({
-    username: Yup.string()
-      .min(4, "Tên người dùng phải có ít nhất 4 ký tự")
-      .required("Vui lòng nhập tên người dùng"),
     email: Yup.string()
       .email("Email không hợp lệ")
       .required("Vui lòng nhập email"),
@@ -54,20 +51,18 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
   });
 
   const handleRegister = async (values: {
-    username: string;
+    fullName: string;
     email: string;
     phoneNumber: string;
-    fullName: string;
     cccd: string;
     password: string;
   }) => {
     try {
       // Gọi API đăng ký
       const response = await authApi.signUp({
-        username: values.username,
+        fullName: values.fullName,
         email: values.email,
         phoneNumber: values.phoneNumber,
-        fullName: values.fullName,
         cccd: values.cccd,
         password: values.password,
       });
@@ -99,11 +94,10 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
 
         <Formik
           initialValues={{
-            username: "",
+            fullName: "",
             email: "",
             password: "",
             phoneNumber: "",
-            fullName: "",
             cccd: "",
           }}
           validationSchema={validationSchema}
@@ -118,19 +112,19 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
             touched,
           }) => (
             <>
-              {/* Tên người dùng */}
-              <Text style={styles.label}>Tên người dùng</Text>
+              {/* Họ và tên */}
+              <Text style={styles.label}>Họ và tên</Text>
               <View style={styles.inputContainer}>
                 <TextInput
-                  placeholder="Nhập tên người dùng"
-                  value={values.username}
-                  onChangeText={handleChange("username")}
-                  onBlur={handleBlur("username")}
+                  placeholder="Nhập họ và tên"
+                  value={values.fullName}
+                  onChangeText={handleChange("fullName")}
+                  onBlur={handleBlur("fullName")}
                   style={styles.input}
                 />
               </View>
-              {touched.username && errors.username && (
-                <Text style={styles.errorText}>{errors.username}</Text>
+              {touched.fullName && errors.fullName && (
+                <Text style={styles.errorText}>{errors.fullName}</Text>
               )}
 
               {/* Email */}
@@ -180,25 +174,11 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
                   onBlur={handleBlur("phoneNumber")}
                   keyboardType="phone-pad"
                   style={styles.input}
+                  maxLength={10}
                 />
               </View>
               {touched.phoneNumber && errors.phoneNumber && (
                 <Text style={styles.errorText}>{errors.phoneNumber}</Text>
-              )}
-
-              {/* Họ và tên */}
-              <Text style={styles.label}>Họ và tên</Text>
-              <View style={styles.inputContainer}>
-                <TextInput
-                  placeholder="Nhập họ và tên"
-                  value={values.fullName}
-                  onChangeText={handleChange("fullName")}
-                  onBlur={handleBlur("fullName")}
-                  style={styles.input}
-                />
-              </View>
-              {touched.fullName && errors.fullName && (
-                <Text style={styles.errorText}>{errors.fullName}</Text>
               )}
 
               {/* CCCD */}
@@ -210,6 +190,7 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
                   onChangeText={handleChange("cccd")}
                   onBlur={handleBlur("cccd")}
                   style={styles.input}
+                  maxLength={12}
                 />
               </View>
               {touched.cccd && errors.cccd && (

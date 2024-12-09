@@ -6,10 +6,9 @@ const authApi = {
     return axiosClient.post("auth/login", data);
   },
   signUp: (data: {
-    username: string;
+    fullName: string;
     email: string;
     phoneNumber: string;
-    fullName: string;
     cccd: string;
     password: string;
   }) => {

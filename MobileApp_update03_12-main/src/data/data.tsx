@@ -24,30 +24,33 @@ export const payment = [
 // popularRoutes.ts
 export const popularRoutes = [
   {
-    title: "Quy Nhơn - Sài Gòn (24P Vip)",
-    price: "500.000 đ",
-    details: "12 giờ 00 phút",
+    title: "Hồ Chí Minh - Đà Nẵng (24P Vip)",
+    price: "450.000 đ",
+    details: "6 giờ 20 phút",
   },
   {
-    title: "Quy Nhơn - Đà Nẵng (Giường)",
-    price: "240.000 đ",
-    details: "12 giờ 00 phút",
+    title: "Đà Nẵng - Thừa Thiên Huế (16 Chỗ)",
+    price: "550.000 đ",
+    details: "9 giờ 15 phút",
   },
   {
-    title: "Quy Nhơn - Đà Nẵng (24P Vip)",
-    price: "500.000 đ",
-    details: "12 giờ 00 phút",
+    title: "Đà Nẵng - Bình Định (24P Vip)",
+    price: "350.000 đ",
+    details: "3 giờ 45 phút",
   },
   {
-    title: "Hà Nội - Đà Nẵng (24P Vip)",
-    price: "500.000 đ",
-    details: "12 giờ 00 phút",
+    title: "Bình Định - Quảng Ngãi (24P Vip)",
+    price: "300.000 đ",
+    details: "2 giờ 30 phút",
   },
   {
-    title: "Sài Gòn - Đà Nẵng (24P Vip)",
-    price: "500.000 đ",
-    details: "12 giờ 00 phút",
+    title: "Thừa Thiên Huế - Quảng Ngãi (24P Vip)",
+    price: "700.000 đ",
+    details: "10 giờ 10 phút",
   },
-
-  // Thêm các tuyến khác...
+  {
+    title: "Quảng Ngãi - Đà Nẵng (24P Vip)",
+    price: "400.000 đ",
+    details: "5 giờ 55 phút",
+  },
 ];

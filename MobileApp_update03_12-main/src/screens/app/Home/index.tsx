@@ -12,10 +12,7 @@ import { styles, pickerSelectStyles } from "./style";
 import { provinces, popularRoutes } from "../../../data/data";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import RNPickerSelect from "react-native-picker-select";
-import busRoute from "../../../services/BusRoutes/busRouteApi";
 import tripApi from "../../../services/Trips/tripApi";
-import { Picker } from "@react-native-picker/picker";
-
 interface HomeScreenProps {
   navigation: any;
 }
@@ -26,7 +23,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [destination, setDestination] = useState<string>("");
   const [departureDate, setDepartureDate] = useState<Date>(new Date());
   const [isDatePickerVisible, setDatePickerVisible] = useState<boolean>(false);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [fadeAnim] = useState(new Animated.Value(0));
 
   // Animation effect on load
@@ -108,6 +104,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     }
   };
 
+  const handleItemClick = (item: any) => {
+    const { title } = item;
+
+    const cleanedTitle = title.replace(/\s*\(.*?\)\s*/g, "");
+
+    // Split by " - " to separate departure and destination
+    const [departure, destination] = cleanedTitle.split(" - ");
+    setDeparture(departure);
+    setDestination(destination);
+  };
+
   // Render header content
   const renderHeader = () => (
     <>
@@ -184,7 +191,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <Animated.View style={[styles.routeCard, { opacity: fadeAnim }]}>
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => console.log(`${item.title} pressed`)}
+              onPress={() => handleItemClick(item)}
               style={styles.routeTouchable}
             >
               <Text style={styles.routeTitle}>{item.title}</Text>

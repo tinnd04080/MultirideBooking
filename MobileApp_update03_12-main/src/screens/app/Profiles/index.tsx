@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { styles } from "./style";
 import Icon from "react-native-vector-icons/Ionicons";
-import Header from "../../../components/headerApp"; // Import Header
+import Header from "../../../components/headerApp";
 
 interface ProfileScreenProps {
   navigation: any;
@@ -59,7 +59,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         <View style={styles.header}>
           <Animated.Image
             source={require("../../../assets/logoSplash.png")}
-            style={[styles.avatar, { transform: [{ rotate: spin }] }]} // Thêm hiệu ứng xoay vào hình ảnh
+            style={[styles.avatar, { transform: [{ rotate: spin }] }]}
           />
           <Text style={styles.title}>MultiRide Booking</Text>
         </View>
@@ -71,21 +71,29 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
         <TouchableOpacity
           style={styles.item}
-          onPress={() => console.log("Lịch sử")}
+          onPress={() => navigation.navigate("EditProfileScreen")}
+        >
+          <Icon name="pencil-outline" size={24} color="#333" />
+          <Text style={styles.itemText}>Chỉnh sửa thông tin</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.item}
+          onPress={() => navigation.navigate("BookingHistoryScreen")}
         >
           <Icon name="time" size={24} color="#333" />
           <Text style={styles.itemText}>Lịch Sử Chuyến Đi</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.item}
-          onPress={() => console.log("Cẩm nang")}
+          onPress={() => navigation.navigate("SafetyManualScreen")}
         >
           <Icon name="book" size={24} color="#333" />
           <Text style={styles.itemText}>Cẩm Nang An Toàn</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.item}
-          onPress={() => console.log("Q&A")}
+          onPress={() => navigation.navigate("QAScreen")}
         >
           <Icon name="help-circle" size={24} color="#333" />
           <Text style={styles.itemText}>Q&A</Text>
@@ -97,14 +105,14 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         </View>
         <TouchableOpacity
           style={styles.item}
-          onPress={() => console.log("Điều khoản")}
+          onPress={() => navigation.navigate("TermsAndConditionsScreen")}
         >
           <Icon name="document" size={24} color="#333" />
           <Text style={styles.itemText}>Điều khoản và điều kiện</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.item}
-          onPress={() => console.log("Chính sách")}
+          onPress={() => navigation.navigate("PrivacyPolicyScreen")}
         >
           <Icon name="shield" size={24} color="#333" />
           <Text style={styles.itemText}>Chính Sách Quyền Riêng Tư</Text>
