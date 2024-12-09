@@ -8,7 +8,7 @@ export const VoucherApi = createApi({
     baseUrl: import.meta.env.VITE_API,
     credentials: 'include',
     prepareHeaders: (headers, { getState }) => {
-      const accessToken = localStorage.getItem('token');
+      const accessToken = localStorage.getItem('token')
 
       if (accessToken) {
         headers.set('authorization', `Bearer ${accessToken}`)
@@ -18,10 +18,14 @@ export const VoucherApi = createApi({
   }),
   tagTypes: ['Vouchers'],
   endpoints: (builder) => ({
-    getAllVouchers: builder.query<IVoucherDocs, number | string>({
-      query: (page) => `/promotions?page=${1}&limit=10`,
-      providesTags: ['Vouchers']
+    /* Phần get voucher */
+    getAllVouchers: builder.query<IVoucherDocs, { page: number; limit: number }>({
+      query: ({ page, limit }) => {
+        return `/promotions?page=${page}&limit=${limit}`
+      },
+      providesTags: (result) => [{ type: 'Vouchers', id: 'LIST' }]
     }),
+
     getAllVouchersActive: builder.query<IVoucherDocs, number | string>({
       query: () => `/vouchers/active`,
       providesTags: (result) => {

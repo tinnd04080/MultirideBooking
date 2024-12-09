@@ -1,15 +1,15 @@
 export interface IVoucherDocs {
   data: {
-    docs: IVoucher[]
+    data: IVoucher[]
+    totalPage: number // Thêm trường này để khớp với dữ liệu trả về
+    currentPage?: number
     hasNextPage?: boolean
     hasPrevPage?: boolean
     limit?: number
     nextPage?: null | number
-    page?: number
     pagingCounter?: number
     prevPage?: null | number
-    totalDocs?: number
-    totalPages: number
+    page?: number
   }
 }
 

@@ -54,8 +54,10 @@ export const productApi = createApi({
 
     /* TRIP */
     /* Lấy danh sách */
-    getAllTrips: builder.query<IProductDocs, { _page?: number; _limit?: number; query?: string }>({
-      query: ({ _page, _limit, query }) => `/trips`,
+    getAllTrips: builder.query<IProductDocs, { page?: number; limit?: number; query?: string }>({
+      query: ({ page, limit }) => {
+        return `/trips?page=${page}&limit=${limit}`
+      },
       providesTags: (result) => {
         return [{ type: 'Product', id: 'LIST' }]
       }

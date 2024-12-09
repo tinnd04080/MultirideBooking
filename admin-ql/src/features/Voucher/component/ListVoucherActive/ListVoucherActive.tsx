@@ -13,7 +13,21 @@ import { useState } from 'react'
 
 const ListVoucherActive = () => {
   const [currentPage, setCurrentPage] = useState(1)
-  const { data: VoucherActive, isLoading, isError } = useGetAllVouchersQuery(0)
+  const [options, setoptions] = useState({
+    page: 1,
+    limit: 10
+  })
+
+  const {
+    data: VoucherActive,
+    isLoading,
+    isError
+  } = useGetAllVouchersQuery({
+    page: options.page, // Trang hiện tại
+    limit: options.limit // Số lượng item trên mỗi trang
+  })
+
+  console.log('totalPage:', VoucherActive?.data?.totalPage)
 
   const { user } = useAppSelector((state: RootState) => state.persistedReducer.auth)
 
@@ -74,15 +88,15 @@ const ListVoucherActive = () => {
         columns={voucherDataColumns}
         dataSource={vouchers}
         pagination={{
-          pageSize: VoucherActive && VoucherActive?.data?.limit,
-          total: VoucherActive && VoucherActive?.data?.totalDocs,
-          onChange(page) {
-            setCurrentPage(page)
-          },
-          showQuickJumper: true
-          //   pageSizeOptions: ['10', '25', '50', '100'],
-          //   defaultPageSize: 10,
-          //   showSizeChanger: true
+          current: options.page, // Trang hiện tại
+          pageSize: options.limit, // Kích thước trang (số lượng items trên mỗi trang)
+          showSizeChanger: false,
+          /* total: dataProducts?.totalPage * 10, // Tổng số bản ghi */
+          total: VoucherActive?.totalPage ? VoucherActive?.totalPage * options.limit : 0,
+          showQuickJumper: true, // Cho phép nhảy đến trang
+          onChange(page, pageSize) {
+            setoptions((prev) => ({ ...prev, page, limit: pageSize }))
+          }
         }}
         scroll={{ x: 'max-content', y: '50vh' }} // Cấu hình cuộn ngang
         rowSelection={user.role === IRoleUser.ADMIN ? rowSelection : undefined}

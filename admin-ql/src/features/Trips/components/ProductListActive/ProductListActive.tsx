@@ -8,20 +8,20 @@ import { IRoleUser } from '~/types'
 import { useRender } from '../../hooks'
 
 export const ProductListActive = ({ checkPath }: any) => {
+  const [options, setoptions] = useState({
+    page: 1,
+    limit: 10
+  })
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
   const [loading, setLoading] = useState(false)
   const { user } = useAppSelector((state: RootState) => state.persistedReducer.auth)
-  const [options, setOptions] = useState({
-    page: 1,
-    limit: 5
-  })
   const {
     data: dataProducts,
     isLoading: loadingProduct,
     isError: errorProudct
   } = useGetAllTripsQuery({
-    _page: 1,
-    _limit: 10,
+    page: options.page, // Trang hiện tại
+    limit: options.limit, // Số lượng item trên mỗi trang
     query: ''
   })
   console.log(dataProducts, 'data')
@@ -89,16 +89,18 @@ export const ProductListActive = ({ checkPath }: any) => {
         rowSelection={user.role === IRoleUser.ADMIN ? rowSelection : undefined}
         columns={columnsData}
         dataSource={products}
-        scroll={{ x: 1300 }}
         pagination={{
-          pageSizeOptions: ['5', '10', '15', '20', '25', '30', '40', '50'],
-          defaultPageSize: options.limit,
-          showSizeChanger: true,
-          total: dataProducts?.data?.length,
-          onChange: (page, pageSize) => {
-            setOptions((prev) => ({ ...prev, page, limit: pageSize }))
+          current: options.page, // Trang hiện tại
+          pageSize: options.limit, // Kích thước trang (số lượng items trên mỗi trang)
+          showSizeChanger: false,
+          /* total: dataProducts?.totalPage * 10, // Tổng số bản ghi */
+          total: dataProducts?.totalPage ? dataProducts?.totalPage * options.limit : 0,
+          showQuickJumper: true, // Cho phép nhảy đến trang
+          onChange(page, pageSize) {
+            setoptions((prev) => ({ ...prev, page, limit: pageSize }))
           }
         }}
+        scroll={{ y: '55vh', x: 'max-content' }} // chỉnh sửa cuộn ngang
         bordered={true}
       />
     </div>
