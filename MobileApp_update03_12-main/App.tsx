@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { useNavigation } from "@react-navigation/native"; // Import useNavigation hook
 import Icon from "react-native-vector-icons/MaterialIcons";
 import SplashScreen from "./src/screens/auth/splash";
 import LoginScreen from "./src/screens/auth/SignIn";
@@ -14,13 +13,16 @@ import NotificationScreen from "./src/screens/app/Notification";
 import ProfileScreen from "./src/screens/app/Profiles";
 import TicketBookingScreen from "./src/screens/App.TicketBookingScreen";
 import SeatSelectionScreen from "./src/screens/SeatSelectionScreen/SeatSelectionScreen";
-import PickupDropoffScreen from "./src/screens/App.PickupDropoffScreen";
-import PassengerInfoScreen from "./src/screens/App.PassengerInfoScreen";
-import PaymentScreen from "./src/screens/App.PaymentScreen";
 import OtpScreen from "./src/screens/auth/OTP";
 import BankTransferScreen from "./src/screens/App.PaymentScreen/PaymentTransfer";
 import ConfirmInformation from "./src/screens/ConfirmInformationScreen/ConfirmInformationScreen";
 import CreateticketsScreen from "./src/screens/CreateticketsScreen/CreateticketsScreen";
+import BookingHistoryScreen from "./src/screens/tripHistory";
+import SafetyManualScreen from "./src/screens/SafetyManual";
+import QAScreen from "./src/screens/QAScreen";
+import PrivacyPolicyScreen from "./src/screens/PrivacyPolicy";
+import TermsAndConditionsScreen from "./src/screens/Clause";
+import EditProfileScreen from "./src/screens/UpdateInfo";
 // RootStackParamList.ts
 export type RootStackParamList = {
   SplashScreen: undefined;
@@ -115,19 +117,24 @@ const App: React.FC = () => {
           name="CreateticketsScreen"
           component={CreateticketsScreen}
         />
-        {/* <Stack.Screen
-          name="PickupDropoffScreen"
-          component={PickupDropoffScreen}
-        /> */}
-        {/*  <Stack.Screen
-          name="PassengerInfoScreen"
-          component={PassengerInfoScreen}
-        /> */}
-        {/* <Stack.Screen name="PaymentScreen" component={PaymentScreen} /> */}
-        {/*   <Stack.Screen
-          name="BankTransferScreen"
-          component={BankTransferScreen}
-        /> */}
+        <Stack.Screen
+          name="BookingHistoryScreen"
+          component={BookingHistoryScreen}
+        />
+        <Stack.Screen
+          name="SafetyManualScreen"
+          component={SafetyManualScreen}
+        />
+        <Stack.Screen name="QAScreen" component={QAScreen} />
+        <Stack.Screen
+          name="PrivacyPolicyScreen"
+          component={PrivacyPolicyScreen}
+        />
+        <Stack.Screen
+          name="TermsAndConditionsScreen"
+          component={TermsAndConditionsScreen}
+        />
+        <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
