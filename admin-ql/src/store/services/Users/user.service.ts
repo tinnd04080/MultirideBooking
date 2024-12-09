@@ -23,8 +23,17 @@ export const userApi = createApi({
       providesTags: ['User']
     }),
 
-    getAllUserByRole: builder.query<any, { limit: number; page: number; roleName: 'customer' | 'staff' }>({
+    /* getAllUserByRole: builder.query<any, { limit: number; page: number; roleName: 'customer' | 'staff' }>({
       query: (options) => `/users?_page=${options.page}&limit=${options.limit}`,
+      providesTags: ['User']
+    }), */
+    getAllUserByRole: builder.query<any, { limit: number; page: number }>({
+      query: (options) => {
+        const { limit, page } = options
+        let query = `/users?limit=${limit}&page=${page}`
+
+        return query
+      },
       providesTags: ['User']
     }),
 

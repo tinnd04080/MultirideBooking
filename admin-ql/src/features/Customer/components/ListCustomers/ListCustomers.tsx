@@ -109,6 +109,10 @@ export const ListCustomers = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
   const { data: customersData, isLoading, isError } = useGetAllUserByRoleQuery(options)
 
+  console.log('totalPage get được', customersData?.totalPage)
+  console.log('Người dùng chọn', options)
+  console.log('Dữ liệu trả về', customersData)
+
   const handleDeleteMany = () => {
     selectedRowKeys.forEach((selectItem) => {
       deleteUser(selectItem as string)
@@ -358,9 +362,11 @@ export const ListCustomers = () => {
           dataSource={customers}
           bordered
           pagination={{
-            showSizeChanger: true,
-            pageSizeOptions: ['10', '15', '20', '25'],
-            total: customersData?.data?.totalPage,
+            current: options.page, // Trang hiện tại
+            pageSize: options.limit, // Kích thước trang (số lượng items trên mỗi trang)
+            showSizeChanger: false,
+            showQuickJumper: true, // Cho phép nhảy đến trang
+            total: customersData?.totalPage * 10,
             onChange(page, pageSize) {
               setoptions((prev) => ({ ...prev, page, limit: pageSize }))
             }
