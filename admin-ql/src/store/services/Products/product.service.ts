@@ -20,12 +20,16 @@ export const productApi = createApi({
   endpoints: (builder) => ({
     /*  BUSES  */
     /* Hiển thị */
-    getAllProducts: builder.query<IProductDocs, { _page?: number; _limit?: number; query?: string }>({
-      query: ({ _page, _limit, query }) => `/buses`,
+    getAllProducts: builder.query<IProductDocs, { page?: number; limit?: number; query?: string }>({
+      query: ({ page, limit, query }) => {
+        // Sử dụng các tham số destructured để thêm vào URL
+        return `/buses?page=${page}&limit=${limit}&query=${query}`
+      },
       providesTags: (result) => {
         return [{ type: 'Product', id: 'LIST' }]
       }
     }),
+
     /* Thêm */
     createProduct: builder.mutation<{ message: string; data: IProduct }, any>({
       query: (product) => ({

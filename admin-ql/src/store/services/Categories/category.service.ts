@@ -18,10 +18,13 @@ export const categoryApi = createApi({
   }),
   tagTypes: ['Category'],
   endpoints: (builder) => ({
-    getAllCategory: builder.query<ICategoryDocs, { _page: number; _limit: number }>({
-      query: ({ _page, _limit }) => `/bus-routes`,
+    getAllCategory: builder.query<ICategoryDocs, { page: number; limit: number }>({
+      query: ({ page, limit }) => {
+        return `/bus-routes?page=${page}&limit=${limit}` // Truyền tham số page và limit vào query string
+      },
       providesTags: (result) => [{ type: 'Category', id: 'LIST' }]
     }),
+
     getAllCategoryDeleted: builder.query<ICategoryDocs, number>({
       query: (page) => `/categories-isDeleted?_page=${page}`,
       providesTags: (result) =>

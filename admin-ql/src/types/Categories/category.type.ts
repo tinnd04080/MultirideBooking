@@ -9,8 +9,9 @@ export interface ICategory {
 }
 
 export interface ICategoryDocs {
-  docs: ICategory[]
+  data: ICategory[]
   totalDocs: number
+  totalPage: number
   limit: number
   totalPages: number
   page: number

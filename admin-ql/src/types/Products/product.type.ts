@@ -26,10 +26,12 @@ export interface IProduct {
 }
 
 export interface IProductDocs {
-  docs: IProduct[]
+  data: IProduct[]
   totalDocs: number
+  totalPage: number
+  currentPage: number
   limit: number
-  totalPages: string
+  totalPages?: number
   page: number
   pagingCounter: number
   hasPrevPage: boolean

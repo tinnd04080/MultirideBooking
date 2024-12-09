@@ -10,8 +10,23 @@ import { cancelDelete } from '../..'
 import { useRenderCategory } from '../../hooks'
 
 const ListCategory = () => {
-  const [options, setOptions] = useState({ _page: 1, _limit: 10 })
-  const { data: categories } = useGetAllCategoryQuery(options)
+  const [options, setoptions] = useState({
+    page: 1,
+    limit: 10
+  })
+  console.log('Sau khi chọn', options)
+
+  const {
+    data: categories,
+    isLoading: loadingProduct,
+    isError: errorProduct
+  } = useGetAllCategoryQuery({
+    page: options.page, // Trang hiện tại
+    limit: options.limit // Số lượng item trên mỗi trang
+  })
+
+  console.log(`dữ liệu sau khi get về `, categories)
+
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
   const [deleteFakeCategory] = useDeleteFakeMutation()
 
@@ -84,14 +99,15 @@ const ListCategory = () => {
           columns={columnsData}
           dataSource={categorriesData}
           pagination={{
-            pageSize: categories && categories.limit,
-            // showSizeChanger: true,
-            // pageSizeOptions: ['5', '10', '15', '20'],
-            total: categories && categories?.totalDocs,
-            onChange(page) {
-              setOptions((prev) => ({ ...prev, _page: page }))
-            },
-            showQuickJumper: true
+            current: options.page, // Trang hiện tại
+            pageSize: options.limit, // Kích thước trang (số lượng items trên mỗi trang)
+            showSizeChanger: false,
+            /* total: dataProducts?.totalPage * 10, // Tổng số bản ghi */
+            total: categories?.totalPage ? categories?.totalPage * options.limit : 0,
+            showQuickJumper: true, // Cho phép nhảy đến trang
+            onChange(page, pageSize) {
+              setoptions((prev) => ({ ...prev, page, limit: pageSize }))
+            }
           }}
           scroll={{ y: '50vh', x: 'max-content' }} // chỉnh sửa cuộn ngang
           bordered

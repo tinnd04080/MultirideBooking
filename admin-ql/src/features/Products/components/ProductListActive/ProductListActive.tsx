@@ -11,29 +11,31 @@ export const ProductListActive = ({ checkPath }: any) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
   const [loading, setLoading] = useState(false)
   const { user } = useAppSelector((state: RootState) => state.persistedReducer.auth)
-  const [options, setOptions] = useState({
+  const [options, setoptions] = useState({
     page: 1,
     limit: 10
   })
+  console.log('Giá trị người dùng thay đổi:', options)
+  /* api */
   const {
     data: dataProducts,
     isLoading: loadingProduct,
-    isError: errorProudct
+    isError: errorProduct
   } = useGetAllProductsQuery({
-    _page: options.page, // Sử dụng page từ state để động khi thay đổi
-    _limit: options.limit,
-    query: ''
+    page: options.page, // Trang hiện tại
+    limit: options.limit, // Số lượng item trên mỗi trang
+    query: '' // Nếu bạn có thể sử dụng query cho lọc dữ liệu, hãy thêm ở đây
   })
-  console.log('data', dataProducts)
-  console.log('totalPage', dataProducts?.totalPage) // Thêm dòng này để kiểm tra tổng số trang
-  console.log('currentPage', dataProducts?.currentPage) // Thêm dòng này để kiểm tra trang hiện tại
+
+  console.log('data', dataProducts) // Kiểm tra dữ liệu trả về từ API
+  console.log('totalPage nè: ', dataProducts?.totalPage) // Kiểm tra tổng số trang
+  console.log('currentPage', dataProducts?.currentPage) // Kiểm tra trang hiện tại
 
   const products = dataProducts?.data?.map((product: any, index: number) => ({
     ...product,
     key: product._id,
     index: index + 1
   }))
-  console.log('aaa', products.totalPage)
 
   const start = () => {
     setLoading(true)
@@ -97,9 +99,11 @@ export const ProductListActive = ({ checkPath }: any) => {
           current: options.page, // Trang hiện tại
           pageSize: options.limit, // Kích thước trang (số lượng items trên mỗi trang)
           showSizeChanger: false,
-          total: dataProducts?.totalPage * 10, // Tổng số bản ghi
-          onChange: (page, pageSize) => {
-            setOptions((prev) => ({ ...prev, page, limit: pageSize }))
+          /* total: dataProducts?.totalPage * 10, // Tổng số bản ghi */
+          total: dataProducts?.totalPage ? dataProducts?.totalPage * options.limit : 0,
+          showQuickJumper: true, // Cho phép nhảy đến trang
+          onChange(page, pageSize) {
+            setoptions((prev) => ({ ...prev, page, limit: pageSize }))
           }
         }}
         bordered={true}
