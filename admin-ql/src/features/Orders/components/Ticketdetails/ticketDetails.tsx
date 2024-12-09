@@ -110,7 +110,7 @@ const TicketDetails = ({ TicketDetail }: TicketDetail) => {
           </div>
 
           <div className='info-group'>
-            <p className='info-title'>Thời gian phát hành vé:</p>
+            <p className='info-title'>Thời điểm phát hành vé:</p>
             <p className='info-content'>{formatDateTime(TicketDetail.createdAt)}</p>
           </div>
 

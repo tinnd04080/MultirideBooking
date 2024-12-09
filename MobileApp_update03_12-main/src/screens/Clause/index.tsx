@@ -1,6 +1,8 @@
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
-import { styles } from "./style";
+/* import { styles } from "./style"; */
+import { styles } from "./styles"; // Đảm bảo "style" là tên chính xác của file
+
 import Header from "../../components/header";
 
 const TermsAndConditionsScreen = () => {
