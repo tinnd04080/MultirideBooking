@@ -1,0 +1,78 @@
+/* Cơ bản */
+.user-info-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-info-text {
+  font-size: 14px;
+  font-weight: normal;
+  color: #6b7280; /* Màu xám nhạt */
+}
+
+.user-info-link {
+  font-size: 16px;
+  font-weight: bold;
+  color: #111827; /* Màu đen */
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: none;
+}
+
+.user-info-link:hover {
+  text-decoration: underline;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  padding: 30px;
+  width: 400px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #6b7280; /* Màu xám nhạt */
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  color: #111827; /* Màu đen */
+}
+
+/* Trạng thái */
+.status-active {
+  color: blue;
+  font-weight: bold;
+}
+
+.status-inactive {
+  color: red;
+  font-weight: bold;
+}
+
+.status-unknown {
+  color: gray;
+  font-weight: bold;
+}
