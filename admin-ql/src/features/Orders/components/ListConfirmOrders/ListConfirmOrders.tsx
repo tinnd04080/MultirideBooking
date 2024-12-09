@@ -86,7 +86,6 @@ const ListConfirmOrders = () => {
     clearFilters()
     setSearchText('')
   }
-
   const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<IOrderDataType> => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
@@ -101,14 +100,21 @@ const ListConfirmOrders = () => {
         <Space>
           <ButtonAnt
             type='primary'
-            onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
+            onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)} // Tìm kiếm
             icon={<SearchOutlined />}
             size='small'
             style={{ width: 90 }}
           >
             Tìm kiếm
           </ButtonAnt>
-          <ButtonAnt onClick={() => clearFilters && handleReset(clearFilters)} size='small' style={{ width: 90 }}>
+          <ButtonAnt
+            onClick={() => {
+              clearFilters && handleReset(clearFilters) // Reset filter
+              handleSearch([], confirm, dataIndex) // Tự động tìm kiếm lại với giá trị rỗng
+            }}
+            size='small'
+            style={{ width: 90 }}
+          >
             Làm mới
           </ButtonAnt>
         </Space>
@@ -117,20 +123,28 @@ const ListConfirmOrders = () => {
     filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
     onFilter: (value, record) => {
       const targetValue = record[dataIndex]
-      if (typeof targetValue === 'object') {
-        targetValue?.avatar === undefined && delete targetValue.avatar
-        return Object.values(targetValue).some((val: any) =>
-          val
+      if (targetValue !== undefined && targetValue !== null) {
+        if (typeof targetValue === 'object') {
+          targetValue?.avatar === undefined && delete targetValue.avatar
+          // Duyệt qua các giá trị trong object và kiểm tra chúng
+          return Object.values(targetValue).some((val: any) => {
+            if (val !== undefined && val !== null) {
+              return val
+                .toString()
+                .toLowerCase()
+                .includes((value as string).toLowerCase())
+            }
+            return false // Nếu val là undefined hoặc null thì không khớp
+          })
+        } else {
+          // Kiểm tra nếu targetValue không phải object và tránh cắt bớt chuỗi
+          return targetValue
             .toString()
             .toLowerCase()
             .includes((value as string).toLowerCase())
-        )
-      } else {
-        return targetValue
-          .toString()
-          .toLowerCase()
-          .includes((value as string).toLowerCase())
+        }
       }
+      return false // Trả về false nếu targetValue là undefined hoặc null
     },
     onFilterDropdownOpenChange: (visible) => {
       if (visible) {
@@ -140,13 +154,13 @@ const ListConfirmOrders = () => {
     render: (text) =>
       searchedColumn === dataIndex ? (
         <Highlighter
-          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0, margin: '0 auto', textAlign: 'center' }}
           searchWords={[searchText]}
           autoEscape
-          textToHighlight={text ? text.toString().substring(text.length - 8) : ''}
+          textToHighlight={text ? text.toString().substring() : ''} // Đảm bảo không cắt chuỗi quá mức
         />
       ) : (
-        text /* .substring(text.length - 8) */
+        text
       )
   })
   /*End Search */
@@ -210,7 +224,7 @@ const ListConfirmOrders = () => {
       title: 'Mã vé',
       dataIndex: 'code',
       key: 'code',
-      width: 100,
+      width: 85,
       ...getColumnSearchProps('code')
     },
     {
@@ -219,7 +233,7 @@ const ListConfirmOrders = () => {
       key: 'user',
       width: 150,
       rowScope: 'row',
-      ...getColumnSearchProps('phone'),
+      ...getColumnSearchProps('user'),
       // sorter: (a, b) => {
       //   return a.user.username.localeCompare(b.user.username)
       // },

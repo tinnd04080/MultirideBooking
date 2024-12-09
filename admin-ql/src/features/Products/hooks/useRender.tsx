@@ -21,13 +21,12 @@ import { TbBasketDiscount } from 'react-icons/tb'
 import clsxm from '~/utils/clsxm'
 import { formatCurrency } from '~/utils'
 import { useAppSelector } from '~/store/hooks'
-
 export const useRender = (productsList: IProduct[], deleteReal?: boolean, checkPath?: boolean) => {
   const dispatch = useAppDispatch()
   const searchInput = useRef<InputRef>(null)
   const [searchText, setSearchText] = useState<string>('')
   const [searchedColumn, setSearchedColumn] = useState<string>('')
-
+  const [options, setOptions] = useState({ page: 1, limit: 10 })
   const [deleteFakeProduct] = useDeleteFakeProductMutation()
   const [restoreProduct] = useRestoreProductMutation()
   const [deleteProduct] = useDeleteProductMutation()
@@ -178,13 +177,17 @@ export const useRender = (productsList: IProduct[], deleteReal?: boolean, checkP
       key: 'index',
       width: 50
     },
-    // {
-    //   title: 'Tên Xe',
-    //   dataIndex: 'busTypeName',
-    //   key: 'busTypeName',
-    //   width: 270,
-    //   ...getColumnSearchProps('busTypeName' as unknown as IProduct)
-    // },
+    {
+      title: 'STT',
+      dataIndex: 'index',
+      key: 'index',
+      width: 50,
+      render: (_: any, record: IProduct, index: number) => {
+        // Tính số thứ tự dựa trên trang và giới hạn
+        const startIndex = (options.page - 1) * options.limit
+        return startIndex + index + 1 // index là chỉ số của bản ghi trong trang
+      }
+    },
     {
       title: 'Biển số xe',
       dataIndex: 'licensePlate',
@@ -243,20 +246,6 @@ export const useRender = (productsList: IProduct[], deleteReal?: boolean, checkP
     }
   ]
 
-  /* column admin */
-  /* handle delete product */
-  /*Xoa mem Xe đi */
-  const handleDeleteProduct = async (id: string) => {
-    try {
-      const response = await deleteFakeProduct({ id }).unwrap()
-      if (response.message === 'success') {
-        message.success('Xe đã được chuyển vào thùng rác!')
-      }
-    } catch (error) {
-      message.error('Xóa Xe thất bại')
-    }
-  }
-
   const handleRestoreProduct = async (id: string) => {
     try {
       const response = await restoreProduct({ id })
@@ -277,30 +266,6 @@ export const useRender = (productsList: IProduct[], deleteReal?: boolean, checkP
     } catch (error) {
       message.error('Khôi phục Xe thất bại')
     }
-  }
-
-  const handleChangeStatusProduct = async (product: IProduct) => {
-    // console.log(product)
-    // return
-
-    const newProduct: any = {
-      name: product.name,
-      category: product.category._id,
-      is_active: product.is_active ? false : true,
-      description: product.description,
-      sale: product.sale,
-      size: product.sizes
-        .filter((size) => !size.is_default)
-        .map((size) => ({ _id: size._id, name: size.name, price: size.price })),
-      sizeDefault: product.sizes.filter((size) => size.is_default).map((size) => size._id),
-      toppings: product.toppings.map((topping) => topping._id)
-    }
-    changeStatusProduct({ id: product._id, product: newProduct })
-      .unwrap()
-      .then(() => {
-        message.success('Thay đổi trạng thái thành công')
-      })
-      .catch(() => message.error('Thay đổi trạng thái thất bại'))
   }
 
   const columnsAdmin: any = [
@@ -326,20 +291,6 @@ export const useRender = (productsList: IProduct[], deleteReal?: boolean, checkP
                   className='bg-primary hover:text-white flex items-center justify-center text-white'
                 />
               </Tooltip>
-              {/* <Popconfirm
-                title='Xóa Xe?'
-                description={`Xe sẽ bị xóa'`}
-                onConfirm={() => handleDeleteProductReal(product._id)}
-                okText='Có'
-                cancelText='Không'
-              >
-                <ButtonAntd
-                  size='large'
-                  icon={<SyncOutlined />}
-                  danger
-                  className='hover:text-white flex items-center justify-center text-white'
-                />
-              </Popconfirm> */}
             </Space>
           )
         } else {
