@@ -16,7 +16,7 @@ const QAScreen = () => {
     {
       question: "Tôi có thể hủy vé đã đặt không?",
       answer:
-        "Có, bạn có thể hủy vé qua ứng dụng. Lưu ý rằng hủy vé trước giờ xe chạy 24h sẽ được hoàn tiền.",
+        "Không, nếu bạn muốn huỷ vé bạn phải liên hệ với nhân viên nhà xe. Lưu ý rằng hủy vé trước giờ xe chạy 24h sẽ được hoàn tiền.",
     },
     {
       question: "Nhà xe có chính sách giảm giá không?",
