@@ -13,6 +13,14 @@ import { useNavigation } from "@react-navigation/native"; // Thêm import useNav
 import { string } from "yup";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { FontAwesome } from "@expo/vector-icons"; // Import FontAwesome icons từ Expo
+/* import dayjs from "dayjs"; // Sử dụng dayjs để làm việc với thời gian dễ dàng hơn */
+import dayjs from "dayjs";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter"; // Plugin để so sánh ngày giờ
+import utc from "dayjs/plugin/utc"; // Plugin hỗ trợ UTC
+
+// Sử dụng các plugin
+dayjs.extend(isSameOrAfter);
+dayjs.extend(utc);
 // Định nghĩa kiểu cho props của màn hình TicketBookingScreen
 interface TicketBookingScreenProps {
   route: {
@@ -74,6 +82,27 @@ const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
+  // Sắp xếp các chuyến xe theo departureTime từ sáng đến tối
+  /*   const sortedTrips = trips.sort((a, b) => {
+    const timeA = new Date(a.departureTime).getTime(); // Chuyển departureTime thành đối tượng Date
+    const timeB = new Date(b.departureTime).getTime(); // Chuyển departureTime thành đối tượng Date
+    return timeA - timeB; // Sắp xếp theo thứ tự thời gian
+  }); */
+  // Lọc và sắp xếp các chuyến xe
+  // Lấy thời gian hiện tại
+  const currentTime = dayjs(); // Sử dụng dayjs để làm việc với thời gian dễ dàng hơn
+  const filteredAndSortedTrips = trips
+    .filter((trip) => {
+      // Lọc chỉ những chuyến đi có departureTime chưa qua
+      const tripTime = dayjs(trip.departureTime); // Chuyển departureTime thành đối tượng dayjs
+      return tripTime.isSameOrAfter(currentTime); // Kiểm tra xem departureTime có lớn hơn hoặc bằng thời gian hiện tại không
+    })
+    .sort((a, b) => {
+      const timeA = dayjs(a.departureTime).valueOf(); // Sử dụng valueOf() thay vì getTime()
+      const timeB = dayjs(b.departureTime).valueOf(); // Sử dụng valueOf() thay vì getTime()
+      return timeA - timeB; // Sắp xếp theo thứ tự thời gian
+    });
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("vi-VN", {
       currency: "VND",
@@ -102,6 +131,7 @@ const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
   const handleSelectTrip = (/* tripId: string */ trip: any) => {
     navigation.navigate("SeatSelectionScreen", { trip });
   };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <Header title="Chọn tuyến xe" />
@@ -115,12 +145,6 @@ const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
           Ngày khởi hành:{" "}
           {new Date(trips[0].departureTime).toLocaleDateString("vi-VN")}
         </Text>
-        {/*   <TouchableOpacity
-          style={styles.customButton}
-          onPress={() => setShowDatePicker(true)}
-        >
-          <Text style={styles.customButtonText}>Chọn ngày khác</Text>
-        </TouchableOpacity> */}
       </View>
 
       {showDatePicker && (
@@ -134,7 +158,7 @@ const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
       )}
 
       <FlatList
-        data={trips}
+        data={filteredAndSortedTrips}
         renderItem={({ item }) => (
           <View style={styles.ticket}>
             {/* Phần 1: Thông tin thời gian khởi hành, thời gian dự kiến đến và loại xe */}
@@ -148,14 +172,6 @@ const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
 
               {/* Khối chiều ngang 2 chứa thông tin thời gian */}
               <View style={styles.timeContainer}>
-                {/* <Text style={styles.ticketInfo}>
-                  <View></View>
-                  <Text>Bến xe: {item.route.startDistrict}</Text>
-                  <Text>Giờ khởi hành: {formatTime(item.departureTime)}</Text>
-                </Text>
-                <Text style={styles.ticketInfo}>
-                  Giờ đến dự kiến: {formatDateTime(item.arrivalTime)}
-                </Text> */}
                 <View style={styles.ticketInfo1}>
                   <Text style={styles.District}>
                     {item.route.startDistrict}
