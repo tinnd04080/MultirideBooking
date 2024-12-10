@@ -10,7 +10,10 @@ import {
   Alert,
 } from "react-native";
 import { getOnTicket, Ticket } from "../TicketDetail/api"; // Đảm bảo import API đúng
-import Header from "../../../../components/header/index";
+/* import Header from "../../../../components/header/index"; */
+import CustomHeader from "../../../../components/HeaderTicketDetails/index";
+import { useNavigation } from "@react-navigation/native"; // Import hook từ React Navigation
+
 import { styles } from "./style";
 import { Image } from "react-native"; // Đảm bảo nhập đúng Image từ react-native
 import PaymentComponent from "../../../../components/payment/index"; // Sử dụng export theo tên
@@ -19,6 +22,7 @@ interface TicketDetailsProps {
 }
 
 const TicketDetails: React.FC<TicketDetailsProps> = ({ route }) => {
+  const navigation = useNavigation(); // Lấy đối tượng navigation từ context
   const { ticketId } = route.params; // Lấy ticketId từ route.params
   const [ticketData, setTicketData] = useState<Ticket | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -138,7 +142,12 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({ route }) => {
         <RefreshControl refreshing={refreshing} /* onRefresh={onRefresh} */ />
       }
     >
-      <Header title="Chi tiết vé" />
+      {/*  <Header title="Chi tiết vé" /> */}
+      <CustomHeader
+        title="Chi tiết vé"
+        navigation={navigation}
+        backTo="Vé của tôi"
+      />
       <View style={styles.ticketBox}>
         {/* Tiêu đề chính */}
         <Text style={styles.mainTitle}>Chi tiết vé</Text>

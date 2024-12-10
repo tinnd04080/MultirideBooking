@@ -56,16 +56,16 @@ const BottomTabNavigator = () => {
           let iconName;
 
           switch (route.name) {
-            case "Home":
+            case "Trang chủ":
               iconName = "home";
               break;
-            case "Ticket":
+            case "Vé của tôi": //
               iconName = "confirmation-number";
               break;
-            case "Notification":
+            case "Thông báo":
               iconName = "notifications";
               break;
-            case "Profile":
+            case "Cá nhân":
               iconName = "person";
               break;
             default:
@@ -80,10 +80,10 @@ const BottomTabNavigator = () => {
         headerShown: false,
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Ticket" component={TicketScreen} />
-      <Tab.Screen name="Notification" component={NotificationScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Trang chủ" component={HomeScreen} />
+      <Tab.Screen name="Vé của tôi" component={TicketScreen} />
+      <Tab.Screen name="Thông báo" component={NotificationScreen} />
+      <Tab.Screen name="Cá nhân" component={ProfileScreen} />
     </Tab.Navigator>
   );
 };

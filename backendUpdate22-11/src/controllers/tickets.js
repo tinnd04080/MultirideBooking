@@ -8,17 +8,8 @@ import {
   PAYMENT_METHOD,
   PROMOTIONT_STATUS,
 } from "../constants/index.js";
-import Tickets from "../models/tickets.js";
 import randomNumber from "../utils/randomNumber.js";
-import Bus from "../models/bus.js";
 import createVNPayPaymentUrl from "../utils/payment.js";
-import Notification from "../models/notifications.js";
-import Trip from "../models/trips.js";
-import Seat from "../models/seats.js";
-import Promotion, { PromotionUsage } from "../models/promotion.js";
-import Seats from "../models/seats.js";
-import Permission from "../models/permissions.js";
-import BusRoutes from "../models/busRoutes.js";
 import qs from "qs";
 import moment from "moment";
 import crypto from "crypto";
@@ -27,6 +18,17 @@ import { createPaymentToken } from "../utils/zalopayService.js";
 import config from "../config/zalopay.js"; // Đảm bảo đường dẫn đúng và có phần mở rộng .js
 import CryptoJS from "crypto-js";
 import axios from "axios";
+/* import các thực thể  */
+import User from "../models/users.js"; // Thêm dòng này vào để import User
+import Permission from "../models/permissions.js";
+import BusRoutes from "../models/busRoutes.js";
+import Seats from "../models/seats.js";
+import Notification from "../models/notifications.js";
+import Trip from "../models/trips.js";
+import Seat from "../models/seats.js";
+import Bus from "../models/bus.js";
+import Tickets from "../models/tickets.js";
+import Promotion, { PromotionUsage } from "../models/promotion.js";
 
 const getListTicket = async (page, limit, queryObj = {}) => {
   // Lấy danh sách vé với điều kiện lọc queryObj
@@ -273,7 +275,7 @@ const TicketController = {
   //     });
   //   }
   // },
-  /* update 02/12 nhưng chưa có phần hủy vé thì sẽ trả lại mã */
+
   createTicket: async (req, res) => {
     try {
       const {
@@ -1036,7 +1038,7 @@ const TicketController = {
       });
     }
   },
-  getTopUsers: async (req, res) => {
+  /*  getTopUsers: async (req, res) => {
     try {
       // Truy vấn 1: Tính số lượng vé đã đặt cho từng người dùng
       const topUsersStats = await Tickets.aggregate([
@@ -1076,6 +1078,49 @@ const TicketController = {
       res.status(500).json({
         success: false,
         message: "Error fetching top users.",
+      });
+    }
+  }, */
+  getTopUsers: async (req, res) => {
+    try {
+      // Truy vấn 1: Tính số lượng vé đã đặt cho từng người dùng
+      const topUsersStats = await Tickets.aggregate([
+        {
+          $group: {
+            _id: "$user", // Nhóm theo `userId`
+            bookingCount: { $sum: 1 }, // Đếm số vé đặt
+          },
+        },
+        { $sort: { bookingCount: -1 } }, // Sắp xếp giảm dần theo số vé
+        { $limit: 5 }, // Lấy 5 người dùng có số vé cao nhất
+      ]);
+
+      // Truy vấn 2: Lấy thông tin chi tiết của người dùng
+      const userIds = topUsersStats.map((user) => user._id); // Lấy danh sách userId từ kết quả đầu tiên
+      const users = await User.find({ _id: { $in: userIds } }); // Lấy thông tin chi tiết người dùng từ bảng User
+
+      // Ghép thông tin người dùng với số vé đã đặt
+      const topUsers = topUsersStats.map((stat) => {
+        const user = users.find(
+          (user) => user._id.toString() === stat._id.toString()
+        );
+        return {
+          _id: stat._id,
+          name: user ? user.fullName : "N/A", // Nếu không tìm thấy thì trả về 'N/A'
+          email: user ? user.email : "N/A", // Nếu không tìm thấy thì trả về 'N/A'
+          bookingCount: stat.bookingCount,
+        };
+      });
+
+      res.json({
+        success: true,
+        data: topUsers, // Trả về danh sách top người dùng với số lượng vé đặt
+      });
+    } catch (error) {
+      console.error("Error fetching top users:", error); // Log lỗi chi tiết
+      res.status(500).json({
+        success: false,
+        message: `Error fetching top users: ${error.message}`, // Trả về thông tin lỗi chi tiết
       });
     }
   },
