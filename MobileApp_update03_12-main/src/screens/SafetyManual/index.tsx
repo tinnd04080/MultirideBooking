@@ -49,7 +49,7 @@ const SafetyManualScreen = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <Header title="Safety Manual" />
+      <Header title="Cẩm nang an toàn" />
       <ScrollView contentContainerStyle={styles.container}>
         {safetyTips.map((tip, index) => (
           <View key={index} style={styles.card}>

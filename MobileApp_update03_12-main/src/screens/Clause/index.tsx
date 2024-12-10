@@ -8,7 +8,7 @@ import Header from "../../components/header";
 const TermsAndConditionsScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <Header title="Terms and Conditions" />
+      <Header title="Điều khoản và điều kiện" />
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.sectionTitle}>1. Giới thiệu</Text>
         <Text style={styles.paragraph}>

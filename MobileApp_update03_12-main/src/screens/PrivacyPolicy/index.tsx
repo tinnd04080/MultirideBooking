@@ -6,7 +6,7 @@ import Header from "../../components/header";
 const PrivacyPolicyScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <Header title="Privacy Policy" />
+      <Header title="Chính sách quyền riêng tư" />
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.sectionTitle}>1. Thu thập thông tin cá nhân</Text>
         <Text style={styles.paragraph}>
