@@ -398,7 +398,7 @@ const TripController = {
         .json({ message: "Internal server error", error: error.message });
     }
   }, */
-  getTripsByRoute: async (req, res) => {
+  /* getTripsByRoute: async (req, res) => {
     try {
       const { startProvince, endProvince, departureDate } = req.query;
       console.log(
@@ -432,6 +432,75 @@ const TripController = {
         const endOfDay = new Date(
           new Date(departureDate).setUTCHours(23, 59, 59, 999)
         );
+        tripsQuery.departureTime = { $gte: startOfDay, $lte: endOfDay };
+      } else {
+        tripsQuery.departureTime = { $gte: new Date() };
+      }
+
+      const trips = await Trip.find(tripsQuery)
+        .populate(["route", "bus"])
+        .exec();
+
+      if (trips.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "Không tìm thấy chuyến xe phù hợp." });
+      }
+
+      // Tính số ghế trống cho mỗi chuyến xe và thêm vào dữ liệu chuyến xe
+      for (let trip of trips) {
+        const availableSeats = await Seats.countDocuments({
+          trip: trip._id,
+          status: SEAT_STATUS.EMPTY,
+        });
+        // Thêm availableSeats vào mỗi chuyến xe
+        trip.availableSeats = availableSeats;
+      }
+
+      return res.status(200).json({ trips });
+    } catch (error) {
+      console.error("Error occurred:", error);
+      res
+        .status(500)
+        .json({ message: "Internal server error", error: error.message });
+    }
+  }, */
+
+  getTripsByRoute: async (req, res) => {
+    try {
+      const { startProvince, endProvince, departureDate } = req.query;
+      console.log(
+        "startProvince:",
+        startProvince,
+        "endProvince:",
+        endProvince,
+        "departureDate:",
+        departureDate
+      );
+
+      const routes = await BusRoutes.find({
+        startProvince,
+        endProvince,
+      }).exec();
+
+      if (routes.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "Không tìm thấy tuyến xe phù hợp." });
+      }
+
+      const routeIds = routes.map((route) => route._id);
+
+      const tripsQuery = { route: { $in: routeIds } };
+
+      if (departureDate) {
+        // Sử dụng moment để tính toán startOfDay và endOfDay, chắc chắn là thời gian UTC hoặc múi giờ của bạn
+        const startOfDay = moment(departureDate).startOf("day").toDate(); // Múi giờ mặc định của hệ thống (hoặc UTC nếu muốn)
+        const endOfDay = moment(departureDate).endOf("day").toDate();
+
+        console.log("startOfDay:", startOfDay);
+        console.log("endOfDay:", endOfDay);
+
         tripsQuery.departureTime = { $gte: startOfDay, $lte: endOfDay };
       } else {
         tripsQuery.departureTime = { $gte: new Date() };

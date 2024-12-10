@@ -42,23 +42,34 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     return `${day}-${month}-${year}`;
   };
   // Handle date selection
-  const handleConfirmDate = (date: Date) => {
+  /* const handleConfirmDate = (date: Date) => {
     setDepartureDate(date);
     setDatePickerVisible(false);
+  }; */
+  const handleConfirmDate = (date: Date) => {
+    // Tạo đối tượng Date mới với múi giờ UTC
+    const adjustedDate = new Date(
+      Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+    );
+
+    console.log("UTC Adjusted Date:", adjustedDate); // Log ra giá trị chuẩn
+    setDepartureDate(adjustedDate); // Cập nhật state
+    setDatePickerVisible(false); // Đóng DateTimePicker
   };
 
   // Handle search button press
-  /* const handleSearch = async () => {
+  const handleSearch = async () => {
     try {
       const response = await tripApi.getTripsByRoute(
         departure,
         destination,
         departureDate
       );
+      console.log(departureDate);
 
       if (response && response.trips) {
         // In dữ liệu đã lấy được từ API ra console
-        console.log("Trips data fetched:", response.trips);
+        /* console.log("Trips data fetched:", response.trips); */
         navigation.navigate("TicketBookingScreen", {
           trips: response.trips,
           selectedDay: departureDate,
@@ -68,12 +79,24 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       } else {
         Alert.alert("Không tìm thấy chuyến đi phù hợp.");
       }
-    } catch (error) {
-      console.error("Lỗi khi tìm chuyến đi:", error);
-      Alert.alert("Có lỗi xảy ra. Vui lòng thử lại sau.");
+    } catch (error: any) {
+      // Log thông báo lỗi chi tiết từ server
+      if (error.response) {
+        console.error("Error response:", error.response.data);
+        Alert.alert(
+          "Vui lòng thao tác lại",
+          error.response.data.message || "Có lỗi xảy ra."
+        );
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+        Alert.alert("Không thể kết nối đến server");
+      } else {
+        console.error("Unexpected error:", error.message);
+        Alert.alert("Lỗi không xác định", error.message);
+      }
     }
-  }; */
-  const handleSearch = async () => {
+  };
+  /*  const handleSearch = async () => {
     if (!departure || !destination) {
       Alert.alert("Vui lòng chọn điểm khởi hành và điểm đến.");
       return;
@@ -102,7 +125,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       console.error("Lỗi khi tìm chuyến đi:", error);
       Alert.alert("Có lỗi xảy ra. Vui lòng thử lại sau.");
     }
-  };
+  }; */
 
   const handleItemClick = (item: any) => {
     const { title } = item;

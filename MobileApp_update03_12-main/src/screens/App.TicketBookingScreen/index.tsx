@@ -17,7 +17,7 @@ import { FontAwesome } from "@expo/vector-icons"; // Import FontAwesome icons t�
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter"; // Plugin để so sánh ngày giờ
 import utc from "dayjs/plugin/utc"; // Plugin hỗ trợ UTC
-
+import { Dropdown } from "react-native-element-dropdown";
 // Sử dụng các plugin
 dayjs.extend(isSameOrAfter);
 dayjs.extend(utc);
@@ -80,7 +80,13 @@ export type RootStackParamList = {
 const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
   const { trips, selectedDay } = route.params;
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedSeatCapacity, setSelectedSeatCapacity] = useState<{
+    label: string;
+    value: number | null;
+  } | null>(null);
+
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  console.log("Dữ liệu được lấy từ home:", trips);
 
   // Sắp xếp các chuyến xe theo departureTime từ sáng đến tối
   /*   const sortedTrips = trips.sort((a, b) => {
@@ -102,6 +108,19 @@ const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
       const timeB = dayjs(b.departureTime).valueOf(); // Sử dụng valueOf() thay vì getTime()
       return timeA - timeB; // Sắp xếp theo thứ tự thời gian
     });
+  const filteredBySeatCapacity = selectedSeatCapacity
+    ? filteredAndSortedTrips.filter(
+        (trip) => trip.bus.seatCapacity === selectedSeatCapacity
+      )
+    : filteredAndSortedTrips;
+
+  // Dữ liệu cho Dropdown
+  const seatOptions = [
+    { label: "Tất cả số ghế", value: null },
+    { label: "Xe 16 chỗ - ghế ngồi", value: 16 },
+    { label: "Xe 20 chỗ - giường nằm", value: 20 },
+    { label: "36 chỗ - ghế ngồi ", value: 36 },
+  ];
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -145,20 +164,42 @@ const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
           Ngày khởi hành:{" "}
           {new Date(trips[0].departureTime).toLocaleDateString("vi-VN")}
         </Text>
+        <Dropdown
+          /* renderLeftIcon={() => (
+            <FontAwesome
+              name="filter"
+              size={15}
+              color="#F8FAFC"
+              style={styles.iconStyle}
+            />
+          )} */
+          renderRightIcon={() => (
+            <FontAwesome name="chevron-down" size={15} color="#F8FAFC" />
+          )}
+          style={styles.dropdown}
+          placeholderStyle={styles.placeholderStyle}
+          selectedTextStyle={styles.selectedTextStyle}
+          data={seatOptions}
+          labelField="label"
+          valueField="value"
+          placeholder="Lọc theo loại xe"
+          value={selectedSeatCapacity}
+          onChange={(item) => setSelectedSeatCapacity(item.value)}
+        />
+        {showDatePicker && (
+          <DateTimePicker
+            value={selectedDay}
+            mode="date"
+            display="default"
+            minimumDate={new Date()}
+            // onChange={handleDateChange}
+          />
+        )}
+        {/* </View> */}
       </View>
 
-      {showDatePicker && (
-        <DateTimePicker
-          value={selectedDay}
-          mode="date"
-          display="default"
-          minimumDate={new Date()}
-          // onChange={handleDateChange}
-        />
-      )}
-
       <FlatList
-        data={filteredAndSortedTrips}
+        data={filteredBySeatCapacity}
         renderItem={({ item }) => (
           <View style={styles.ticket}>
             {/* Phần 1: Thông tin thời gian khởi hành, thời gian dự kiến đến và loại xe */}
@@ -237,7 +278,7 @@ const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
                   {item.bus ? item.bus.busTypeName : "Không có thông tin xe"}
                 </Text>
                 <Text style={styles.availableSeatsb}>
-                  Còn trống{" "}
+                  Xe {item.bus.seatCapacity} chỗ / trống{" "}
                   <Text style={{ color: "#D70000" }}>
                     {item.availableSeats}
                   </Text>{" "}

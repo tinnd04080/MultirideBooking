@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#FFF",
+    /* backgroundColor: "#FFF", */
   },
   dateDisplayContainer: {
     alignItems: "center",
@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
   currentDateText: {
     fontSize: 15,
     color: "#FFF7D1",
-    marginBottom: 8,
+    marginBottom: 3,
     fontWeight: "500",
   },
   routeDisplayText: {
@@ -191,4 +191,41 @@ export const styles = StyleSheet.create({
     flex: 1, // Tạo khoảng trống giữa hai phần tử thời gian
   },
   District: { fontSize: 17, color: "#000", fontWeight: "600" },
+  container: {
+    justifyContent: "center", // Căn giữa theo chiều dọc
+    alignItems: "center", // Căn giữa theo chiều ngang
+  },
+  dropdown: {
+    /* backgroundColor: "red", */
+    width: "45%",
+    marginBottom: 10,
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
+    color: "#F8FAFC",
+    justifyContent: "center", // Căn giữa theo chiều dọc trong dropdown
+  },
+  placeholderStyle: {
+    fontSize: 16,
+    color: "#F8FAFC",
+    fontWeight: "600",
+    textAlign: "center", // Căn giữa text trong placeholder
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+    color: "#F8FAFC",
+    fontWeight: "600",
+    textAlign: "center", // Căn giữa text khi đã chọn
+  },
+  tripItem: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F8FAFC",
+    justifyContent: "center", // Căn giữa nội dung trong trip item
+    alignItems: "center", // Căn giữa nội dung trong trip item theo chiều ngang
+  },
+  tripText: {
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center", // Căn giữa text trong tripText
+  },
 });
