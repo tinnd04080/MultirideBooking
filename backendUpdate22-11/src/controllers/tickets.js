@@ -428,9 +428,10 @@ const TicketController = {
       /* Nếu trong 10' không xử lý thanh toán thì vé sẽ bị hủy  */
       setTimeout(async () => {
         const ticketInfo = await Tickets.findById(ticket._id).exec();
+        console.log(`Giá trị ticketInfo ${ticketInfo}`);
 
         // Nếu người dùng chưa chọn phương thức thanh toán
-        if (ticketInfo.paymentMethod === PAYMENT_METHOD.PENDING) {
+        if (ticketInfo.status === TICKET_STATUS.PENDING) {
           // Cập nhật trạng thái vé
           ticketInfo.status = TICKET_STATUS.CANCELED;
           await ticketInfo.save();

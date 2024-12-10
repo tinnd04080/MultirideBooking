@@ -11,9 +11,21 @@ export const styles = StyleSheet.create({
     marginBottom: 20,
     color: "#343a40",
   },
+  firstView: {
+    justifyContent: "space-between",
+    flexDirection: "row",
+    width: "100%",
+    alignItems: "center",
+  },
+  secondView: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   ticketContainer: {
     flexDirection: "row",
-    paddingHorizontal: 16,
+    /* paddingHorizontal: 16, */
+    paddingStart: 16,
     paddingVertical: 10,
     backgroundColor: "#fff",
     marginBottom: 12,
@@ -27,9 +39,17 @@ export const styles = StyleSheet.create({
 
   leftSection: {
     justifyContent: "center",
+    /*   backgroundColor: "#000", */
   },
   rightSection: {
-    alignItems: "flex-end",
+    /*  alignItems: "flex-end", */
+    /* backgroundColor: "#000", */
+  },
+  textTotalAmount: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginTop: 10,
+    color: "#2d3436",
   },
   time: {
     fontSize: 30,
@@ -46,12 +66,24 @@ export const styles = StyleSheet.create({
     color: "#000",
     fontWeight: "500",
     marginTop: 10,
+    marginRight: 16,
+  },
+  createdAt: {
+    fontSize: 16,
+    color: "#000",
+    marginTop: 10,
+    marginRight: 16,
+    fontWeight: "500",
   },
   statusContainer: {
+    height: 40,
+    width: 130,
     paddingVertical: 6,
     paddingHorizontal: 12,
-    borderRadius: 20,
+    borderTopLeftRadius: 20, // Góc trên trái
+    borderBottomLeftRadius: 20, // Góc dưới trái không có bo tròn
     marginBottom: 4,
+    alignSelf: "flex-end",
   },
   statusText: {
     color: "#fff",
@@ -91,6 +123,7 @@ export const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold",
     color: "#005C78",
+    marginRight: 16,
   },
   noTicketsContainer: {
     flex: 1,
@@ -171,5 +204,12 @@ export const styles = StyleSheet.create({
   dropdownPlaceholder: {
     fontSize: 16,
     color: "#aaa", // Màu cho placeholder khi không có giá trị
+  },
+  line: {
+    width: "95%", // Chiều rộng của đường kẻ ngang
+    borderBottomWidth: 1, // Độ dày của đường kẻ
+    borderBottomColor: "#b2bec3", // Màu sắc của đường kẻ
+    borderStyle: "dashed", // Đường nét đứt
+    marginTop: 10,
   },
 });

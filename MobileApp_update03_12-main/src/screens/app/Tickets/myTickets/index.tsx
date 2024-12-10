@@ -25,6 +25,7 @@ interface Tickets {
   status: string;
   totalAmount: string;
   seatNumber: string;
+  createdAt: string;
   trip: {
     departureTime: string; // Trip là một đối tượng có thuộc tính departureTime
   };
@@ -87,12 +88,33 @@ const MyTicketsScreen: React.FC = () => {
   }; */
 
   /* Lấy dữ liệu từ api */
-  const fetchTickets = async (page: number) => {
+  /*  const fetchTickets = async (page: number) => {
     try {
       setLoading(true);
       const response = await getTickets(page); // Gọi API để lấy dữ liệu vé
       const { data, totalPage } = response;
       setTickets(page === 1 ? data : [...tickets, ...data]); // Nếu là trang 1, thay thế tất cả dữ liệu, nếu không thì nối thêm
+      setTotalPage(totalPage);
+    } catch (error: any) {
+      console.error("Error fetching tickets:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  }; */
+  const fetchTickets = async (page: number) => {
+    try {
+      setLoading(true);
+      const response = await getTickets(page); // Gọi API để lấy dữ liệu vé
+      const { data, totalPage } = response;
+
+      // Sắp xếp danh sách vé theo thứ tự từ mới nhất đến cũ nhất dựa vào trường `createdAt`
+      const sortedTickets = data.sort((a: any, b: any) => {
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
+        return dateB - dateA; // Sắp xếp theo thứ tự giảm dần (mới nhất ở đầu)
+      });
+
+      setTickets(page === 1 ? sortedTickets : [...tickets, ...sortedTickets]); // Nếu là trang 1, thay thế tất cả dữ liệu, nếu không thì nối thêm
       setTotalPage(totalPage);
     } catch (error: any) {
       console.error("Error fetching tickets:", error.message);
@@ -116,6 +138,16 @@ const MyTicketsScreen: React.FC = () => {
   };
 
   // Lọc vé theo tình trạng
+  /*  useEffect(() => {
+    if (selectedStatus === "ALL") {
+      setFilteredTickets(tickets);
+    } else {
+      const filtered = tickets.filter(
+        (ticket) => ticket.status === selectedStatus
+      );
+      setFilteredTickets(filtered);
+    }
+  }, [selectedStatus, tickets]); */
   useEffect(() => {
     if (selectedStatus === "ALL") {
       setFilteredTickets(tickets);
@@ -126,12 +158,14 @@ const MyTicketsScreen: React.FC = () => {
       setFilteredTickets(filtered);
     }
   }, [selectedStatus, tickets]);
+  /* Chuyển màn h */
   const handleSelectTrip = (/* tripId: string */ trip: any) => {
     navigation.navigate("Home");
   };
   const handleSelectTicket = (ticket: Tickets) => {
     navigation.navigate("TicketDetails", { ticketId: ticket._id }); // Truyền _id (hoặc 'code' nếu đó là _id)
   };
+
   // Các hàm định dạng
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -148,6 +182,15 @@ const MyTicketsScreen: React.FC = () => {
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
+  };
+  const formatTimeDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    return `${hours}:${minutes} - ${day}/${month}/${year}`;
   };
 
   const formatCurrency = (amount: number | string) => {
@@ -205,43 +248,53 @@ const MyTicketsScreen: React.FC = () => {
       onPress={() => handleSelectTicket(item)} // Gọi hàm khi bấm vào mục
     >
       <View style={styles.leftSection}>
-        <View
-          style={{
-            justifyContent: "space-between",
-            flexDirection: "row",
-            width: "100%",
-          }}
-        >
-          <Text style={styles.time}>{formatTime(item.trip.departureTime)}</Text>
-          <View style={[styles.statusContainer, getStatusStyle(item.status)]}>
-            <Text style={styles.statusText}>{getStatusText(item.status)}</Text>
+        <View style={styles.firstView}>
+          {/* View chứa "Xuất phát" và thời gian */}
+          <View style={{ flexDirection: "column" }}>
+            <Text style={styles.date}> Xuất bến</Text>
+            <Text style={styles.time}>
+              {formatTime(item.trip.departureTime)}
+            </Text>
+            <Text style={styles.date}>
+              Ngày {formatDate(item.trip.departureTime)}
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: "column",
+            }}
+          >
+            {/* Phần trạng thái */}
+            <View style={[styles.statusContainer, getStatusStyle(item.status)]}>
+              <Text style={styles.statusText}>
+                {getStatusText(item.status)}
+              </Text>
+            </View>
           </View>
         </View>
-
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: 10,
-          }}
-        >
+        <View style={styles.line} />
+        <View style={styles.secondView}>
           <View>
-            <Text style={styles.date}>
-              Xuất phát: {formatDate(item.trip.departureTime)}
+            <Text style={styles.route}>
+              Mã vé: <Text style={styles.code}>{item.code}</Text>{" "}
             </Text>
             <Text style={styles.route}>
               {item.busRoute.startProvince} - {item.busRoute.endProvince}
             </Text>
           </View>
           <View style={styles.rightSection}>
+            <Text style={styles.textTotalAmount}>Giá vé:</Text>
             <View style={{ alignItems: "flex-end" }}>
-              <Text style={styles.code}>{item.code}</Text>
               <Text style={styles.price}>
                 {formatCurrency(item.totalAmount)} đ
               </Text>
             </View>
           </View>
         </View>
+        <View style={styles.line} />
+        <Text style={styles.createdAt}>
+          Thời điểm phát hành vé: {formatTimeDate(item.createdAt)}
+        </Text>
       </View>
     </TouchableOpacity>
     /*    </View> */
