@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -14,10 +15,24 @@ import Header from "../../components/header";
 import profileApi from "../../services/updateUser/updateAPI";
 
 const EditProfileScreen = () => {
+  const [initialValues, setInitialValues] = useState({
+    phoneNumber: "",
+    fullName: "",
+    cccd: "",
+    password: "",
+    newPassword: "",
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Refs để tự động focus vào trường có lỗi
+  const fullNameInputRef = useRef<TextInput>(null);
+  const phoneNumberInputRef = useRef<TextInput>(null);
+  const cccdInputRef = useRef<TextInput>(null);
+  const passwordInputRef = useRef<TextInput>(null);
+  const newPasswordInputRef = useRef<TextInput>(null);
+
+  // Schema validate
   const validationSchema = Yup.object().shape({
-    userName: Yup.string()
-      .required("Tên người dùng không được để trống")
-      .min(2, "Tên người dùng quá ngắn"),
     phoneNumber: Yup.string()
       .matches(/^\d{10,11}$/, "Số điện thoại không hợp lệ")
       .required("Số điện thoại không được để trống"),
@@ -33,44 +48,87 @@ const EditProfileScreen = () => {
       .min(6, "Mật khẩu mới quá ngắn (tối thiểu 6 ký tự)"),
   });
 
-  const initialValues = {
-    userName: "",
-    phoneNumber: "",
-    fullName: "",
-    cccd: "",
-    password: "",
-    newPassword: "",
+  // Lấy dữ liệu profile
+  const fetchProfile = async () => {
+    try {
+      const profile = await profileApi.getProfile();
+      setInitialValues({
+        phoneNumber: profile.phoneNumber || "",
+        fullName: profile.fullName || "",
+        cccd: profile.cccd || "",
+        password: "",
+        newPassword: "",
+      });
+    } catch (error) {
+      Alert.alert(
+        "Lỗi",
+        "Không thể tải thông tin người dùng. Vui lòng thử lại."
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  // Xử lý lỗi và focus vào trường lỗi
+  const handleErrorFocus = (errors: any) => {
+    if (errors.fullName) {
+      fullNameInputRef.current?.focus();
+    } else if (errors.phoneNumber) {
+      phoneNumberInputRef.current?.focus();
+    } else if (errors.cccd) {
+      cccdInputRef.current?.focus();
+    } else if (errors.password) {
+      passwordInputRef.current?.focus();
+    } else if (errors.newPassword) {
+      newPasswordInputRef.current?.focus();
+    }
+  };
+
+  // Xử lý submit
   const handleSubmit = async (values: any) => {
     try {
-      // Gọi API cập nhật thông tin người dùng
-      const profileResponse = await profileApi.updateProfile({
-        userName: values.userName,
+      setIsLoading(true);
+
+      // Cập nhật thông tin
+      await profileApi.updateProfile({
         phoneNumber: values.phoneNumber,
         fullName: values.fullName,
         cccd: values.cccd,
       });
 
-      // Gọi API thay đổi mật khẩu
-      const passwordResponse = await profileApi.changePassword({
+      // Đổi mật khẩu
+      await profileApi.changePassword({
         password: values.password,
         newPassword: values.newPassword,
       });
 
-      // Thông báo thành công
       Alert.alert(
         "Cập nhật thành công",
         "Thông tin và mật khẩu đã được cập nhật."
       );
     } catch (error) {
-      // Thông báo lỗi
       Alert.alert(
         "Có lỗi xảy ra",
-        "Không thể cập nhật thông tin, vui lòng thử lại."
+        "Không thể cập nhật thông tin. Vui lòng thử lại."
       );
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  // Loading screen
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Đang tải thông tin...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -79,7 +137,11 @@ const EditProfileScreen = () => {
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
-          onSubmit={handleSubmit}
+          onSubmit={(values, { setErrors }) => {
+            handleSubmit(values);
+            handleErrorFocus(setErrors);
+          }}
+          enableReinitialize
         >
           {({
             handleChange,
@@ -90,22 +152,24 @@ const EditProfileScreen = () => {
             touched,
           }) => (
             <View>
-              {/* Tên người dùng */}
-              <Text style={styles.label}>Tên người dùng</Text>
+              {/* Họ tên */}
+              <Text style={styles.label}>Họ tên</Text>
               <TextInput
+                ref={fullNameInputRef}
                 style={styles.input}
-                placeholder="Nhập tên người dùng"
-                onChangeText={handleChange("userName")}
-                onBlur={handleBlur("userName")}
-                value={values.userName}
+                placeholder="Nhập họ tên"
+                onChangeText={handleChange("fullName")}
+                onBlur={handleBlur("fullName")}
+                value={values.fullName}
               />
-              {touched.userName && errors.userName && (
-                <Text style={styles.errorText}>{errors.userName}</Text>
+              {touched.fullName && errors.fullName && (
+                <Text style={styles.errorText}>{errors.fullName}</Text>
               )}
 
               {/* Số điện thoại */}
               <Text style={styles.label}>Số điện thoại</Text>
               <TextInput
+                ref={phoneNumberInputRef}
                 style={styles.input}
                 placeholder="Nhập số điện thoại"
                 keyboardType="numeric"
@@ -118,22 +182,10 @@ const EditProfileScreen = () => {
                 <Text style={styles.errorText}>{errors.phoneNumber}</Text>
               )}
 
-              {/* Họ tên */}
-              <Text style={styles.label}>Họ tên</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Nhập họ tên"
-                onChangeText={handleChange("fullName")}
-                onBlur={handleBlur("fullName")}
-                value={values.fullName}
-              />
-              {touched.fullName && errors.fullName && (
-                <Text style={styles.errorText}>{errors.fullName}</Text>
-              )}
-
               {/* CCCD */}
               <Text style={styles.label}>CCCD</Text>
               <TextInput
+                ref={cccdInputRef}
                 style={styles.input}
                 placeholder="Nhập CCCD"
                 keyboardType="numeric"
@@ -149,6 +201,7 @@ const EditProfileScreen = () => {
               {/* Mật khẩu */}
               <Text style={styles.label}>Mật khẩu cũ</Text>
               <TextInput
+                ref={passwordInputRef}
                 style={styles.input}
                 placeholder="Nhập mật khẩu cũ"
                 secureTextEntry
@@ -163,6 +216,7 @@ const EditProfileScreen = () => {
               {/* Mật khẩu mới */}
               <Text style={styles.label}>Mật khẩu mới</Text>
               <TextInput
+                ref={newPasswordInputRef}
                 style={styles.input}
                 placeholder="Nhập mật khẩu mới"
                 secureTextEntry
