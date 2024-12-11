@@ -65,4 +65,10 @@ export const styles = StyleSheet.create({
     color: "#555",
     marginTop: 4,
   },
+  loader: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
 });

@@ -1,4 +1,10 @@
-import { Image, SafeAreaView, Text, View } from "react-native";
+import {
+  Image,
+  SafeAreaView,
+  Text,
+  View,
+  ActivityIndicator,
+} from "react-native";
 import { styles } from "./style";
 import { FlashList } from "@shopify/flash-list";
 import Header from "../../../components/headerApp";
@@ -16,6 +22,7 @@ interface Notification {
 
 const NotificationScreen = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const renderItem = ({ item }: { item: Notification }) => (
     <View style={styles.notificationContainer}>
@@ -46,8 +53,9 @@ const NotificationScreen = () => {
     </View>
   );
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
+  const fetchNotifications = async () => {
+    setLoading(true);
+    try {
       const ticketData = await getNotifications();
       console.log("Stored Tickets:", ticketData);
 
@@ -84,20 +92,38 @@ const NotificationScreen = () => {
         }) || [];
 
       setNotifications(tickets);
-    };
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchNotifications();
+  useEffect(() => {
+    fetchNotifications(); // Initial fetch
+
+    const intervalId = setInterval(() => {
+      fetchNotifications(); // Fetch notifications every 5 seconds
+    }, 5000); // Update every 5 seconds
+
+    return () => {
+      clearInterval(intervalId); // Clear interval when component unmounts
+    };
   }, []);
 
   return (
     <SafeAreaView style={styles.container}>
       <Header title="Thông báo" />
-      <FlashList
-        data={notifications}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
-        estimatedItemSize={50}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />
+      ) : (
+        <FlashList
+          data={notifications}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          estimatedItemSize={50}
+        />
+      )}
     </SafeAreaView>
   );
 };

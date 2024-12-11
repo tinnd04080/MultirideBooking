@@ -1,6 +1,7 @@
 import axiosClient from "../Api/axiosClient";
 
 interface UpdateProfileRequest {
+  email: string;
   phoneNumber: string;
   fullName: string;
   cccd: string;

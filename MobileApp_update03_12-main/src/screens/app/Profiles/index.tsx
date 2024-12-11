@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Animated,
@@ -12,6 +12,7 @@ import {
 import { styles } from "./style";
 import Icon from "react-native-vector-icons/Ionicons";
 import Header from "../../../components/headerApp";
+import profileApi from "../../../services/updateUser/updateAPI";
 
 interface ProfileScreenProps {
   navigation: any;
@@ -20,6 +21,10 @@ interface ProfileScreenProps {
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const spinValue = useRef(new Animated.Value(0)).current; // Khởi tạo giá trị xoay
+
+  const [initialValues, setInitialValues] = useState({
+    fullname: "",
+  });
 
   const handleLogout = () => {
     Alert.alert("Đăng xuất", "Bạn có chắc chắn muốn đăng xuất?", [
@@ -46,6 +51,21 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     ]);
   };
 
+  const fetchProfile = async () => {
+    try {
+      const profile = await profileApi.getProfile();
+      setInitialValues({
+        fullname: profile.fullname || "",
+      });
+    } catch (error) {
+      Alert.alert("Lỗi!");
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
   // Tính toán giá trị xoay cho màn hình
   const spin = spinValue.interpolate({
     inputRange: [0, 1],
@@ -61,7 +81,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             source={require("../../../assets/logoSplash.png")}
             style={[styles.avatar, { transform: [{ rotate: spin }] }]}
           />
-          <Text style={styles.title}>MultiRide Booking</Text>
+          <Text style={styles.title}>{initialValues.fullname}</Text>
         </View>
 
         <View style={styles.termsSection}>
