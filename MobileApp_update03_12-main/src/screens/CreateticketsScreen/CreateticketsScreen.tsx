@@ -270,38 +270,18 @@ const SuccessScreen = ({ route }: any) => {
         return "#000000"; // Màu đen mặc định
     }
   };
+  /* Biến tính toán */
+  const originalPrice = ticketData.seatNumber.length * ticketData.trip.price;
+  const discount =
+    ticketData?.promotion?.discountAmount &&
+    ticketData?.seatNumber?.length &&
+    ticketData?.trip?.price
+      ? (ticketData.promotion.discountAmount / 100) *
+        (ticketData.seatNumber.length * ticketData.trip.price)
+      : 0; // Giá trị mặc định nếu không có đủ thông tin
+
   /* start các hàm của chọn phương thức thanh toán */
 
-  // Lọc icon theo giá trị đã chọn
-  /* const selectedPayment = payment.find((item) => item.value === value);
-  const selectedIcon = selectedPayment ? selectedPayment.icon : null; */
-  /* end */
-
-  /* Nút thanh toán */
-  /* const handlePaymentUpdate = async () => {
-    try {
-      console.log(value); // Phương thức thanh toán đã chọn
-      console.log(ticket._id); // ID của vé
-      console.log(token); // Token xác thực
-
-      // Gửi phương thức thanh toán lên API
-      const result = await updatePaymentMethod(ticket._id, value, token);
-      console.log("Payment method updated successfully:", result);
-
-      // Kiểm tra nếu phương thức thanh toán là ZALOPAY, lấy URL thanh toán
-      if (value === "ZALOPAY" && result && result.order_url) {
-        // Mở URL thanh toán ZaloPay trong trình duyệt di động
-        Linking.openURL(result.order_url).catch((err) => {
-          console.error("Failed to open URL:", err);
-        });
-      }
-
-      // Bạn có thể làm gì đó sau khi thành công, ví dụ điều hướng người dùng hoặc thông báo
-    } catch (error) {
-      console.error("Failed to update payment method:", error);
-    }
-  }; */
-  /* end */
   return (
     <ScrollView
       refreshControl={
@@ -323,7 +303,7 @@ const SuccessScreen = ({ route }: any) => {
           <View style={styles.infoRow}>
             <Text style={styles.label}>Chuyến xe:</Text>
             <Text style={styles.value}>
-              {ticketData.trip.route.startProvince} -{" "}
+              {ticketData.trip.route.startProvince} -
               {ticketData.trip.route.endProvince}
             </Text>
           </View>
@@ -355,6 +335,14 @@ const SuccessScreen = ({ route }: any) => {
                   <Text style={styles.selectedSeatText}>{seat}</Text>
                 </View>
               ))}
+            </View>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Sử dụng mã giảm giá:</Text>
+            <View style={styles.numberSeat}>
+              <Text style={styles.discount}>
+                {ticketData?.promotion?.code ?? "Không có"}
+              </Text>
             </View>
           </View>
           <View style={styles.infoRow}>
@@ -406,9 +394,21 @@ const SuccessScreen = ({ route }: any) => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Chi phí chuyến xe</Text>
           <View style={styles.infoRow}>
+            <View style={styles.infoRow}>
+              <Text style={styles.label}>Tạm tính ban đầu:</Text>
+              <Text style={styles.value}>
+                {`${formatCurrency(originalPrice)} VNĐ`}
+              </Text>
+            </View>
+            <View style={styles.infoRow}>
+              <Text style={styles.label}>Giảm giá:</Text>
+              <Text style={styles.value}>
+                - {`${formatCurrency(discount)} VNĐ`}
+              </Text>
+            </View>
             <Text style={styles.labelTolal}>Tổng tiền:</Text>
             <Text style={styles.valueHighlight}>
-              {formatCurrency(ticketData.totalAmount)} VND
+              {formatCurrency(ticketData.totalAmount)} VNĐ
             </Text>
             <View style={styles.infoRow}>
               <Text style={styles.label}>Phương thức thanh toán:</Text>
