@@ -146,7 +146,7 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({ route }) => {
       <CustomHeader
         title="Chi tiết vé"
         navigation={navigation}
-        backTo="Vé của tôi"
+        backTo="Ticket"
       />
       <View style={styles.ticketBox}>
         {/* Tiêu đề chính */}
