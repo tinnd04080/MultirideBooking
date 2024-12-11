@@ -458,9 +458,10 @@ const ListPendingOrders = () => {
         customerPhone: item.customerPhone,
         customerName: item.customerName,
         note: item.note,
-        totalPrice: item?.totalAmount
-        /*  code: item.promotion.code,
-        discountAmount: item.promotion.discountAmount */
+        totalPrice: item?.totalAmount,
+        code: item?.promotion?.code,
+        discountAmount: item?.promotion?.discountAmount,
+        price: item.trip.price
       }
     }))
 

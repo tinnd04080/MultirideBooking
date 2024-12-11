@@ -26,6 +26,7 @@ type TicketDetail = {
     totalPrice?: number
     code?: string
     discountAmount?: number
+    price?: number
   }
 }
 
@@ -59,6 +60,11 @@ const TicketDetails = ({ TicketDetail }: TicketDetail) => {
   const handleCancel = () => {
     setIsModalVisible(false)
   }
+  const originalPrice = (TicketDetail?.seatNumber?.length || 0) * (TicketDetail?.price || 0)
+  const discount =
+    TicketDetail?.discountAmount && TicketDetail?.seatNumber?.length && TicketDetail?.price
+      ? (TicketDetail.discountAmount / 100) * (TicketDetail.seatNumber.length * TicketDetail.price)
+      : 0
 
   return (
     <>
@@ -101,6 +107,10 @@ const TicketDetails = ({ TicketDetail }: TicketDetail) => {
             <p className='info-title'>Vị trí ghế:</p>
             <p className='info-content'>{TicketDetail.seatNumber?.join(', ')}</p>
           </div>
+          <div className='info-group'>
+            <p className='info-title'>Sử dụng mã giảm giá:</p>
+            <p className='info-content'>{TicketDetail?.code ?? 'Không sử dụng'}</p>
+          </div>
 
           <div className='info-group'>
             <p className='info-title'>Thời gian khởi hành:</p>
@@ -136,8 +146,12 @@ const TicketDetails = ({ TicketDetail }: TicketDetail) => {
             <FontAwesomeIcon icon={faWallet} /> Thông tin thanh toán
           </div>
           <div className='info-group'>
-            <p className='info-title'>Phần trăm giảm giá:</p>
-            <p className='info-content'>{formatCurrency(TicketDetail.discountAmount)}</p>
+            <p className='info-title'>Tạm tính ban đầu:</p>
+            <p className='info-content'>{formatCurrency(originalPrice)}</p>
+          </div>
+          <div className='info-group'>
+            <p className='info-title'>Giảm giá:</p>
+            <p className='info-content'>- {formatCurrency(discount)}</p>
           </div>
           <div className='info-group'>
             <p className='info-title'>Tổng tiền:</p>

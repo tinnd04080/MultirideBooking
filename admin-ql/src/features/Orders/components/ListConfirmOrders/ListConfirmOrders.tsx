@@ -441,7 +441,10 @@ const ListConfirmOrders = () => {
         customerName: item.customerName,
         note: item.note,
         totalPrice: item?.totalAmount,
-        invoiceCode: item?.invoiceCode
+        invoiceCode: item?.invoiceCode,
+        code: item?.promotion?.code,
+        discountAmount: item?.promotion?.discountAmount,
+        price: item.trip.price
       }
     }))
   /* const totalItems = dataTrip?.length // tổng số item thực tế
