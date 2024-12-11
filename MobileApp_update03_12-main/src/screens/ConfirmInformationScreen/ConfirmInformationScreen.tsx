@@ -520,7 +520,9 @@ const ConfirmInformation: React.FC = ({ route }: any) => {
                   ]}
                   placeholder="Nhập mã giảm giá"
                   value={discountCode}
-                  onChangeText={(text) => setDiscountCode(text.toUpperCase())}
+                  onChangeText={(text) =>
+                    setDiscountCode(text /* .toUpperCase() */)
+                  }
                   editable={!isDiscountApplied}
                 />
               </View>

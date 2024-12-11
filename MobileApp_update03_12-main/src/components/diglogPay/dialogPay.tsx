@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Animated,
   Image,
+  Alert,
 } from "react-native";
 import axiosClient from "../../services/Api/axiosClient"; // Đảm bảo đường dẫn chính xác
 import { ImageSourcePropType } from "react-native";
@@ -100,7 +101,7 @@ const Popup: React.FC<PopupProps> = ({
               setDescribe("Vui lòng thực hiện thanh toán");
               setImageSource(require("../../assets/pending.gif"));
               console.log("Updating ticket status for Id:", IdTickets);
-              setButtonText("Hủy vé"); // Cập nhật text nút
+              setButtonText("Hủy giao dịch"); // Cập nhật text nút
               // Gửi yêu cầu cập nhật trạng thái vé PAYMENTPENDING
               await axiosClient.put(`/tickets/update-status/${IdTickets}`, {
                 status: "PAYMENTPENDING",
@@ -158,15 +159,48 @@ const Popup: React.FC<PopupProps> = ({
 
       case "Tạo lại vé":
         console.log("Retrying payment...");
-        onClose();
+        navigation.navigate("Home");
         break;
 
-      case "Hủy vé":
+      /*  case "Hủy giao dịch":
         console.log("Cancelling transaction...");
         await axiosClient.put(`/tickets/update-status/${IdTickets}`, {
           status: "PAYMENTPENDING",
         });
-        onClose();
+        if (IdTickets) {
+          navigation.navigate("TicketDetails", { ticketId: IdTickets });
+        } else {
+          console.error("IdTickets is undefined.");
+        }
+        break; */
+      case "Hủy giao dịch":
+        Alert.alert(
+          "Giao dịch của bạn đã được hủy", // Tiêu đề (title)
+          "Vé của bạn sẽ được chuyển sang hình thức thanh toán tại quầy. Nhân viên sẽ liên hệ với bạn để xác nhận.", // Nội dung (label)
+          [
+            {
+              text: "OK",
+              onPress: async () => {
+                console.log("Cancelling transaction...");
+                try {
+                  await axiosClient.put(`/tickets/update-status/${IdTickets}`, {
+                    status: "PAYMENTPENDING",
+                  });
+
+                  if (IdTickets) {
+                    navigation.navigate("TicketDetails", {
+                      ticketId: IdTickets,
+                    });
+                  } else {
+                    console.error("IdTickets is undefined.");
+                  }
+                } catch (error) {
+                  console.error("Error cancelling transaction:", error);
+                }
+              },
+            },
+          ]
+        );
         break;
 
       default:
