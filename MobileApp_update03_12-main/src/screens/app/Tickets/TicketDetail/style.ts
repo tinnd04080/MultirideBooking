@@ -8,6 +8,7 @@ export const styles = StyleSheet.create({
     margin: 10,
     height: "100%",
   },
+
   ticketBox: {
     backgroundColor: "#fff",
     borderRadius: 20, // Bo góc cho hộp
@@ -167,6 +168,13 @@ export const styles = StyleSheet.create({
     textAlign: "right",
     marginLeft: "auto",
     flexWrap: "wrap",
+  },
+  discount: {
+    fontSize: 15,
+    color: "#000",
+    flexWrap: "wrap",
+    textAlign: "right",
+    fontWeight: "600",
   },
   selectedSeatText: {
     color: "#fff", // Màu chữ trắng

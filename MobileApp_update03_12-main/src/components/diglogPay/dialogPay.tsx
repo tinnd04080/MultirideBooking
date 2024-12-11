@@ -156,7 +156,7 @@ const Popup: React.FC<PopupProps> = ({
         } else {
           console.error("IdTickets is undefined.");
         }
-
+        break;
       case "Tạo lại vé":
         console.log("Retrying payment...");
         navigation.navigate("Home");

@@ -136,6 +136,17 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({ route }) => {
     return <Text>No ticket data found.</Text>;
   }
 
+  const originalPrice = ticketData.seatNumber.length * ticketData.trip.price;
+  const discount =
+    ticketData?.promotion?.discountAmount &&
+    ticketData?.seatNumber?.length &&
+    ticketData?.trip?.price
+      ? (ticketData.promotion.discountAmount / 100) *
+        (ticketData.seatNumber.length * ticketData.trip.price)
+      : 0; // Giá trị mặc định nếu không có đủ thông tin
+
+  /* start các hàm của chọn phương thức thanh toán */
+
   return (
     <ScrollView
       refreshControl={
@@ -197,6 +208,14 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({ route }) => {
             </View>
           </View>
           <View style={styles.infoRow}>
+            <Text style={styles.label}>Sử dụng mã giảm giá:</Text>
+            <View style={styles.numberSeat}>
+              <Text style={styles.discount}>
+                {ticketData?.promotion?.code ?? "Không có"}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.infoRow}>
             <Text style={styles.label}>Biển số xe:</Text>
             <Text style={styles.value}>
               {formatLicensePlate(ticketData.bus.licensePlate)}
@@ -245,6 +264,18 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({ route }) => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Chi phí chuyến xe</Text>
           <View style={styles.infoRow}>
+            <View style={styles.infoRow}>
+              <Text style={styles.label}>Tạm tính ban đầu:</Text>
+              <Text style={styles.value}>
+                {`${formatCurrency(originalPrice)} VNĐ`}
+              </Text>
+            </View>
+            <View style={styles.infoRow}>
+              <Text style={styles.label}>Giảm giá:</Text>
+              <Text style={styles.value}>
+                - {`${formatCurrency(discount)} VNĐ`}
+              </Text>
+            </View>
             <Text style={styles.labelTolal}>Tổng tiền:</Text>
             <Text style={styles.valueHighlight}>
               {formatCurrency(ticketData.totalAmount)} VND
