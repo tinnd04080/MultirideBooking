@@ -88,12 +88,6 @@ const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   console.log("Dữ liệu được lấy từ home:", trips);
 
-  // Sắp xếp các chuyến xe theo departureTime từ sáng đến tối
-  /*   const sortedTrips = trips.sort((a, b) => {
-    const timeA = new Date(a.departureTime).getTime(); // Chuyển departureTime thành đối tượng Date
-    const timeB = new Date(b.departureTime).getTime(); // Chuyển departureTime thành đối tượng Date
-    return timeA - timeB; // Sắp xếp theo thứ tự thời gian
-  }); */
   // Lọc và sắp xếp các chuyến xe
   // Lấy thời gian hiện tại
   const currentTime = dayjs(); // Sử dụng dayjs để làm việc với thời gian dễ dàng hơn
@@ -101,7 +95,7 @@ const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
     .filter((trip) => {
       // Lọc chỉ những chuyến đi có departureTime chưa qua
       const tripTime = dayjs(trip.departureTime); // Chuyển departureTime thành đối tượng dayjs
-      return tripTime.isSameOrAfter(currentTime); // Kiểm tra xem departureTime có lớn hơn hoặc bằng thời gian hiện tại không
+      return tripTime.isSameOrAfter(currentTime) && trip.status === "OPEN"; // Kiểm tra xem departureTime có lớn hơn hoặc bằng thời gian hiện tại và trạng thái là OPEN không
     })
     .sort((a, b) => {
       const timeA = dayjs(a.departureTime).valueOf(); // Sử dụng valueOf() thay vì getTime()
@@ -165,14 +159,6 @@ const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
           {new Date(trips[0].departureTime).toLocaleDateString("vi-VN")}
         </Text>
         <Dropdown
-          /* renderLeftIcon={() => (
-            <FontAwesome
-              name="filter"
-              size={15}
-              color="#F8FAFC"
-              style={styles.iconStyle}
-            />
-          )} */
           renderRightIcon={() => (
             <FontAwesome name="chevron-down" size={15} color="#F8FAFC" />
           )}
