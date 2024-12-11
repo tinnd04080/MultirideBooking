@@ -13,7 +13,6 @@ import { getOnTicket, Ticket } from "../TicketDetail/api"; // Đảm bảo impor
 /* import Header from "../../../../components/header/index"; */
 import CustomHeader from "../../../../components/HeaderTicketDetails/index";
 import { useNavigation } from "@react-navigation/native"; // Import hook từ React Navigation
-
 import { styles } from "./style";
 import { Image } from "react-native"; // Đảm bảo nhập đúng Image từ react-native
 import PaymentComponent from "../../../../components/payment/index"; // Sử dụng export theo tên

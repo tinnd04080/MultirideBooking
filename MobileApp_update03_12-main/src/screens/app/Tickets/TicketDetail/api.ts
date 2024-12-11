@@ -37,7 +37,7 @@ export interface Ticket {
   };
   trip: Trip;
   bus: Bus;
-  promotion: Promotion | null;
+  /* promotion: Promotion | null; */
   code?: string;
   boardingPoint?: string;
   dropOffPoint?: string;
@@ -48,6 +48,9 @@ export interface Ticket {
   note: string;
   customerPhone: number;
   customerName: string;
+  promotion: {
+    discountAmount: number;
+  };
 }
 
 // Hàm lấy thông tin vé theo ticketId
