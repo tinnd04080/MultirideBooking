@@ -50,6 +50,7 @@ export interface Ticket {
   customerName: string;
   promotion: {
     discountAmount: number;
+    code: number;
   };
 }
 

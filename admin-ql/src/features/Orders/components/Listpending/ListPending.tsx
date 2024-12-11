@@ -326,8 +326,8 @@ const ListPending = () => {
         customerName: item.customerName,
         note: item.note,
         totalPrice: item?.totalAmount,
-        code: item.promotion.code,
-        discountAmount: item.promotion.discountAmount,
+        code: item?.promotion?.code,
+        discountAmount: item?.promotion?.discountAmount,
         price: item.trip.price
       }
     }))

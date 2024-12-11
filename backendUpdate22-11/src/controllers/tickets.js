@@ -688,21 +688,20 @@ const TicketController = {
       }
 
       // Đặt timeout 10 phút
+
       setTimeout(async () => {
         const ticketInfo = await Tickets.findById(ticket._id).exec();
 
-        // Nếu người dùng chưa chọn phương thức thanh toán
         if (ticketInfo.status === TICKET_STATUS.PENDING) {
-          // Cập nhật trạng thái vé
           ticketInfo.status = TICKET_STATUS.CANCELED;
           await ticketInfo.save();
 
-          // cập nhật trạng thái ghế
           await updateSeatStt({
             tripId: tripInfo._id,
             seatNumber,
             status: SEAT_STATUS.EMPTY,
           });
+
           if (discountCode) {
             const discount = await Promotion.findOne({
               code: discountCode,
@@ -713,8 +712,7 @@ const TicketController = {
             }
           }
         }
-      }, 10 * 60 * 1000); // 10 phút
-
+      }, 10 * 60 * 1000);
       // Lấy thông tin chi tiết vé, bao gồm thông tin mã giảm giá
       const ticketInfo = await Tickets.findById(ticket._id)
         .populate({
