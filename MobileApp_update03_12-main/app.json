@@ -42,6 +42,7 @@
         "projectId": "fc807c23-7d07-44a8-a90c-e51d8da9467c"
       }
     },
-    "plugins": ["expo-localization"]
+    "plugins": ["expo-localization"],
+    "newArchEnabled": true
   }
 }

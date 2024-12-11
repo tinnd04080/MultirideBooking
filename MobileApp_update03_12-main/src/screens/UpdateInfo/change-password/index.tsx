@@ -59,15 +59,6 @@ const ChangePassWord = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="0000ff" />
-        <Text>Đang tải thông tin...</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={{ flex: 1 }}>
       <Header title="Đổi mật khẩu" />

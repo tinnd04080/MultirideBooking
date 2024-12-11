@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Alert, ScrollView, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  Alert,
+  ScrollView,
+  TextInput,
+  StyleSheet,
+} from "react-native";
 import Button from "../../../components/Button/button";
 import authApi from "../../../services/Auth/authApi";
 import { styles } from "./style";
 
 const OtpScreen = ({ route, navigation }: { route: any; navigation: any }) => {
   const { email } = route.params;
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [resendCountdown, setResendCountdown] = useState(60);
   const [isResendEnabled, setIsResendEnabled] = useState(false);
 
@@ -23,12 +30,13 @@ const OtpScreen = ({ route, navigation }: { route: any; navigation: any }) => {
   }, [resendCountdown]);
 
   const handleVerifyOtp = async () => {
-    if (!otp) {
+    const otpCode = otp.join(""); // Kết hợp các giá trị otp thành một chuỗi
+    if (!otpCode) {
       Alert.alert("Lỗi", "Vui lòng nhập mã OTP.");
       return;
     }
 
-    const data = { email: email, otp: otp };
+    const data = { email: email, otp: otpCode };
 
     try {
       const response = await authApi.verifyOtp(data);
@@ -57,6 +65,12 @@ const OtpScreen = ({ route, navigation }: { route: any; navigation: any }) => {
     }
   };
 
+  const handleOtpChange = (text: string, index: number) => {
+    const newOtp = [...otp];
+    newOtp[index] = text;
+    setOtp(newOtp);
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>🔒 Xác Minh OTP</Text>
@@ -65,14 +79,18 @@ const OtpScreen = ({ route, navigation }: { route: any; navigation: any }) => {
         <Text style={styles.email}>{email}</Text>
       </Text>
       <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Nhập mã OTP"
-          value={otp}
-          onChangeText={setOtp}
-          keyboardType="numeric"
-          maxLength={6}
-        />
+        {otp.map((digit, index) => (
+          <TextInput
+            key={index}
+            style={styles.input}
+            placeholder="•"
+            value={digit}
+            onChangeText={(text) => handleOtpChange(text, index)}
+            keyboardType="numeric"
+            maxLength={1}
+            autoFocus={index === 0}
+          />
+        ))}
       </View>
       <Button
         title="Xác Minh"

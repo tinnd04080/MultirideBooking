@@ -16,6 +16,7 @@ import profileApi from "../../services/updateUser/updateAPI";
 
 const EditProfileScreen = () => {
   const [initialValues, setInitialValues] = useState({
+    email: "",
     phoneNumber: "",
     fullName: "",
     cccd: "",
@@ -23,12 +24,16 @@ const EditProfileScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Refs để tự động focus vào trường có lỗi
+  const emailInputRef = useRef<TextInput>(null);
   const fullNameInputRef = useRef<TextInput>(null);
   const phoneNumberInputRef = useRef<TextInput>(null);
   const cccdInputRef = useRef<TextInput>(null);
 
   // Schema validate
   const validationSchema = Yup.object().shape({
+    email: Yup.string()
+      .email("Email không hợp lệ")
+      .required("Vui lòng nhập email"),
     phoneNumber: Yup.string()
       .matches(/^\d{10,11}$/, "Số điện thoại không hợp lệ")
       .required("Số điện thoại không được để trống"),
@@ -45,6 +50,7 @@ const EditProfileScreen = () => {
     try {
       const profile = await profileApi.getProfile();
       setInitialValues({
+        email: profile.email || "",
         phoneNumber: profile.phoneNumber || "",
         fullName: profile.fullName || "",
         cccd: profile.cccd || "",
@@ -84,6 +90,7 @@ const EditProfileScreen = () => {
         phoneNumber: values.phoneNumber,
         fullName: values.fullName,
         cccd: values.cccd,
+        email: "",
       });
 
       Alert.alert(
@@ -144,6 +151,22 @@ const EditProfileScreen = () => {
               />
               {touched.fullName && errors.fullName && (
                 <Text style={styles.errorText}>{errors.fullName}</Text>
+              )}
+
+              {/* Email */}
+              <Text style={styles.label}>Email</Text>
+              <TextInput
+                ref={emailInputRef}
+                placeholder="Nhập email của bạn"
+                value={values.email}
+                onChangeText={handleChange("email")}
+                onBlur={handleBlur("email")}
+                style={styles.input}
+                editable={false}
+                pointerEvents="none"
+              />
+              {touched.email && errors.email && (
+                <Text style={styles.errorText}>{errors.email}</Text>
               )}
 
               {/* Số điện thoại */}
