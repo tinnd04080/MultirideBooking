@@ -341,6 +341,7 @@ const ConfirmInformation: React.FC = ({ route }: any) => {
                 value={phoneNumber}
                 onChangeText={handlePhoneChange}
                 keyboardType="phone-pad"
+                maxLength={10}
               />
             </View>
             {phoneNumberError && (

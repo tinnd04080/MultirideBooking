@@ -1,12 +1,10 @@
 // provinces.ts
 export const provinces = [
-  "Hà Nội",
   "Hồ Chí Minh",
   "Đà Nẵng",
   "Thừa Thiên Huế",
   "Bình Định",
   "Quảng Ngãi",
-  "Quảng Bình",
 ];
 export const payment = [
   {

@@ -14,8 +14,11 @@ const authApi = {
   }) => {
     return axiosClient.post("auth/register", data); // Đường dẫn đăng ký
   },
-  verifyOtp: (data: { email: String; otp: string }) => {
+  verifyOtp: (data: { email: string; otp: string }) => {
     return axiosClient.post("/auth/verify-otp", data);
+  },
+  sendOtp: (email: string) => {
+    return axiosClient.post("/auth/send-otp", { email }); // Gửi OTP qua email
   },
 };
 

@@ -173,7 +173,7 @@ export const useRenderVoucher = () => {
       render: (status: string) => (
         <>
           <Tag color={status === 'EXPIRED' ? 'error' : 'green'} className=''>
-            {status === 'EXPIRED' ? 'Hết hạng' : 'Đang hoạt động'}
+            {status === 'EXPIRED' ? 'Hết hạn' : 'Đang hoạt động'}
           </Tag>
         </>
       ),
