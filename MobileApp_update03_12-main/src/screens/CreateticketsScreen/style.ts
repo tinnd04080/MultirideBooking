@@ -86,13 +86,20 @@ export const styles = StyleSheet.create({
   label: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#555",
+    color: "#000",
     textAlign: "right",
   },
   value: {
     fontSize: 15,
     color: "#000",
     flex: 1,
+    flexWrap: "wrap",
+    textAlign: "right",
+    fontWeight: "600",
+  },
+  discount: {
+    fontSize: 15,
+    color: "#000",
     flexWrap: "wrap",
     textAlign: "right",
     fontWeight: "600",
