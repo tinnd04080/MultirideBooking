@@ -330,7 +330,7 @@ const TicketController = {
   //     });
   //   }
   // },
-  createTicket: async (req, res) => {
+  /* createTicket: async (req, res) => {
     try {
       const {
         customerPhone,
@@ -536,9 +536,209 @@ const TicketController = {
         error: error.message,
       });
     }
+  }, */
+  //  Thêm trường
+  createTicket: async (req, res) => {
+    try {
+      const {
+        customerPhone,
+        customerName,
+        note,
+        trip,
+        seatNumber,
+        boardingPoint,
+        dropOffPoint,
+        status,
+        discountCode,
+      } = req.body;
+
+      // Kiểm tra thông tin các trường bắt buộc
+      if (!customerPhone || !customerName || !boardingPoint || !dropOffPoint) {
+        return res.status(400).json({
+          message: "Vui lòng nhập đầy đủ thông tin yêu cầu.",
+        });
+      }
+
+      const user = req.user.id;
+
+      let code;
+      // Hàm tạo mã vé duy nhất
+      const generateUniqueCode = async () => {
+        const randomLetters = () => {
+          const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Bảng chữ cái
+          return (
+            letters.charAt(Math.floor(Math.random() * letters.length)) +
+            letters.charAt(Math.floor(Math.random() * letters.length))
+          ); // Lấy 2 chữ cái ngẫu nhiên
+        };
+
+        // Lấy ngày, tháng, năm hiện tại (2 số cuối của năm)
+        const today = dayjs();
+        const datePart =
+          today.format("DDMM") + today.year().toString().slice(-2); // Lấy ngày, tháng và 2 số cuối năm
+
+        let newCode = `${randomLetters()}${datePart}- ${randomNumber(5)}`; // Tạo mã với ngày tháng năm (2 số cuối năm), 2 chữ cái và số ngẫu nhiên
+        const existingTicket = await Tickets.findOne({ code: newCode }).exec();
+        if (existingTicket) {
+          return generateUniqueCode(); // Tạo lại mã nếu mã đã tồn tại
+        }
+        return newCode;
+      };
+      // Tạo mã vé duy nhất
+      code = await generateUniqueCode();
+
+      // kiểm tra thông tin chuyến xe
+      const tripInfo = await Trip.findById(trip).populate("bus route").exec();
+      if (!tripInfo) {
+        return res.status(404).json({
+          message: "Chuyến xe không tồn tại",
+        });
+      }
+
+      if (dayjs().isAfter(tripInfo.departureTime)) {
+        return res.status(400).json({
+          message: "Chuyến xe đã khởi hành",
+        });
+      }
+
+      let totalAmount = tripInfo.price * seatNumber.length;
+
+      // kiểm tra trạng thái ghế
+      for await (let seat of seatNumber) {
+        const seatInfo = await Seats.findOne({
+          seatNumber: seat,
+          trip: tripInfo._id,
+        }).exec();
+
+        if (!seatInfo) {
+          return res.status(404).json({
+            message: "Không tìm thấy ghế",
+          });
+        }
+
+        if (seatInfo.status === SEAT_STATUS.SOLD) {
+          return res.status(406).json({
+            message: `Ghế ${seat} đã có người đặt`,
+          });
+        }
+      }
+
+      // cập nhật trạng thái ghế
+      await updateSeatStt({
+        tripId: tripInfo._id,
+        seatNumber,
+        status: SEAT_STATUS.SOLD,
+      });
+
+      let discount;
+      if (discountCode) {
+        discount = await Promotion.findOne({ code: discountCode }).exec();
+        if (!discount) {
+          return res.status(404).json({ message: "Mã giảm giá không tồn tại" });
+        }
+
+        // Kiểm tra trạng thái mã giảm giá
+        if (discount.status === PROMOTIONT_STATUS.EXPIRED) {
+          return res.status(400).json({ message: "Mã giảm giá đã hết hạn" });
+        }
+
+        // Tính giảm giá
+        if (discount.discountType === DISCOUNT_TYPE.AMOUNT) {
+          totalAmount -= discount.discountAmount;
+        } else {
+          const decreasePrice = (totalAmount * discount.discountAmount) / 100;
+          totalAmount -= decreasePrice;
+        }
+
+        totalAmount = totalAmount >= 0 ? totalAmount : 0;
+      }
+
+      const ticket = await new Tickets({
+        user,
+        customerPhone,
+        customerName,
+        note,
+        trip,
+        code,
+        seatNumber,
+        boardingPoint,
+        dropOffPoint,
+        status,
+        totalAmount,
+        promotion: discount ? discount._id : null, // Lưu mã giảm giá vào trường promotion
+      }).save();
+
+      // mã giảm giá
+      if (discountCode) {
+        await new PromotionUsage({
+          user,
+          ticket: ticket._id,
+          promotion: discount._id,
+        }).save();
+
+        // Cập nhật remainingCount
+        if (discount.remainingCount > 0) {
+          discount.remainingCount -= 1;
+          await discount.save();
+        } else {
+          return res
+            .status(400)
+            .json({ message: "Mã giảm giá đã hết lượt sử dụng" });
+        }
+      }
+
+      // Đặt timeout 10 phút
+      setTimeout(async () => {
+        const ticketInfo = await Tickets.findById(ticket._id).exec();
+
+        // Nếu người dùng chưa chọn phương thức thanh toán
+        if (ticketInfo.status === TICKET_STATUS.PENDING) {
+          // Cập nhật trạng thái vé
+          ticketInfo.status = TICKET_STATUS.CANCELED;
+          await ticketInfo.save();
+
+          // cập nhật trạng thái ghế
+          await updateSeatStt({
+            tripId: tripInfo._id,
+            seatNumber,
+            status: SEAT_STATUS.EMPTY,
+          });
+          if (discountCode) {
+            const discount = await Promotion.findOne({
+              code: discountCode,
+            }).exec();
+            if (discount) {
+              discount.remainingCount += 1;
+              await discount.save();
+            }
+          }
+        }
+      }, 10 * 60 * 1000); // 10 phút
+
+      // Lấy thông tin chi tiết vé, bao gồm thông tin mã giảm giá
+      const ticketInfo = await Tickets.findById(ticket._id)
+        .populate({
+          path: "trip",
+          populate: {
+            path: "bus route",
+          },
+        })
+        .populate("promotion") // Populates information from the Promotion model
+        .exec();
+
+      res.json({
+        message: "Create ticket successfully",
+        ticket: ticketInfo,
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Lỗi tạo vé",
+        error: error.message,
+      });
+    }
   },
 
-  getTickets: async (req, res) => {
+  /* getTickets: async (req, res) => {
     try {
       const {
         page = PAGINATION.PAGE,
@@ -583,6 +783,69 @@ const TicketController = {
       // Trả về kết quả với dữ liệu về tuyến xe (busRoute) đã được thêm vào
       res.json({
         data: ticketsWithRoute,
+        totalPage,
+        currentPage,
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  },
+ */
+  getTickets: async (req, res) => {
+    try {
+      const {
+        page = PAGINATION.PAGE,
+        limit = PAGINATION.LIMIT,
+        status,
+      } = req.query;
+
+      // Tạo đối tượng điều kiện truy vấn cho vé
+      let query = {};
+
+      // Nếu có status, thêm điều kiện lọc vào query
+      if (status) {
+        query.status = status;
+      }
+
+      // Lấy danh sách vé, trang hiện tại và tổng số trang từ getListTicket
+      const { tickets, currentPage, totalPage } = await getListTicket(
+        page,
+        limit,
+        query // Truy vấn với điều kiện lọc theo status
+      );
+
+      // Truy vấn thêm thông tin từ bảng BusRoutes và Promotion
+      const ticketsWithRouteAndPromotion = await Promise.all(
+        tickets.map(async (ticket) => {
+          // Lấy thông tin chuyến đi từ bảng Trip, giả sử mỗi vé có trip_id
+          const trip = await Trip.findById(ticket.trip);
+
+          // Kiểm tra xem trip có chứa route_id không
+          if (trip && trip.route) {
+            // Truy vấn bảng BusRoutes để lấy thông tin về tuyến xe từ route_id
+            const busRoute = await BusRoutes.findById(trip.route);
+
+            // Truy vấn bảng Promotion để lấy thông tin về khuyến mãi từ trường promotion
+            const promotion = ticket.promotion
+              ? await Promotion.findById(ticket.promotion)
+              : null;
+
+            return {
+              ...ticket.toObject(), // Bao gồm tất cả các dữ liệu từ ticket
+              busRoute: busRoute || null, // Thêm dữ liệu về tuyến xe vào mỗi vé
+              promotion: promotion || null, // Thêm thông tin khuyến mãi vào mỗi vé
+            };
+          }
+          return ticket;
+        })
+      );
+
+      // Trả về kết quả với dữ liệu về tuyến xe (busRoute) và khuyến mãi (promotion) đã được thêm vào
+      res.json({
+        data: ticketsWithRouteAndPromotion,
         totalPage,
         currentPage,
       });

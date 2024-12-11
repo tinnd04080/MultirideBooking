@@ -24,6 +24,8 @@ type TicketDetail = {
     customerName?: string
     note?: string
     totalPrice?: number
+    code?: string
+    discountAmount?: number
   }
 }
 
@@ -37,6 +39,7 @@ const TicketDetails = ({ TicketDetail }: TicketDetail) => {
     const day = date.getDate().toString().padStart(2, '0')
     const month = (date.getMonth() + 1).toString().padStart(2, '0')
     const year = date.getFullYear()
+    /* console.log('data trả về', TicketDetail) */
 
     return (
       <>
@@ -131,6 +134,10 @@ const TicketDetails = ({ TicketDetail }: TicketDetail) => {
           </div>
           <div className='modal-title'>
             <FontAwesomeIcon icon={faWallet} /> Thông tin thanh toán
+          </div>
+          <div className='info-group'>
+            <p className='info-title'>Phần trăm giảm giá:</p>
+            <p className='info-content'>{formatCurrency(TicketDetail.discountAmount)}</p>
           </div>
           <div className='info-group'>
             <p className='info-title'>Tổng tiền:</p>

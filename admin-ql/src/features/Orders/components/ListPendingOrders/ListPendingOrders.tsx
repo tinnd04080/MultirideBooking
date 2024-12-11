@@ -36,7 +36,6 @@ const ListPendingOrders = () => {
     status: 'PAYMENTPENDING',
     room: user._id
   })
-
   const memoOptions = useMemo(() => {
     setoptions((prev) => ({
       ...prev,
@@ -181,7 +180,11 @@ const ListPendingOrders = () => {
   const hasSelected = selectedRowKeys.length > 2
 
   const { data: dataTrip, isLoading, isError } = useGetAllOrderPendingQuery(options)
-
+  useEffect(() => {
+    if (dataTrip) {
+      console.log('Dữ liệu dataTrip: ', dataTrip)
+    }
+  }, [dataTrip])
   const columns: ColumnsType<any> = [
     {
       title: 'STT',
@@ -456,6 +459,8 @@ const ListPendingOrders = () => {
         customerName: item.customerName,
         note: item.note,
         totalPrice: item?.totalAmount
+        /*  code: item.promotion.code,
+        discountAmount: item.promotion.discountAmount */
       }
     }))
 

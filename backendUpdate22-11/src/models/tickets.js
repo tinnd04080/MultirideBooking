@@ -9,6 +9,10 @@ const ticketSchema = new Schema(
       ref: "users",
       required: true,
     },
+    promotion: {
+      type: Schema.Types.ObjectId,
+      ref: "promotions",
+    },
     customerPhone: {
       type: String,
       required: true,

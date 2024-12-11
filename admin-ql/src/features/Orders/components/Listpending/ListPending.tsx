@@ -180,6 +180,7 @@ const ListPending = () => {
   const hasSelected = selectedRowKeys.length > 2
 
   const { data: dataTrip, isLoading, isError } = useGetAllOrderPendingQuery(options)
+  console.log('Dữ liệu được get về: ', dataTrip)
 
   const columns: ColumnsType<any> = [
     {
@@ -324,7 +325,9 @@ const ListPending = () => {
         customerPhone: item.customerPhone,
         customerName: item.customerName,
         note: item.note,
-        totalPrice: item?.totalAmount
+        totalPrice: item?.totalAmount,
+        code: item.promotion.code,
+        discountAmount: item.promotion.discountAmount
       }
     }))
 
