@@ -23,6 +23,7 @@ import QAScreen from "./src/screens/QAScreen";
 import PrivacyPolicyScreen from "./src/screens/PrivacyPolicy";
 import TermsAndConditionsScreen from "./src/screens/Clause";
 import EditProfileScreen from "./src/screens/UpdateInfo";
+import ChangePassWord from "./src/screens/UpdateInfo/change-password";
 // RootStackParamList.ts
 export type RootStackParamList = {
   SplashScreen: undefined;
@@ -135,6 +136,7 @@ const App: React.FC = () => {
           component={TermsAndConditionsScreen}
         />
         <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
+        <Stack.Screen name="ChangePassWord" component={ChangePassWord} />
       </Stack.Navigator>
     </NavigationContainer>
   );

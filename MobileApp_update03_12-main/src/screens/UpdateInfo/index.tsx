@@ -19,8 +19,6 @@ const EditProfileScreen = () => {
     phoneNumber: "",
     fullName: "",
     cccd: "",
-    password: "",
-    newPassword: "",
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -28,8 +26,6 @@ const EditProfileScreen = () => {
   const fullNameInputRef = useRef<TextInput>(null);
   const phoneNumberInputRef = useRef<TextInput>(null);
   const cccdInputRef = useRef<TextInput>(null);
-  const passwordInputRef = useRef<TextInput>(null);
-  const newPasswordInputRef = useRef<TextInput>(null);
 
   // Schema validate
   const validationSchema = Yup.object().shape({
@@ -42,10 +38,6 @@ const EditProfileScreen = () => {
     cccd: Yup.string()
       .matches(/^\d{9,12}$/, "CCCD không hợp lệ")
       .required("CCCD không được để trống"),
-    password: Yup.string().required("Mật khẩu không được để trống"),
-    newPassword: Yup.string()
-      .required("Mật khẩu mới không được để trống")
-      .min(6, "Mật khẩu mới quá ngắn (tối thiểu 6 ký tự)"),
   });
 
   // Lấy dữ liệu profile
@@ -56,8 +48,6 @@ const EditProfileScreen = () => {
         phoneNumber: profile.phoneNumber || "",
         fullName: profile.fullName || "",
         cccd: profile.cccd || "",
-        password: "",
-        newPassword: "",
       });
     } catch (error) {
       Alert.alert(
@@ -81,10 +71,6 @@ const EditProfileScreen = () => {
       phoneNumberInputRef.current?.focus();
     } else if (errors.cccd) {
       cccdInputRef.current?.focus();
-    } else if (errors.password) {
-      passwordInputRef.current?.focus();
-    } else if (errors.newPassword) {
-      newPasswordInputRef.current?.focus();
     }
   };
 
@@ -98,12 +84,6 @@ const EditProfileScreen = () => {
         phoneNumber: values.phoneNumber,
         fullName: values.fullName,
         cccd: values.cccd,
-      });
-
-      // Đổi mật khẩu
-      await profileApi.changePassword({
-        password: values.password,
-        newPassword: values.newPassword,
       });
 
       Alert.alert(
@@ -197,37 +177,6 @@ const EditProfileScreen = () => {
               {touched.cccd && errors.cccd && (
                 <Text style={styles.errorText}>{errors.cccd}</Text>
               )}
-
-              {/* Mật khẩu */}
-              <Text style={styles.label}>Mật khẩu cũ</Text>
-              <TextInput
-                ref={passwordInputRef}
-                style={styles.input}
-                placeholder="Nhập mật khẩu cũ"
-                secureTextEntry
-                onChangeText={handleChange("password")}
-                onBlur={handleBlur("password")}
-                value={values.password}
-              />
-              {touched.password && errors.password && (
-                <Text style={styles.errorText}>{errors.password}</Text>
-              )}
-
-              {/* Mật khẩu mới */}
-              <Text style={styles.label}>Mật khẩu mới</Text>
-              <TextInput
-                ref={newPasswordInputRef}
-                style={styles.input}
-                placeholder="Nhập mật khẩu mới"
-                secureTextEntry
-                onChangeText={handleChange("newPassword")}
-                onBlur={handleBlur("newPassword")}
-                value={values.newPassword}
-              />
-              {touched.newPassword && errors.newPassword && (
-                <Text style={styles.errorText}>{errors.newPassword}</Text>
-              )}
-
               {/* Nút lưu */}
               <TouchableOpacity onPress={handleSubmit} style={styles.button}>
                 <Text style={styles.buttonText}>Lưu Thay Đổi</Text>

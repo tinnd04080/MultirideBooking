@@ -3,51 +3,39 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
-  },
-  header: {
-    fontSize: 22,
-    fontWeight: "bold",
-    padding: 16,
-    backgroundColor: "#2f5061",
-    color: "white",
-    textAlign: "center",
-    borderRadius: 8,
-    marginBottom: 12,
+    backgroundColor: "#f9f9f9",
   },
   notificationContainer: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    marginBottom: 12,
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
   },
   date: {
-    fontSize: 16,
-    color: "#6c757d",
-    marginBottom: 4,
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#444",
+    marginBottom: 8,
   },
   notificationBox: {
     flexDirection: "row",
     padding: 16,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 2,
-    backgroundColor: "white",
+    borderRadius: 8,
+    alignItems: "center",
   },
   successBox: {
-    borderColor: "#4caf50",
-    borderWidth: 2,
+    backgroundColor: "#e0f7e9", // Màu xanh nhạt cho thành công
+    borderLeftWidth: 4,
+    borderLeftColor: "#34c759", // Màu xanh thành công
   },
   failedBox: {
-    borderColor: "#f44336",
-    borderWidth: 2,
+    backgroundColor: "#fde8e8", // Màu đỏ nhạt cho thất bại
+    borderLeftWidth: 4,
+    borderLeftColor: "#ff3b30", // Màu đỏ thất bại
   },
   icon: {
     width: 40,
     height: 40,
-    marginRight: 12,
+    marginRight: 16,
   },
   infoContainer: {
     flex: 1,
@@ -55,24 +43,26 @@ export const styles = StyleSheet.create({
   successText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#4caf50",
+    color: "#34c759", // Màu xanh cho trạng thái thành công
   },
   failedText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#f44336",
+    color: "#ff3b30", // Màu đỏ cho trạng thái thất bại
   },
   route: {
     fontSize: 14,
-    marginVertical: 2,
-    color: "#343a40",
+    color: "#555",
+    marginTop: 4,
   },
   time: {
-    fontSize: 12,
-    color: "#6c757d",
+    fontSize: 14,
+    color: "#555",
+    marginTop: 4,
   },
   seats: {
-    fontSize: 12,
-    color: "#6c757d",
+    fontSize: 14,
+    color: "#555",
+    marginTop: 4,
   },
 });

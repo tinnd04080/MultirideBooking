@@ -117,6 +117,13 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           <Icon name="shield" size={24} color="#333" />
           <Text style={styles.itemText}>Chính Sách Quyền Riêng Tư</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.item}
+          onPress={() => navigation.navigate("ChangePassWord")}
+        >
+          <Icon name="lock" size={24} color="#333" />
+          <Text style={styles.itemText}>Đổi Mật Khẩu</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutText}>Đăng Xuất</Text>
