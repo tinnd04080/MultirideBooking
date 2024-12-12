@@ -1,4 +1,3 @@
-// provinces.ts
 export const provinces = [
   "Hồ Chí Minh",
   "Đà Nẵng",
@@ -6,6 +5,7 @@ export const provinces = [
   "Bình Định",
   "Quảng Ngãi",
 ];
+
 export const payment = [
   {
     label: "Zalopay",
@@ -19,7 +19,6 @@ export const payment = [
   },
 ];
 
-// popularRoutes.ts
 export const popularRoutes = [
   {
     title: "Hồ Chí Minh - Đà Nẵng (24P Vip)",

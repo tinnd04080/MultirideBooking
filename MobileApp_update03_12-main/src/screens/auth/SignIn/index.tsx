@@ -8,7 +8,7 @@ import {
   Alert,
   Image,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import authApi from "../../../services/Auth/authApi";
 import Checkbox from "../../../components/CheckBox";
 import { styles } from "./style";
@@ -70,7 +70,6 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
         }
 
         Alert.alert("Thành công", "Đăng nhập thành công!");
-        // Điều hướng đến màn hình chính hoặc bất kỳ màn hình nào sau khi đăng nhập
         navigation.navigate("MainTabs");
       } else {
         Alert.alert("Lỗi", "Đăng nhập không thành công.");
@@ -86,14 +85,13 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
       "Quên mật khẩu?",
       "Vui lòng liên hệ với bộ phận hỗ trợ để lấy lại mật khẩu."
     );
-    // Có thể thêm điều hướng đến màn hình quên mật khẩu nếu có
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.logoContainer}>
         <Image
-          source={require("../../../assets/logo.png")} // Thay đường dẫn với logo của bạn
+          source={require("../../../assets/logo.png")}
           style={styles.logo}
         />
       </View>
@@ -135,9 +133,9 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
 
         <Button title="Đăng Nhập" onPress={handleLogin} style={styles.button} />
 
-        {/* <TouchableOpacity onPress={handleForgotPassword}>
+        <TouchableOpacity onPress={handleForgotPassword}>
           <Text style={styles.link}>Quên mật khẩu?</Text>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
 
         <TouchableOpacity onPress={() => navigation.navigate("RegisterScreen")}>
           <Text style={styles.link}>Chưa có tài khoản? Đăng ký</Text>

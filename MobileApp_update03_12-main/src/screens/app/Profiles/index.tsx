@@ -12,7 +12,6 @@ import {
 import { styles } from "./style";
 import Icon from "react-native-vector-icons/Ionicons";
 import Header from "../../../components/headerApp";
-import profileApi from "../../../services/updateUser/updateAPI";
 
 interface ProfileScreenProps {
   navigation: any;
@@ -20,7 +19,7 @@ interface ProfileScreenProps {
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const spinValue = useRef(new Animated.Value(0)).current; // Khởi tạo giá trị xoay
+  const spinValue = useRef(new Animated.Value(0)).current;
 
   const [initialValues, setInitialValues] = useState({
     fullname: "",
@@ -36,35 +35,18 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       {
         text: "Đồng ý",
         onPress: () => {
-          // Bắt đầu xoay màn hình
           setIsLoggingOut(true);
           Animated.timing(spinValue, {
             toValue: 1,
-            duration: 3000, // Thời gian xoay 3 giây
+            duration: 3000,
             useNativeDriver: true,
           }).start(() => {
-            // Sau khi xoay xong, điều hướng về màn hình đăng nhập
             navigation.navigate("LoginScreen");
           });
         },
       },
     ]);
   };
-
-  const fetchProfile = async () => {
-    try {
-      const profile = await profileApi.getProfile();
-      setInitialValues({
-        fullname: profile.fullname || "",
-      });
-    } catch (error) {
-      Alert.alert("Lỗi!");
-    }
-  };
-
-  useEffect(() => {
-    fetchProfile();
-  }, []);
 
   // Tính toán giá trị xoay cho màn hình
   const spin = spinValue.interpolate({
@@ -81,7 +63,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             source={require("../../../assets/logoSplash.png")}
             style={[styles.avatar, { transform: [{ rotate: spin }] }]}
           />
-          <Text style={styles.title}>{initialValues.fullname}</Text>
+          <Text style={styles.title}>MultiRide Booking</Text>
         </View>
 
         <View style={styles.termsSection}>
@@ -141,7 +123,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           style={styles.item}
           onPress={() => navigation.navigate("ChangePassWord")}
         >
-          <Icon name="lock" size={24} color="#333" />
+          <Icon name="lock-closed" size={24} color="#333" />
           <Text style={styles.itemText}>Đổi Mật Khẩu</Text>
         </TouchableOpacity>
 

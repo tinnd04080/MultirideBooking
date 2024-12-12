@@ -22,7 +22,7 @@ interface Notification {
 
 const NotificationScreen = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true); // Hiển thị loading ban đầu
 
   const renderItem = ({ item }: { item: Notification }) => (
     <View style={styles.notificationContainer}>
@@ -45,16 +45,18 @@ const NotificationScreen = () => {
           <Text style={item.success ? styles.successText : styles.failedText}>
             {item.status}
           </Text>
+          {/* Uncomment nếu cần hiển thị thêm thông tin */}
+          {/* 
           <Text style={styles.route}>Tuyến: {item.route}</Text>
           <Text style={styles.time}>Thời gian: {item.time}</Text>
-          <Text style={styles.seats}>Ghế: {item.seats}</Text>
+          <Text style={styles.seats}>Ghế: {item.seats}</Text> 
+          */}
         </View>
       </View>
     </View>
   );
 
   const fetchNotifications = async () => {
-    setLoading(true);
     try {
       const ticketData = await getNotifications();
       console.log("Stored Tickets:", ticketData);
@@ -91,25 +93,28 @@ const NotificationScreen = () => {
           };
         }) || [];
 
-      setNotifications(tickets);
+      // Chỉ cập nhật nếu dữ liệu thay đổi
+      if (JSON.stringify(notifications) !== JSON.stringify(tickets)) {
+        setNotifications(tickets);
+      }
     } catch (error) {
       console.error("Error fetching notifications:", error);
     } finally {
-      setLoading(false);
+      setLoading(false); // Dừng loading sau lần fetch đầu tiên
     }
   };
 
   useEffect(() => {
-    fetchNotifications(); // Initial fetch
+    fetchNotifications(); // Lấy dữ liệu lần đầu
 
     const intervalId = setInterval(() => {
-      fetchNotifications(); // Fetch notifications every 5 seconds
-    }, 5000); // Update every 5 seconds
+      fetchNotifications(); // Gọi lại API mỗi 10 giây
+    }, 10000); // 10 giây
 
     return () => {
-      clearInterval(intervalId); // Clear interval when component unmounts
+      clearInterval(intervalId); // Dọn dẹp interval khi unmount
     };
-  }, []);
+  }, [notifications]); // Theo dõi notifications để cập nhật nếu cần
 
   return (
     <SafeAreaView style={styles.container}>

@@ -33,7 +33,7 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
   },
   button: {
-    backgroundColor: "1E90FF",
+    backgroundColor: "#1E90FF",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
