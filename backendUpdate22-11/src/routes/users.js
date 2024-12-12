@@ -16,7 +16,7 @@ userRouter.get("/:id", checkLogin, isAdmin, UserController.getUser);
 userRouter.put(
   "/:id/update-role",
   checkLogin,
-  isAdmin,
+  /* isAdmin, */
   UserController.updateUserRole
 );
 userRouter.put("/:id", checkLogin, isAdmin, UserController.updateUser);

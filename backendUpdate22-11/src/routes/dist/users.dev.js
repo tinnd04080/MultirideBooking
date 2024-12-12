@@ -20,7 +20,9 @@ userRouter.put("/profile", _auth.checkLogin, _users["default"].updateProfile);
 userRouter.post("/profile/change-password", _auth.checkLogin, _users["default"].changeProfilePassword);
 userRouter.get("/", _auth.checkLogin, _auth.isAdmin, _users["default"].getUsers);
 userRouter.get("/:id", _auth.checkLogin, _auth.isAdmin, _users["default"].getUser);
-userRouter.put("/:id/update-role", _auth.checkLogin, _auth.isAdmin, _users["default"].updateUserRole);
+userRouter.put("/:id/update-role", _auth.checkLogin,
+/* isAdmin, */
+_users["default"].updateUserRole);
 userRouter.put("/:id", _auth.checkLogin, _auth.isAdmin, _users["default"].updateUser);
 userRouter["delete"]("/:id", _auth.checkLogin, _auth.isAdmin, _users["default"].removeUser);
 var _default = userRouter;

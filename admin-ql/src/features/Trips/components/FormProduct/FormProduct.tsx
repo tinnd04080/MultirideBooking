@@ -39,13 +39,13 @@ const FormProduct = () => {
     isLoading: loadingProduct,
     isError: errorProudct
   } = useGetAllProductsQuery({
-    _page: 1,
-    _limit: 10,
+    page: 1,
+    limit: 50,
     query: ''
   })
   const { data: dataBusRoute } = useGetAllBusRouteQuery({
-    _page: 1,
-    _limit: 10,
+    page: 1,
+    limit: 50,
     query: ''
   })
   console.log(productEdit, 'productEdit')

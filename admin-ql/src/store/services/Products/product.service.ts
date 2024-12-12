@@ -23,7 +23,7 @@ export const productApi = createApi({
     getAllProducts: builder.query<IProductDocs, { page?: number; limit?: number; query?: string }>({
       query: ({ page, limit, query }) => {
         // Sử dụng các tham số destructured để thêm vào URL
-        return `/buses?page=${page}&limit=${limit}&query=${query}`
+        return `/buses?page=${page}&limit=${limit}`
       },
       providesTags: (result) => {
         return [{ type: 'Product', id: 'LIST' }]
@@ -64,8 +64,8 @@ export const productApi = createApi({
     }),
 
     /* ROUTES */
-    getAllBusRoute: builder.query<IProductDocs, { _page?: number; _limit?: number; query?: string }>({
-      query: ({ _page, _limit, query }) => `/bus-routes`,
+    getAllBusRoute: builder.query<IProductDocs, { page?: number; limit?: number; query?: string }>({
+      query: ({ page, limit, query }) => `/bus-routes??page=${page}&limit=${limit}`,
       providesTags: (result) => {
         return [{ type: 'Product', id: 'LIST' }]
       }
