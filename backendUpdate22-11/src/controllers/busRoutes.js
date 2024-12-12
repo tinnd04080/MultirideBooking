@@ -210,7 +210,7 @@ const BusRouteController = {
           // Nếu có chuyến xe đang hoạt động với status 'OPEN', không cho phép thay đổi status
           return res.status(400).json({
             message:
-              "Hiện đang có chuyến xe đang hoạt động. Không thể hủy tuyến.",
+              "Tuyến xe này đang có chuyến xe hoạt động. Không thể ngừng hoạt động tuyến.",
           });
         }
       }
