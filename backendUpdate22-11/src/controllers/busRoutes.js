@@ -3,6 +3,38 @@ import { PAGINATION } from "../constants/index.js";
 import BusRoutes from "../models/busRoutes.js";
 
 const BusRouteController = {
+  /*  createBusRoutes: async (req, res) => {
+    try {
+      const {
+        startProvince,
+        startDistrict,
+        endDistrict,
+        endProvince,
+        duration,
+        status,
+        distance,
+        pricePerKM,
+      } = req.body;
+
+      const busRoute = await new BusRoutes({
+        startProvince,
+        startDistrict,
+        endDistrict,
+        endProvince,
+        duration,
+        status,
+        distance,
+        pricePerKM,
+      }).save();
+
+      res.json(busRoute);
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }, */
   createBusRoutes: async (req, res) => {
     try {
       const {
@@ -16,6 +48,19 @@ const BusRouteController = {
         pricePerKM,
       } = req.body;
 
+      // Kiểm tra xem tuyến xe đã tồn tại hay chưa
+      const existingRoute = await BusRoutes.findOne({
+        startProvince,
+        endProvince,
+      });
+
+      if (existingRoute) {
+        return res.status(400).json({
+          message: "Tuyến xe đã tồn tại. Vui lòng tạo lại",
+        });
+      }
+
+      // Nếu không tồn tại, tiếp tục tạo mới tuyến xe
       const busRoute = await new BusRoutes({
         startProvince,
         startDistrict,

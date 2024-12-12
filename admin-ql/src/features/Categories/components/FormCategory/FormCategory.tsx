@@ -9,7 +9,7 @@ import { messageAlert } from '~/utils/messageAlert'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
-import { provinces } from '../../data/Data.tsx'
+import { provinces, districtData } from '../../data/Data.tsx'
 
 type FormCategoryProps = {
   open: boolean
@@ -35,7 +35,22 @@ const FormCategory = ({ open }: FormCategoryProps) => {
     }
   }, [cateData])
 
-  const onFinish = async (values: any) => {
+  /* const onFinish = async (values: any) => {
+    // Kiểm tra nếu startProvince và endProvince giống nhau
+    // Kiểm tra nếu startProvince và endProvince trùng nhau
+    if (values.startProvince === values.endProvince) {
+      form.setFields([
+        {
+          name: 'startProvince',
+          errors: ['Tỉnh/Thành phố xuất phát và Tỉnh/Thành phố đến không thể trùng nhau!']
+        },
+        {
+          name: 'endProvince',
+          errors: ['Tỉnh/Thành phố xuất phát và Tỉnh/Thành phố đến không thể trùng nhau!']
+        }
+      ])
+      return
+    }
     console.log(values, 'ccc')
     const formattedValues = {
       ...values,
@@ -49,7 +64,7 @@ const FormCategory = ({ open }: FormCategoryProps) => {
           messageAlert('Cập nhật Tuyến đường thành công', 'success')
           onClose()
         })
-        .catch(() => messageAlert('Cập nhật Tuyến đường thất bại', 'error'))
+        .catch(() => messageAlert('Cập nhật Tuyến đường thất bại 1', 'error'))
       return
     }
 
@@ -60,27 +75,98 @@ const FormCategory = ({ open }: FormCategoryProps) => {
         dispatch(setOpenDrawer(false))
         form.resetFields()
       })
-      .catch(() => message.error('Thêm Tuyến đường thất bại'))
+      .catch(() => message.error('Thêm Tuyến đường thất bại 2'))
+  } */
+  const onFinish = async (values: any) => {
+    // Kiểm tra nếu startProvince và endProvince giống nhau
+    if (values.startProvince === values.endProvince) {
+      form.setFields([
+        {
+          name: 'startProvince',
+          errors: ['Tỉnh/Thành phố xuất phát và Tỉnh/Thành phố đến không thể trùng nhau!']
+        },
+        {
+          name: 'endProvince',
+          errors: ['Tỉnh/Thành phố xuất phát và Tỉnh/Thành phố đến không thể trùng nhau!']
+        }
+      ])
+      return
+    }
+
+    console.log(values, 'ccc')
+
+    const formattedValues = {
+      ...values,
+      duration: values.duration ? values.duration.toISOString() : null // Chuyển đổi thành ISO string
+    }
+
+    try {
+      // Cập nhật nếu có cateData._id
+      if (cateData._id) {
+        await updateCategory({ _id: cateData._id, ...formattedValues }).unwrap()
+        messageAlert('Cập nhật Tuyến đường thành công', 'success')
+        onClose()
+        return
+      }
+
+      // Thêm mới tuyến đường nếu không có cateData._id
+      await addCategory(formattedValues).unwrap()
+      message.success('Thêm Tuyến đường thành công')
+      dispatch(setOpenDrawer(false))
+      form.resetFields()
+    } catch (error: any) {
+      // Lấy thông báo lỗi từ backend (nếu có)
+      const errorMessage = error?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại sau.'
+      message.error(errorMessage) // Hiển thị thông báo lỗi từ backend
+      const errorMessage2 = error?.data?.message
+      console.log('Thông báo từ backend:', errorMessage2)
+    }
   }
 
   const onClose = () => {
     dispatch(setOpenDrawer(false))
-    dispatch(setCategory({}))
+    dispatch(setCategory({ _id: '', name: '' }))
     form.resetFields()
   }
   const [dataTt, setDataTt] = useState<Province[]>([])
+  const [districts, setDistricts] = useState<string[]>([])
+  // useEffect(() => {
+  //   const handelFetch = async () => {
+  //     try {
+  //       const data = provinces
+  //       /* await axios.get('https://vn-public-apis.fpo.vn/provinces/getAll?limit=-1') */
+  //       setDataTt(data)
+  //     } catch (error) {
+  //       //
+  //     }
+  //   }
+  //   handelFetch()
+  // }, [])
   useEffect(() => {
     const handelFetch = async () => {
       try {
         const data = provinces
-        /* await axios.get('https://vn-public-apis.fpo.vn/provinces/getAll?limit=-1') */
         setDataTt(data)
       } catch (error) {
-        //
+        // Handle error if needed
       }
     }
     handelFetch()
   }, [])
+
+  // Cập nhật khi chọn tỉnh thành
+  const handleProvinceChange = (value: string, field: 'startProvince' | 'endProvince') => {
+    // Reset districts khi tỉnh thành thay đổi
+    setDistricts(districtData[value] || [])
+
+    // Reset trường quận/huyện nếu tỉnh thành thay đổi
+    if (field === 'startProvince') {
+      form.setFieldsValue({ startDistrict: undefined })
+    } else if (field === 'endProvince') {
+      form.setFieldsValue({ endDistrict: undefined })
+    }
+  }
+
   return (
     <Drawer
       title={cateData._id ? 'Cập nhật Tuyến đường' : 'Thêm Tuyến đường mới'}
@@ -103,16 +189,16 @@ const FormCategory = ({ open }: FormCategoryProps) => {
           name='startProvince'
           rules={[{ required: true, message: 'Vui lòng nhập tỉnh/thành phố xuất phát!' }]}
         >
-          <Select placeholder='Tỉnh/Thành phố xuất phát'>
-            {dataTt?.map((itc: any) => {
-              return (
-                <Select.Option key={itc._id} value={itc.name}>
-                  {itc.name}
-                </Select.Option>
-              )
-            })}
+          <Select
+            placeholder='Tỉnh/Thành phố xuất phát'
+            onChange={(value) => handleProvinceChange(value, 'startProvince')}
+          >
+            {dataTt?.map((itc) => (
+              <Select.Option key={itc._id} value={itc.name}>
+                {itc.name}
+              </Select.Option>
+            ))}
           </Select>
-          {/* <Input size='large' placeholder='Tỉnh/Thành phố xuất phát' /> */}
         </Form.Item>
 
         <Form.Item
@@ -120,7 +206,13 @@ const FormCategory = ({ open }: FormCategoryProps) => {
           name='startDistrict'
           rules={[{ required: true, message: 'Vui lòng nhập điểm xuất phát!' }]}
         >
-          <Input size='large' placeholder='Điểm xuất phát' />
+          <Select placeholder='Điểm xuất phát'>
+            {districts.map((district, index) => (
+              <Select.Option key={index} value={district}>
+                {district}
+              </Select.Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item
@@ -128,19 +220,23 @@ const FormCategory = ({ open }: FormCategoryProps) => {
           name='endProvince'
           rules={[{ required: true, message: 'Vui lòng nhập tỉnh/thành phố đến!' }]}
         >
-          <Select placeholder='Tỉnh/Thành phố đến'>
-            {dataTt?.map((itc: any) => {
-              return (
-                <Select.Option key={itc._id} value={itc.name}>
-                  {itc.name}
-                </Select.Option>
-              )
-            })}
+          <Select placeholder='Tỉnh/Thành phố đến' onChange={(value) => handleProvinceChange(value, 'endProvince')}>
+            {dataTt?.map((itc) => (
+              <Select.Option key={itc._id} value={itc.name}>
+                {itc.name}
+              </Select.Option>
+            ))}
           </Select>
         </Form.Item>
 
         <Form.Item label='Điểm đến' name='endDistrict' rules={[{ required: true, message: 'Vui lòng nhập điểm đến!' }]}>
-          <Input size='large' placeholder='Điểm đến' />
+          <Select placeholder='Điểm đến'>
+            {districts.map((district, index) => (
+              <Select.Option key={index} value={district}>
+                {district}
+              </Select.Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item label='Ngày' name='duration' rules={[{ required: true, message: 'Vui lòng chọn ngày!' }]}>
