@@ -1,8 +1,41 @@
 import dayjs from "dayjs";
 import { PAGINATION } from "../constants/index.js";
 import BusRoutes from "../models/busRoutes.js";
+import Trip from "../models/trips.js";
 
 const BusRouteController = {
+  /*  createBusRoutes: async (req, res) => {
+    try {
+      const {
+        startProvince,
+        startDistrict,
+        endDistrict,
+        endProvince,
+        duration,
+        status,
+        distance,
+        pricePerKM,
+      } = req.body;
+
+      const busRoute = await new BusRoutes({
+        startProvince,
+        startDistrict,
+        endDistrict,
+        endProvince,
+        duration,
+        status,
+        distance,
+        pricePerKM,
+      }).save();
+
+      res.json(busRoute);
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }, */
   createBusRoutes: async (req, res) => {
     try {
       const {
@@ -16,6 +49,19 @@ const BusRouteController = {
         pricePerKM,
       } = req.body;
 
+      // Kiểm tra xem tuyến xe đã tồn tại hay chưa
+      const existingRoute = await BusRoutes.findOne({
+        startProvince,
+        endProvince,
+      });
+
+      if (existingRoute) {
+        return res.status(400).json({
+          message: "Tuyến xe đã tồn tại. Vui lòng tạo lại",
+        });
+      }
+
+      // Nếu không tồn tại, tiếp tục tạo mới tuyến xe
       const busRoute = await new BusRoutes({
         startProvince,
         startDistrict,
@@ -101,8 +147,8 @@ const BusRouteController = {
       });
     }
   },
-
-  updateBusRoute: async (req, res) => {
+  /* update 12/12 */
+  /* updateBusRoute: async (req, res) => {
     try {
       const { id } = req.params;
       console.log(req.body);
@@ -139,40 +185,37 @@ const BusRouteController = {
         error: error.message,
       });
     }
-  },
-  /* update 1/12 */
-  /*   updateBusRoute: async (req, res) => {
+  }, */
+  updateBusRoute: async (req, res) => {
     try {
-      const { id } = req.params; // Lấy id tuyến xe từ tham số URL
-      console.log(req.body); // In ra dữ liệu body để kiểm tra
-
+      const { id } = req.params;
+      console.log(req.body);
       const {
         startProvince,
         startDistrict,
         endDistrict,
         endProvince,
         duration,
-        status, // Trạng thái của tuyến xe (status)
+        status,
         distance,
         pricePerKM,
       } = req.body;
 
-      // Kiểm tra xem tuyến xe này có đang tham gia chuyến xe nào không
-      const tripUsingBusRoute = await Trip.findOne({ busRouteId: id }); // Giả sử busRouteId là ID của tuyến xe trong bảng Trip
+      // Kiểm tra nếu trạng thái muốn thay đổi là 'CLOSED'
+      if (status === "CLOSED") {
+        // Kiểm tra xem có chuyến xe nào với busRouteId này và có status là 'OPEN'
+        const activeTrip = await Trip.findOne({ route: id, status: "OPEN" });
 
-      // Nếu tuyến xe đang tham gia chuyến xe và chuyến xe có status là OPEN
-      if (
-        tripUsingBusRoute &&
-        tripUsingBusRoute.status === "OPEN" &&
-        status !== tripUsingBusRoute.status
-      ) {
-        return res.status(400).json({
-          message:
-            "Không thể thay đổi trạng thái của tuyến xe khi chuyến xe đang ở trạng thái OPEN",
-        });
+        if (activeTrip) {
+          // Nếu có chuyến xe đang hoạt động với status 'OPEN', không cho phép thay đổi status
+          return res.status(400).json({
+            message:
+              "Tuyến xe này đang có chuyến xe hoạt động. Không thể ngừng hoạt động tuyến.",
+          });
+        }
       }
 
-      // Cập nhật thông tin tuyến xe
+      // Cập nhật BusRoute nếu không có chuyến xe đang hoạt động hoặc trạng thái của chuyến xe là 'CLOSED'
       const busRoute = await BusRoutes.findByIdAndUpdate(
         id,
         {
@@ -181,14 +224,14 @@ const BusRouteController = {
           endDistrict,
           endProvince,
           duration,
-          status, // Cập nhật trạng thái của tuyến xe
+          status,
           distance,
           pricePerKM,
         },
         { new: true }
       );
 
-      // Trả về thông tin tuyến xe đã được cập nhật
+      // Trả về BusRoute đã được cập nhật
       res.json(busRoute);
     } catch (error) {
       res.status(500).json({
@@ -196,7 +239,8 @@ const BusRouteController = {
         error: error.message,
       });
     }
-  }, */
+  },
+
   removeBusRoute: async (req, res) => {
     try {
       const { id } = req.params;

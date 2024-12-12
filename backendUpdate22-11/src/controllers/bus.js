@@ -1,6 +1,6 @@
 import { PAGINATION } from "../constants/index.js";
 import Bus from "../models/bus.js";
-import trip from "../models/trips.js";
+import Trip from "../models/trips.js";
 
 const BusController = {
   // Hàm tạo mới một bus
@@ -112,70 +112,50 @@ const BusController = {
     }
   },
 
-  // Hàm cập nhật thông tin một bus
-  /*   updateBus: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { busTypeName, seatCapacity, priceFactor, licensePlate } = req.body;
+  // updateBus: async (req, res) => {
+  //   try {
+  //     const { id } = req.params;
+  //     const { busTypeName, seatCapacity, priceFactor, licensePlate, status } =
+  //       req.body;
 
-      // Cập nhật thông tin xe bus
-      const bus = await Bus.findByIdAndUpdate(
-        id,
-        {
-          busTypeName,
-          seatCapacity,
-          priceFactor,
-          licensePlate,
-        },
-        { new: true }
-      ).exec();
+  //     /*   // Kiểm tra xem xe bus này có đang tham gia chuyến xe nào không
+  //     const tripUsingBus = await Trip.findOne({ busId: id });
 
-      if (!bus) {
-        return res.status(404).json({ message: "Bus not found" });
-      }
+  //     // Nếu xe đang tham gia chuyến xe và chuyến xe có status là OPEN
+  //     if (tripUsingBus && tripUsingBus.status === "OPEN") {
+  //       return res.status(400).json({
+  //         message:
+  //           "Xe không thể thay đổi trạng thái khi đang tham gia chuyến xe mở",
+  //       });
+  //     } */
 
-      res.json(bus);
-    } catch (error) {
-      res.status(500).json({
-        message: "Internal server error",
-        error: error.message,
-      });
-    }
-  }, */
-  /* Hàm chỉnh sửa xe. Cập nhật 12/01 */
-  /*  updateBus: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { busTypeName, seatCapacity, priceFactor, licensePlate, status } =
-        req.body;
+  //     // Cập nhật thông tin xe bus, bao gồm trường status nếu có
+  //     const bus = await Bus.findByIdAndUpdate(
+  //       id,
+  //       {
+  //         busTypeName,
+  //         seatCapacity,
+  //         priceFactor,
+  //         licensePlate,
+  //         status, // Cập nhật trường status
+  //       },
+  //       { new: true }
+  //     ).exec();
 
-      // Cập nhật thông tin xe bus, bao gồm trường status nếu có
-      const bus = await Bus.findByIdAndUpdate(
-        id,
-        {
-          busTypeName,
-          seatCapacity,
-          priceFactor,
-          licensePlate,
-          status, // Cập nhật trường status
-        },
-        { new: true }
-      ).exec();
+  //     // Kiểm tra nếu không tìm thấy bus
+  //     if (!bus) {
+  //       return res.status(404).json({ message: "Bus not found" });
+  //     }
 
-      // Kiểm tra nếu không tìm thấy bus
-      if (!bus) {
-        return res.status(404).json({ message: "Bus not found" });
-      }
-
-      // Trả về thông tin bus đã cập nhật
-      res.json(bus);
-    } catch (error) {
-      res.status(500).json({
-        message: "Internal server error",
-        error: error.message,
-      });
-    }
-  }, */
+  //     // Trả về thông tin bus đã cập nhật
+  //     res.json(bus);
+  //   } catch (error) {
+  //     res.status(500).json({
+  //       message: "Internal server error",
+  //       error: error.message,
+  //     });
+  //   }
+  // },
 
   updateBus: async (req, res) => {
     try {
@@ -183,16 +163,20 @@ const BusController = {
       const { busTypeName, seatCapacity, priceFactor, licensePlate, status } =
         req.body;
 
-      /*   // Kiểm tra xem xe bus này có đang tham gia chuyến xe nào không
-      const tripUsingBus = await Trip.findOne({ busId: id });
+      // Kiểm tra nếu status là 'CLOSED', thực hiện kiểm tra tình trạng chuyến xe
+      if (status === "CLOSED") {
+        // Truy vấn tất cả các chuyến xe liên quan đến bus này có status = "OPEN"
+        const tripUsingBus = await Trip.findOne({ bus: id, status: "OPEN" });
+        console.log(tripUsingBus);
 
-      // Nếu xe đang tham gia chuyến xe và chuyến xe có status là OPEN
-      if (tripUsingBus && tripUsingBus.status === "OPEN") {
-        return res.status(400).json({
-          message:
-            "Xe không thể thay đổi trạng thái khi đang tham gia chuyến xe mở",
-        });
-      } */
+        // Nếu tìm thấy chuyến xe nào có status là "OPEN", không cho phép chuyển bus thành "CLOSED"
+        if (tripUsingBus) {
+          return res.status(400).json({
+            message:
+              "Tuyến xe này có chuyến xe đang hoạt động. Không thể chuyển đổi trạng thái",
+          });
+        }
+      }
 
       // Cập nhật thông tin xe bus, bao gồm trường status nếu có
       const bus = await Bus.findByIdAndUpdate(
@@ -222,7 +206,6 @@ const BusController = {
     }
   },
 
-  // Hàm xóa một bus theo id
   removeBus: async (req, res) => {
     try {
       const { id } = req.params;

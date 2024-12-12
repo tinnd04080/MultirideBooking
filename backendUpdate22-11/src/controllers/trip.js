@@ -3,6 +3,8 @@ import Bus from "../models/bus.js";
 import Trip from "../models/trips.js";
 import BusRoutes from "../models/busRoutes.js";
 import Seats from "../models/seats.js";
+import Ticket from "../models/tickets.js";
+
 import { SEAT_STATUS } from "../constants/index.js";
 import { TRIP_STATUS } from "../constants/index.js";
 import moment from "moment";
@@ -221,40 +223,6 @@ const TripController = {
   /* updateTrip: async (req, res) => {
     try {
       const { id } = req.params;
-      const { route, bus, departureTime, arrivalTime } = req.body;
-
-      const busInfo = await Bus.findById(bus).exec();
-      const busRouteInfo = await BusRoutes.findById(route).exec();
-
-      if (!busInfo || !busRouteInfo) {
-        return res.status(404).json({
-          message: "An error occurred, please try again",
-        });
-      }
-
-      const newTrip = await Trip.findByIdAndUpdate(
-        id,
-        {
-          route,
-          bus,
-          departureTime,
-          arrivalTime,
-        },
-        { new: true }
-      ).exec();
-
-      res.json(newTrip);
-    } catch (error) {
-      res.status(500).json({
-        message: "Internal server error",
-        error: error.message,
-      });
-    }
-  }, */
-
-  updateTrip: async (req, res) => {
-    try {
-      const { id } = req.params;
       const { route, bus, departureTime, arrivalTime, status } = req.body;
 
       // Kiểm tra tính hợp lệ của status
@@ -312,6 +280,183 @@ const TripController = {
         error: error.message,
       });
     }
+  }, */
+  /* updateTrip: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { route, bus, departureTime, arrivalTime, status } = req.body;
+
+      // Kiểm tra tính hợp lệ của status
+      if (status && !Object.values(TRIP_STATUS).includes(status)) {
+        return res.status(400).json({
+          message: "Trạng thái bạn chọn không hợp lệ.",
+        });
+      }
+
+      // Lấy thông tin xe buýt và tuyến xe
+      const busInfo = await Bus.findById(bus).exec();
+      const busRouteInfo = await BusRoutes.findById(route).exec();
+
+      if (!busInfo || !busRouteInfo) {
+        return res.status(404).json({
+          message: "Không tìm thấy xe buýt hoặc tuyến đường, vui lòng thử lại.",
+        });
+      }
+
+      // Kiểm tra trạng thái thời gian chuyến đi
+      const now = new Date();
+      const departureDate = new Date(departureTime);
+      const arrivalDate = new Date(arrivalTime);
+
+      if (departureDate <= now && now <= arrivalDate) {
+        return res.status(400).json({
+          message:
+            "Không thể cập nhật trạng thái. Chuyến xe hiện tại đang chạy.",
+        });
+      }
+
+      // Nếu status muốn cập nhật là CLOSED, kiểm tra các vé liên quan đến chuyến đi
+      if (status === "CLOSED") {
+        // Truy vấn tất cả vé có liên kết với chuyến đi này
+        const tickets = await Ticket.find({ trip: id }).exec();
+
+        // Kiểm tra nếu có vé nào có trạng thái là PAID, PAYMENTPENDING hoặc PENDING
+        const ticketBlocked = tickets.some((ticket) =>
+          ["PAID", "PAYMENTPENDING", "PENDING"].includes(ticket.status)
+        );
+
+        if (ticketBlocked) {
+          return res.status(400).json({
+            message:
+              "Không thể chuyển chuyến xe này thành CLOSED vì có vé đã thanh toán hoặc đang chờ thanh toán.",
+          });
+        }
+      }
+
+      // Cập nhật chuyến đi
+      const newTrip = await Trip.findByIdAndUpdate(
+        id,
+        {
+          route,
+          bus,
+          departureTime,
+          arrivalTime,
+          status, // Cập nhật thêm trường status
+        },
+        { new: true } // Trả về document mới sau khi cập nhật
+      ).exec();
+
+      if (!newTrip) {
+        return res.status(404).json({
+          message: "Không tìm thấy chuyến xe, vui lòng thử lại",
+        });
+      }
+
+      res.json(newTrip);
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }, */
+  updateTrip: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { route, bus, departureTime, arrivalTime, status } = req.body;
+
+      // Kiểm tra tính hợp lệ của status
+      if (status && !Object.values(TRIP_STATUS).includes(status)) {
+        return res.status(400).json({
+          message: "Trạng thái bạn chọn không hợp lệ.",
+        });
+      }
+
+      // Lấy thông tin xe buýt và tuyến xe
+      const busInfo = await Bus.findById(bus).exec();
+      const busRouteInfo = await BusRoutes.findById(route).exec();
+
+      if (!busInfo || !busRouteInfo) {
+        return res.status(404).json({
+          message: "Không tìm thấy xe buýt hoặc tuyến đường, vui lòng thử lại.",
+        });
+      }
+
+      // Nếu status là OPEN, kiểm tra trạng thái của xe và tuyến xe
+      if (status === "OPEN") {
+        // Kiểm tra trạng thái của Bus
+        if (busInfo.status === "CLOSED") {
+          return res.status(400).json({
+            message:
+              "Xe không hoạt động. Hãy cập nhật lại trạng thái xe để thay đổi trạng thái.",
+          });
+        }
+
+        // Kiểm tra trạng thái của BusRoute
+        if (busRouteInfo.status === "CLOSED") {
+          return res.status(400).json({
+            message:
+              "Tuyến xe không hoạt động. Hãy cập nhật lại trạng thái tuyến xe để thay đổi trạng thái.",
+          });
+        }
+      }
+
+      // Kiểm tra trạng thái thời gian chuyến đi
+      const now = new Date();
+      const departureDate = new Date(departureTime);
+      const arrivalDate = new Date(arrivalTime);
+
+      if (departureDate <= now && now <= arrivalDate) {
+        return res.status(400).json({
+          message:
+            "Không thể cập nhật trạng thái. Chuyến xe hiện tại đang chạy.",
+        });
+      }
+
+      // Nếu status muốn cập nhật là CLOSED, kiểm tra các vé liên quan đến chuyến đi
+      if (status === "CLOSED") {
+        // Truy vấn tất cả vé có liên kết với chuyến đi này
+        const tickets = await Ticket.find({ trip: id }).exec();
+
+        // Kiểm tra nếu có vé nào có trạng thái là PAID, PAYMENTPENDING hoặc PENDING
+        const ticketBlocked = tickets.some((ticket) =>
+          ["PAID", "PAYMENTPENDING", "PENDING"].includes(ticket.status)
+        );
+
+        if (ticketBlocked) {
+          return res.status(400).json({
+            message:
+              "Không thể chuyển chuyến xe này thành CLOSED vì có vé đã thanh toán hoặc đang chờ thanh toán.",
+          });
+        }
+      }
+
+      // Cập nhật chuyến đi
+      const newTrip = await Trip.findByIdAndUpdate(
+        id,
+        {
+          route,
+          bus,
+          departureTime,
+          arrivalTime,
+          status, // Cập nhật thêm trường status
+        },
+        { new: true } // Trả về document mới sau khi cập nhật
+      ).exec();
+
+      if (!newTrip) {
+        return res.status(404).json({
+          message: "Không tìm thấy chuyến xe, vui lòng thử lại",
+        });
+      }
+
+      res.json(newTrip);
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
   },
 
   removeTrip: async (req, res) => {
@@ -332,139 +477,6 @@ const TripController = {
       });
     }
   },
-  /* getTripsByRoute: async (req, res) => {
-    try {
-      // Bước 1: Lấy dữ liệu từ request
-      const { startProvince, endProvince, departureDate } = req.query;
-      console.log(
-        "startProvince:",
-        startProvince,
-        "endProvince:",
-        endProvince,
-        "departureDate:",
-        departureDate
-      );
-
-      // Bước 2: Tìm tuyến xe theo startProvince và endProvince
-      const routes = await BusRoutes.find({
-        startProvince,
-        endProvince,
-      }).exec();
-
-      // Bước 2.1: Kiểm tra nếu không tìm thấy tuyến xe
-      if (routes.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "Không tìm thấy tuyến xe phù hợp." });
-      }
-
-      // Bước 2.2: Lấy danh sách ID của các tuyến xe tìm thấy
-      const routeIds = routes.map((route) => route._id);
-
-      // Bước 3: Tạo điều kiện truy vấn chuyến đi theo danh sách ID tuyến xe
-      const tripsQuery = { route: { $in: routeIds } };
-
-      // Bước 4: Xử lý logic về thời gian khởi hành
-      if (departureDate) {
-        const startOfDay = new Date(
-          new Date(departureDate).setUTCHours(0, 0, 0, 0)
-        );
-        const endOfDay = new Date(
-          new Date(departureDate).setUTCHours(23, 59, 59, 999)
-        );
-        tripsQuery.departureTime = { $gte: startOfDay, $lte: endOfDay };
-      } else {
-        tripsQuery.departureTime = { $gte: new Date() };
-      }
-
-      // Bước 5: Thực hiện truy vấn chuyến đi
-      const trips = await Trip.find(tripsQuery)
-        .populate(["route", "bus"])
-        .exec();
-
-      // Bước 6: Kiểm tra nếu không có chuyến xe phù hợp
-      if (trips.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "Không tìm thấy chuyến xe phù hợp." });
-      }
-
-      // Bước 7: Trả về danh sách chuyến xe phù hợp
-      return res.status(200).json({ trips });
-    } catch (error) {
-      console.error("Error occurred:", error);
-      res
-        .status(500)
-        .json({ message: "Internal server error", error: error.message });
-    }
-  }, */
-  /* getTripsByRoute: async (req, res) => {
-    try {
-      const { startProvince, endProvince, departureDate } = req.query;
-      console.log(
-        "startProvince:",
-        startProvince,
-        "endProvince:",
-        endProvince,
-        "departureDate:",
-        departureDate
-      );
-
-      const routes = await BusRoutes.find({
-        startProvince,
-        endProvince,
-      }).exec();
-
-      if (routes.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "Không tìm thấy tuyến xe phù hợp." });
-      }
-
-      const routeIds = routes.map((route) => route._id);
-
-      const tripsQuery = { route: { $in: routeIds } };
-
-      if (departureDate) {
-        const startOfDay = new Date(
-          new Date(departureDate).setUTCHours(0, 0, 0, 0)
-        );
-        const endOfDay = new Date(
-          new Date(departureDate).setUTCHours(23, 59, 59, 999)
-        );
-        tripsQuery.departureTime = { $gte: startOfDay, $lte: endOfDay };
-      } else {
-        tripsQuery.departureTime = { $gte: new Date() };
-      }
-
-      const trips = await Trip.find(tripsQuery)
-        .populate(["route", "bus"])
-        .exec();
-
-      if (trips.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "Không tìm thấy chuyến xe phù hợp." });
-      }
-
-      // Tính số ghế trống cho mỗi chuyến xe và thêm vào dữ liệu chuyến xe
-      for (let trip of trips) {
-        const availableSeats = await Seats.countDocuments({
-          trip: trip._id,
-          status: SEAT_STATUS.EMPTY,
-        });
-        // Thêm availableSeats vào mỗi chuyến xe
-        trip.availableSeats = availableSeats;
-      }
-
-      return res.status(200).json({ trips });
-    } catch (error) {
-      console.error("Error occurred:", error);
-      res
-        .status(500)
-        .json({ message: "Internal server error", error: error.message });
-    }
-  }, */
 
   getTripsByRoute: async (req, res) => {
     try {
