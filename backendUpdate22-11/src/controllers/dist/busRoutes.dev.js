@@ -11,6 +11,8 @@ var _index = require("../constants/index.js");
 
 var _busRoutes = _interopRequireDefault(require("../models/busRoutes.js"));
 
+var _trips = _interopRequireDefault(require("../models/trips.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var BusRouteController = {
@@ -196,8 +198,47 @@ var BusRouteController = {
       }
     }, null, null, [[0, 8]]);
   },
+
+  /* update 12/12 */
+
+  /* updateBusRoute: async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log(req.body);
+      const {
+        startProvince,
+        startDistrict,
+        endDistrict,
+        endProvince,
+        duration,
+        status,
+        distance,
+        pricePerKM,
+      } = req.body;
+        const busRoute = await BusRoutes.findByIdAndUpdate(
+        id,
+        {
+          startProvince,
+          startDistrict,
+          endDistrict,
+          endProvince,
+          duration,
+          status,
+          distance,
+          pricePerKM,
+        },
+        { new: true }
+      );
+        res.json(busRoute);
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }, */
   updateBusRoute: function updateBusRoute(req, res) {
-    var id, _req$body2, startProvince, startDistrict, endDistrict, endProvince, duration, status, distance, pricePerKM, busRoute;
+    var id, _req$body2, startProvince, startDistrict, endDistrict, endProvince, duration, status, distance, pricePerKM, activeTrip, busRoute;
 
     return regeneratorRuntime.async(function updateBusRoute$(_context4) {
       while (1) {
@@ -206,8 +247,33 @@ var BusRouteController = {
             _context4.prev = 0;
             id = req.params.id;
             console.log(req.body);
-            _req$body2 = req.body, startProvince = _req$body2.startProvince, startDistrict = _req$body2.startDistrict, endDistrict = _req$body2.endDistrict, endProvince = _req$body2.endProvince, duration = _req$body2.duration, status = _req$body2.status, distance = _req$body2.distance, pricePerKM = _req$body2.pricePerKM;
-            _context4.next = 6;
+            _req$body2 = req.body, startProvince = _req$body2.startProvince, startDistrict = _req$body2.startDistrict, endDistrict = _req$body2.endDistrict, endProvince = _req$body2.endProvince, duration = _req$body2.duration, status = _req$body2.status, distance = _req$body2.distance, pricePerKM = _req$body2.pricePerKM; // Kiểm tra nếu trạng thái muốn thay đổi là 'CLOSED'
+
+            if (!(status === "CLOSED")) {
+              _context4.next = 10;
+              break;
+            }
+
+            _context4.next = 7;
+            return regeneratorRuntime.awrap(_trips["default"].findOne({
+              route: id,
+              status: "OPEN"
+            }));
+
+          case 7:
+            activeTrip = _context4.sent;
+
+            if (!activeTrip) {
+              _context4.next = 10;
+              break;
+            }
+
+            return _context4.abrupt("return", res.status(400).json({
+              message: "Hiện đang có chuyến xe đang hoạt động. Không thể hủy tuyến."
+            }));
+
+          case 10:
+            _context4.next = 12;
             return regeneratorRuntime.awrap(_busRoutes["default"].findByIdAndUpdate(id, {
               startProvince: startProvince,
               startDistrict: startDistrict,
@@ -221,81 +287,28 @@ var BusRouteController = {
               "new": true
             }));
 
-          case 6:
+          case 12:
             busRoute = _context4.sent;
+            // Trả về BusRoute đã được cập nhật
             res.json(busRoute);
-            _context4.next = 13;
+            _context4.next = 19;
             break;
 
-          case 10:
-            _context4.prev = 10;
+          case 16:
+            _context4.prev = 16;
             _context4.t0 = _context4["catch"](0);
             res.status(500).json({
               message: "Internal server error",
               error: _context4.t0.message
             });
 
-          case 13:
+          case 19:
           case "end":
             return _context4.stop();
         }
       }
-    }, null, null, [[0, 10]]);
+    }, null, null, [[0, 16]]);
   },
-
-  /* update 1/12 */
-
-  /*   updateBusRoute: async (req, res) => {
-    try {
-      const { id } = req.params; // Lấy id tuyến xe từ tham số URL
-      console.log(req.body); // In ra dữ liệu body để kiểm tra
-        const {
-        startProvince,
-        startDistrict,
-        endDistrict,
-        endProvince,
-        duration,
-        status, // Trạng thái của tuyến xe (status)
-        distance,
-        pricePerKM,
-      } = req.body;
-        // Kiểm tra xem tuyến xe này có đang tham gia chuyến xe nào không
-      const tripUsingBusRoute = await Trip.findOne({ busRouteId: id }); // Giả sử busRouteId là ID của tuyến xe trong bảng Trip
-        // Nếu tuyến xe đang tham gia chuyến xe và chuyến xe có status là OPEN
-      if (
-        tripUsingBusRoute &&
-        tripUsingBusRoute.status === "OPEN" &&
-        status !== tripUsingBusRoute.status
-      ) {
-        return res.status(400).json({
-          message:
-            "Không thể thay đổi trạng thái của tuyến xe khi chuyến xe đang ở trạng thái OPEN",
-        });
-      }
-        // Cập nhật thông tin tuyến xe
-      const busRoute = await BusRoutes.findByIdAndUpdate(
-        id,
-        {
-          startProvince,
-          startDistrict,
-          endDistrict,
-          endProvince,
-          duration,
-          status, // Cập nhật trạng thái của tuyến xe
-          distance,
-          pricePerKM,
-        },
-        { new: true }
-      );
-        // Trả về thông tin tuyến xe đã được cập nhật
-      res.json(busRoute);
-    } catch (error) {
-      res.status(500).json({
-        message: "Internal server error",
-        error: error.message,
-      });
-    }
-  }, */
   removeBusRoute: function removeBusRoute(req, res) {
     var id, busRoute;
     return regeneratorRuntime.async(function removeBusRoute$(_context5) {

@@ -118,8 +118,6 @@ const FormCategory = ({ open }: FormCategoryProps) => {
       // Lấy thông báo lỗi từ backend (nếu có)
       const errorMessage = error?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại sau.'
       message.error(errorMessage) // Hiển thị thông báo lỗi từ backend
-      const errorMessage2 = error?.data?.message
-      console.log('Thông báo từ backend:', errorMessage2)
     }
   }
 
