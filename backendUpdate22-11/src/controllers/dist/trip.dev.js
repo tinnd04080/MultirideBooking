@@ -15,6 +15,8 @@ var _busRoutes = _interopRequireDefault(require("../models/busRoutes.js"));
 
 var _seats = _interopRequireDefault(require("../models/seats.js"));
 
+var _tickets = _interopRequireDefault(require("../models/tickets.js"));
+
 var _moment = _interopRequireDefault(require("moment"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
@@ -359,8 +361,62 @@ var TripController = {
       }
     }, null, null, [[0, 8]]);
   },
+
+  /* updateTrip: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { route, bus, departureTime, arrivalTime, status } = req.body;
+        // Kiểm tra tính hợp lệ của status
+      if (status && !Object.values(TRIP_STATUS).includes(status)) {
+        return res.status(400).json({
+          message: "Trạng thái bạn chọn không hợp lệ.",
+        });
+      }
+        // Lấy thông tin xe buýt và tuyến xe
+      const busInfo = await Bus.findById(bus).exec();
+      const busRouteInfo = await BusRoutes.findById(route).exec();
+        if (!busInfo || !busRouteInfo) {
+        return res.status(404).json({
+          message: "Không tìm thấy xe buýt hoặc tuyến đường, vui lòng thử lại.",
+        });
+      }
+        // Kiểm tra trạng thái thời gian chuyến đi
+      const now = new Date();
+      const departureDate = new Date(departureTime);
+      const arrivalDate = new Date(arrivalTime);
+        if (departureDate <= now && now <= arrivalDate) {
+        return res.status(400).json({
+          message:
+            "Không thể cập nhật trạng thái. Chuyến xe hiện tại đang chạy.",
+        });
+      }
+        // Cập nhật chuyến đi
+      const newTrip = await Trip.findByIdAndUpdate(
+        id,
+        {
+          route,
+          bus,
+          departureTime,
+          arrivalTime,
+          status, // Cập nhật thêm trường status
+        },
+        { new: true } // Trả về document mới sau khi cập nhật
+      ).exec();
+        if (!newTrip) {
+        return res.status(404).json({
+          message: "Không tìm thấy chuyến xe, vui lòng thử lại",
+        });
+      }
+        res.json(newTrip);
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }, */
   updateTrip: function updateTrip(req, res) {
-    var id, _req$body2, route, bus, departureTime, arrivalTime, status, busInfo, busRouteInfo, now, departureDate, arrivalDate, newTrip;
+    var id, _req$body2, route, bus, departureTime, arrivalTime, status, busInfo, busRouteInfo, now, departureDate, arrivalDate, tickets, ticketBlocked, newTrip;
 
     return regeneratorRuntime.async(function updateTrip$(_context4) {
       while (1) {
@@ -416,7 +472,34 @@ var TripController = {
             }));
 
           case 18:
-            _context4.next = 20;
+            if (!(status === "CLOSED")) {
+              _context4.next = 25;
+              break;
+            }
+
+            _context4.next = 21;
+            return regeneratorRuntime.awrap(_tickets["default"].find({
+              trip: id
+            }).exec());
+
+          case 21:
+            tickets = _context4.sent;
+            // Kiểm tra nếu có vé nào có trạng thái là PAID, PAYMENTPENDING hoặc PENDING
+            ticketBlocked = tickets.some(function (ticket) {
+              return ["PAID", "PAYMENTPENDING", "PENDING"].includes(ticket.status);
+            });
+
+            if (!ticketBlocked) {
+              _context4.next = 25;
+              break;
+            }
+
+            return _context4.abrupt("return", res.status(400).json({
+              message: "Không thể chuyển chuyến xe này thành CLOSED vì có vé đã thanh toán hoặc đang chờ thanh toán."
+            }));
+
+          case 25:
+            _context4.next = 27;
             return regeneratorRuntime.awrap(_trips["default"].findByIdAndUpdate(id, {
               route: route,
               bus: bus,
@@ -429,11 +512,11 @@ var TripController = {
             } // Trả về document mới sau khi cập nhật
             ).exec());
 
-          case 20:
+          case 27:
             newTrip = _context4.sent;
 
             if (newTrip) {
-              _context4.next = 23;
+              _context4.next = 30;
               break;
             }
 
@@ -441,25 +524,25 @@ var TripController = {
               message: "Không tìm thấy chuyến xe, vui lòng thử lại"
             }));
 
-          case 23:
+          case 30:
             res.json(newTrip);
-            _context4.next = 29;
+            _context4.next = 36;
             break;
 
-          case 26:
-            _context4.prev = 26;
+          case 33:
+            _context4.prev = 33;
             _context4.t0 = _context4["catch"](0);
             res.status(500).json({
               message: "Internal server error",
               error: _context4.t0.message
             });
 
-          case 29:
+          case 36:
           case "end":
             return _context4.stop();
         }
       }
-    }, null, null, [[0, 26]]);
+    }, null, null, [[0, 33]]);
   },
   removeTrip: function removeTrip(req, res) {
     var id, data, route, bus, trip;
