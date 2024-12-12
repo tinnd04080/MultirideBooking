@@ -80,7 +80,7 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     marginVertical: 10,
     color: "#333",
-    paddingHorizontal: 10,
+    paddingHorizontal: 13,
   },
   routeCard: {
     backgroundColor: "#fff",

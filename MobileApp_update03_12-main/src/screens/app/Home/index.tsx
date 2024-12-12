@@ -25,7 +25,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [isDatePickerVisible, setDatePickerVisible] = useState<boolean>(false);
   const [fadeAnim] = useState(new Animated.Value(0));
 
-  // Animation effect on load
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -42,10 +41,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     return `${day}-${month}-${year}`;
   };
   // Handle date selection
-  /* const handleConfirmDate = (date: Date) => {
-    setDepartureDate(date);
-    setDatePickerVisible(false);
-  }; */
   const handleConfirmDate = (date: Date) => {
     // Tạo đối tượng Date mới với múi giờ UTC
     const adjustedDate = new Date(
@@ -96,36 +91,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       }
     }
   };
-  /*  const handleSearch = async () => {
-    if (!departure || !destination) {
-      Alert.alert("Vui lòng chọn điểm khởi hành và điểm đến.");
-      return;
-    }
 
-    try {
-      const formattedDate = formatDate(departureDate); // Chuyển định dạng ngày
-      const response = await tripApi.getTripsByRoute(
-        departure,
-        destination,
-        departureDate
-      );
-
-      if (response && response.trips) {
-        console.log("Trips data fetched:", response.trips);
-        navigation.navigate("TicketBookingScreen", {
-          trips: response.trips,
-          selectedDay: departureDate,
-          departure: departure,
-          destination: destination,
-        });
-      } else {
-        Alert.alert("Không tìm thấy chuyến đi phù hợp.");
-      }
-    } catch (error) {
-      console.error("Lỗi khi tìm chuyến đi:", error);
-      Alert.alert("Có lỗi xảy ra. Vui lòng thử lại sau.");
-    }
-  }; */
+  const filterProvinces = (selectedProvince: string): string[] => {
+    return provinces.filter((province) => province !== selectedProvince);
+  };
 
   const handleItemClick = (item: any) => {
     const { title } = item;
@@ -155,7 +124,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             <Text style={styles.label}>Điểm khởi hành</Text>
             <RNPickerSelect
               onValueChange={(value) => setDeparture(value)}
-              items={provinces.map((province) => ({
+              items={filterProvinces(destination).map((province) => ({
                 label: province,
                 value: province,
               }))}
@@ -170,7 +139,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             <Text style={styles.label}>Điểm đến</Text>
             <RNPickerSelect
               onValueChange={(value) => setDestination(value)}
-              items={provinces.map((province) => ({
+              items={filterProvinces(departure).map((province) => ({
                 label: province,
                 value: province,
               }))}

@@ -3,25 +3,25 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F2F6FC", // Màu nền nhẹ nhàng
+    backgroundColor: "#F2F6FC",
     padding: 20,
   },
   title: {
     fontSize: 26,
     fontWeight: "bold",
     textAlign: "center",
-    color: "#2C3E50", // Màu sắc tươi sáng
+    color: "#2C3E50",
     marginVertical: 20,
   },
   subtitle: {
     fontSize: 16,
     textAlign: "center",
     marginBottom: 30,
-    color: "#7F8C8D", // Màu xám nhạt
+    color: "#7F8C8D",
   },
   email: {
     fontWeight: "bold",
-    color: "#2980B9", // Màu xanh dương nổi bật
+    color: "#2980B9",
   },
   inputContainer: {
     flexDirection: "row",
@@ -40,7 +40,7 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#2C3E50",
     marginHorizontal: 5,
-    shadowColor: "#BDC3C7", // Thêm bóng mờ nhẹ cho các ô nhập
+    shadowColor: "#BDC3C7",
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 3,

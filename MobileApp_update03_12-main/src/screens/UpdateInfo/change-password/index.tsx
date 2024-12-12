@@ -13,8 +13,10 @@ import profileApi from "../../../services/updateUser/updateAPI";
 import { styles } from "./style";
 import Header from "../../../components/header";
 import { Formik } from "formik";
+import { useNavigation } from "@react-navigation/native";
 
 const ChangePassWord = () => {
+  const navigation = useNavigation();
   const [initialValues, setInitialValues] = useState({
     password: "",
     newPassword: "",
@@ -48,7 +50,12 @@ const ChangePassWord = () => {
         newPassword: values.newPassword,
       });
 
-      Alert.alert("Cập nhật thành công", "Mật khẩu đã được cập nhật");
+      Alert.alert("Cập nhật thành công", "Mật khẩu đã được cập nhật", [
+        {
+          text: "OK",
+          onPress: () => navigation.navigate("Profile"),
+        },
+      ]);
     } catch (error) {
       Alert.alert(
         "Có lỗi xảy ra",

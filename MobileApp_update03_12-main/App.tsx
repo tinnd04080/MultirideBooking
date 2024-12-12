@@ -84,22 +84,22 @@ const BottomTabNavigator = () => {
       <Tab.Screen
         name="Home"
         component={HomeScreen}
-        options={{ title: "Trang chủ" }} // Đặt tiêu đề tiếng Việt
+        options={{ title: "Trang chủ" }}
       />
       <Tab.Screen
         name="Ticket"
         component={TicketScreen}
-        options={{ title: "Vé của bạn" }} // Đặt tiêu đề tiếng Việt
+        options={{ title: "Vé của bạn" }}
       />
       <Tab.Screen
         name="Notification"
         component={NotificationScreen}
-        options={{ title: "Thông báo" }} // Đặt tiêu đề tiếng Việt
+        options={{ title: "Thông báo" }}
       />
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
-        options={{ title: "Cá nhân" }} // Đặt tiêu đề tiếng Việt
+        options={{ title: "Cá nhân" }}
       />
     </Tab.Navigator>
   );
@@ -109,11 +109,12 @@ const App: React.FC = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="SplashScreen" //SplashScreen
+        initialRouteName="SplashScreen"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="SplashScreen" component={SplashScreen} />
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
+
         <Stack.Screen name="RegisterScreen" component={RegistrationScreen} />
         <Stack.Screen name="OtpScreen" component={OtpScreen} />
         <Stack.Screen name="MainTabs" component={BottomTabNavigator} />
@@ -128,7 +129,7 @@ const App: React.FC = () => {
         />
         <Stack.Screen
           name="ConfirmInformation"
-          component={ConfirmInformation} // Thêm màn hình ConfirmInformation vào đây
+          component={ConfirmInformation}
         />
         <Stack.Screen
           name="CreateticketsScreen"

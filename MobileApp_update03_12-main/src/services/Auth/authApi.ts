@@ -12,13 +12,13 @@ const authApi = {
     cccd: string;
     password: string;
   }) => {
-    return axiosClient.post("auth/register", data); // Đường dẫn đăng ký
+    return axiosClient.post("auth/register", data);
   },
   verifyOtp: (data: { email: string; otp: string }) => {
     return axiosClient.post("/auth/verify-otp", data);
   },
   sendOtp: (email: string) => {
-    return axiosClient.post("/auth/send-otp", { email }); // Gửi OTP qua email
+    return axiosClient.post("/auth/send-otp", { email });
   },
 };
 

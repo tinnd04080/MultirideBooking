@@ -30,7 +30,7 @@ const OtpScreen = ({ route, navigation }: { route: any; navigation: any }) => {
   }, [resendCountdown]);
 
   const handleVerifyOtp = async () => {
-    const otpCode = otp.join(""); // Kết hợp các giá trị otp thành một chuỗi
+    const otpCode = otp.join("");
     if (!otpCode) {
       Alert.alert("Lỗi", "Vui lòng nhập mã OTP.");
       return;
