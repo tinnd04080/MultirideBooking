@@ -281,6 +281,85 @@ const TripController = {
       });
     }
   }, */
+  /* updateTrip: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { route, bus, departureTime, arrivalTime, status } = req.body;
+
+      // Kiểm tra tính hợp lệ của status
+      if (status && !Object.values(TRIP_STATUS).includes(status)) {
+        return res.status(400).json({
+          message: "Trạng thái bạn chọn không hợp lệ.",
+        });
+      }
+
+      // Lấy thông tin xe buýt và tuyến xe
+      const busInfo = await Bus.findById(bus).exec();
+      const busRouteInfo = await BusRoutes.findById(route).exec();
+
+      if (!busInfo || !busRouteInfo) {
+        return res.status(404).json({
+          message: "Không tìm thấy xe buýt hoặc tuyến đường, vui lòng thử lại.",
+        });
+      }
+
+      // Kiểm tra trạng thái thời gian chuyến đi
+      const now = new Date();
+      const departureDate = new Date(departureTime);
+      const arrivalDate = new Date(arrivalTime);
+
+      if (departureDate <= now && now <= arrivalDate) {
+        return res.status(400).json({
+          message:
+            "Không thể cập nhật trạng thái. Chuyến xe hiện tại đang chạy.",
+        });
+      }
+
+      // Nếu status muốn cập nhật là CLOSED, kiểm tra các vé liên quan đến chuyến đi
+      if (status === "CLOSED") {
+        // Truy vấn tất cả vé có liên kết với chuyến đi này
+        const tickets = await Ticket.find({ trip: id }).exec();
+
+        // Kiểm tra nếu có vé nào có trạng thái là PAID, PAYMENTPENDING hoặc PENDING
+        const ticketBlocked = tickets.some((ticket) =>
+          ["PAID", "PAYMENTPENDING", "PENDING"].includes(ticket.status)
+        );
+
+        if (ticketBlocked) {
+          return res.status(400).json({
+            message:
+              "Không thể chuyển chuyến xe này thành CLOSED vì có vé đã thanh toán hoặc đang chờ thanh toán.",
+          });
+        }
+      }
+
+      // Cập nhật chuyến đi
+      const newTrip = await Trip.findByIdAndUpdate(
+        id,
+        {
+          route,
+          bus,
+          departureTime,
+          arrivalTime,
+          status, // Cập nhật thêm trường status
+        },
+        { new: true } // Trả về document mới sau khi cập nhật
+      ).exec();
+
+      if (!newTrip) {
+        return res.status(404).json({
+          message: "Không tìm thấy chuyến xe, vui lòng thử lại",
+        });
+      }
+
+      res.json(newTrip);
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }, */
   updateTrip: async (req, res) => {
     try {
       const { id } = req.params;
@@ -301,6 +380,25 @@ const TripController = {
         return res.status(404).json({
           message: "Không tìm thấy xe buýt hoặc tuyến đường, vui lòng thử lại.",
         });
+      }
+
+      // Nếu status là OPEN, kiểm tra trạng thái của xe và tuyến xe
+      if (status === "OPEN") {
+        // Kiểm tra trạng thái của Bus
+        if (busInfo.status === "CLOSED") {
+          return res.status(400).json({
+            message:
+              "Xe không hoạt động. Hãy cập nhật lại trạng thái xe để thay đổi trạng thái.",
+          });
+        }
+
+        // Kiểm tra trạng thái của BusRoute
+        if (busRouteInfo.status === "CLOSED") {
+          return res.status(400).json({
+            message:
+              "Tuyến xe không hoạt động. Hãy cập nhật lại trạng thái tuyến xe để thay đổi trạng thái.",
+          });
+        }
       }
 
       // Kiểm tra trạng thái thời gian chuyến đi
