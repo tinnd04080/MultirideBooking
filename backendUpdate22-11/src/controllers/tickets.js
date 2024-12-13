@@ -701,16 +701,6 @@ const TicketController = {
             seatNumber,
             status: SEAT_STATUS.EMPTY,
           });
-
-          if (discountCode) {
-            const discount = await Promotion.findOne({
-              code: discountCode,
-            }).exec();
-            if (discount) {
-              discount.remainingCount += 1;
-              await discount.save();
-            }
-          }
         }
       }, 10 * 60 * 1000);
       // Lấy thông tin chi tiết vé, bao gồm thông tin mã giảm giá
@@ -855,7 +845,7 @@ const TicketController = {
       });
     }
   }, */
-  // 13/12
+  // 14/12
   getTickets: async (req, res) => {
     try {
       const {
@@ -863,6 +853,9 @@ const TicketController = {
         limit = PAGINATION.LIMIT,
         status,
       } = req.query;
+
+      // Lấy thời gian hiện tại
+      const currentTime = new Date();
 
       // Tạo đối tượng điều kiện truy vấn cho vé
       let query = {};
@@ -879,58 +872,66 @@ const TicketController = {
         query // Truy vấn với điều kiện lọc theo status
       );
 
-      // Lọc vé có status === PENDING hoặc PAYMENTPENDING
-      const pendingTickets = tickets.filter(
-        (ticket) =>
-          ticket.status === "PENDING" || ticket.status === "PAYMENTPENDING"
-      );
-
-      // Duyệt qua các vé để kiểm tra và cập nhật trạng thái
-      const updatedTickets = await Promise.all(
-        pendingTickets.map(async (ticket) => {
-          // Lấy thông tin chuyến đi từ bảng Trip
+      // Truy vấn thêm thông tin từ bảng BusRoutes và Promotion
+      const ticketsWithRouteAndPromotion = await Promise.all(
+        tickets.map(async (ticket) => {
+          // Lấy thông tin chuyến đi từ bảng Trip, giả sử mỗi vé có trip_id
           const trip = await Trip.findById(ticket.trip);
 
+          // Kiểm tra nếu chuyến đi và thời gian khởi hành (departureTime) tồn tại
           if (trip && trip.departureTime) {
-            // So sánh thời gian departureTime với thời gian hiện tại
             const departureTime = new Date(trip.departureTime);
-            const currentTime = new Date();
 
-            // Nếu đã qua 30 phút so với departureTime, cập nhật status thành CANCELED
-            if (currentTime - departureTime > 30 * 60 * 1000) {
-              ticket.status = "CANCELED";
-              await ticket.save(); // Lưu trạng thái mới vào cơ sở dữ liệu
+            // So sánh thời gian hiện tại với departureTime
+            const timeDifference = departureTime - currentTime;
+
+            // Nếu thời gian còn cách departureTime ít hơn 30 phút và trạng thái vé là PAYMENTPENDING hoặc PENDING
+            if (
+              timeDifference < 30 * 60 * 1000 &&
+              (ticket.status === TICKET_STATUS.PAYMENTPENDING ||
+                ticket.status === TICKET_STATUS.PENDING)
+            ) {
+              // Cập nhật trạng thái vé thành CANCELED
+              await ticketUpdateStt({
+                ticketId: ticket._id,
+                status: TICKET_STATUS.CANCELED,
+              });
+
+              // Kiểm tra mã giảm giá nếu có
+              if (ticket.promotion) {
+                const discount = await Promotion.findById(ticket.promotion);
+
+                // Kiểm tra xem mã giảm giá còn lượt sử dụng không
+                if (discount && discount.remainingCount > 0) {
+                  discount.remainingCount += 1;
+                  await discount.save();
+                } else {
+                  return res
+                    .status(400)
+                    .json({ message: "Mã giảm giá đã hết lượt sử dụng" });
+                }
+              }
             }
           }
 
-          // Truy vấn thêm thông tin tuyến xe và khuyến mãi
-          const busRoute = trip?.route
-            ? await BusRoutes.findById(trip.route)
-            : null;
+          // Trả về vé với thông tin về tuyến xe và khuyến mãi
+          const busRoute =
+            trip && trip.route ? await BusRoutes.findById(trip.route) : null;
           const promotion = ticket.promotion
             ? await Promotion.findById(ticket.promotion)
             : null;
 
           return {
-            ...ticket.toObject(),
-            busRoute: busRoute || null,
-            promotion: promotion || null,
+            ...ticket.toObject(), // Bao gồm tất cả các dữ liệu từ ticket
+            busRoute: busRoute || null, // Thêm dữ liệu về tuyến xe vào mỗi vé
+            promotion: promotion || null, // Thêm thông tin khuyến mãi vào mỗi vé
           };
         })
       );
 
-      // Thêm các vé không thuộc diện cập nhật trạng thái
-      const normalTickets = tickets.filter(
-        (ticket) =>
-          !(ticket.status === "PENDING" || ticket.status === "PAYMENTPENDING")
-      );
-
-      // Kết hợp vé đã xử lý và vé không cần xử lý
-      const allTickets = [...updatedTickets, ...normalTickets];
-
-      // Trả về kết quả
+      // Trả về kết quả với dữ liệu về tuyến xe (busRoute) và khuyến mãi (promotion) đã được thêm vào
       res.json({
-        data: allTickets,
+        data: ticketsWithRouteAndPromotion,
         totalPage,
         currentPage,
       });

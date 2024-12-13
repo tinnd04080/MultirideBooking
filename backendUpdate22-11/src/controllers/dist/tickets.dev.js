@@ -871,8 +871,7 @@ var TicketController = {
           case 81:
             // Đặt timeout 10 phút
             setTimeout(function _callee() {
-              var ticketInfo, _discount;
-
+              var ticketInfo;
               return regeneratorRuntime.async(function _callee$(_context5) {
                 while (1) {
                   switch (_context5.prev = _context5.next) {
@@ -884,7 +883,7 @@ var TicketController = {
                       ticketInfo = _context5.sent;
 
                       if (!(ticketInfo.status === _index.TICKET_STATUS.PENDING)) {
-                        _context5.next = 17;
+                        _context5.next = 9;
                         break;
                       }
 
@@ -901,29 +900,6 @@ var TicketController = {
                       }));
 
                     case 9:
-                      if (!discountCode) {
-                        _context5.next = 17;
-                        break;
-                      }
-
-                      _context5.next = 12;
-                      return regeneratorRuntime.awrap(_promotion["default"].findOne({
-                        code: discountCode
-                      }).exec());
-
-                    case 12:
-                      _discount = _context5.sent;
-
-                      if (!_discount) {
-                        _context5.next = 17;
-                        break;
-                      }
-
-                      _discount.remainingCount += 1;
-                      _context5.next = 17;
-                      return regeneratorRuntime.awrap(_discount.save());
-
-                    case 17:
                     case "end":
                       return _context5.stop();
                   }
@@ -1015,15 +991,74 @@ var TicketController = {
     }
   },
   */
+  // 12/12
+
+  /* getTickets: async (req, res) => {
+    try {
+      const {
+        page = PAGINATION.PAGE,
+        limit = PAGINATION.LIMIT,
+        status,
+      } = req.query;
+        // Tạo đối tượng điều kiện truy vấn cho vé
+      let query = {};
+        // Nếu có status, thêm điều kiện lọc vào query
+      if (status) {
+        query.status = status;
+      }
+        // Lấy danh sách vé, trang hiện tại và tổng số trang từ getListTicket
+      const { tickets, currentPage, totalPage } = await getListTicket(
+        page,
+        limit,
+        query // Truy vấn với điều kiện lọc theo status
+      );
+        // Truy vấn thêm thông tin từ bảng BusRoutes và Promotion
+      const ticketsWithRouteAndPromotion = await Promise.all(
+        tickets.map(async (ticket) => {
+          // Lấy thông tin chuyến đi từ bảng Trip, giả sử mỗi vé có trip_id
+          const trip = await Trip.findById(ticket.trip);
+            // Kiểm tra xem trip có chứa route_id không
+          if (trip && trip.route) {
+            // Truy vấn bảng BusRoutes để lấy thông tin về tuyến xe từ route_id
+            const busRoute = await BusRoutes.findById(trip.route);
+              // Truy vấn bảng Promotion để lấy thông tin về khuyến mãi từ trường promotion
+            const promotion = ticket.promotion
+              ? await Promotion.findById(ticket.promotion)
+              : null;
+              return {
+              ...ticket.toObject(), // Bao gồm tất cả các dữ liệu từ ticket
+              busRoute: busRoute || null, // Thêm dữ liệu về tuyến xe vào mỗi vé
+              promotion: promotion || null, // Thêm thông tin khuyến mãi vào mỗi vé
+            };
+          }
+          return ticket;
+        })
+      );
+        // Trả về kết quả với dữ liệu về tuyến xe (busRoute) và khuyến mãi (promotion) đã được thêm vào
+      res.json({
+        data: ticketsWithRouteAndPromotion,
+        totalPage,
+        currentPage,
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }, */
+  // 14/12
   getTickets: function getTickets(req, res) {
-    var _req$query, _req$query$page, page, _req$query$limit, limit, status, query, _ref3, tickets, currentPage, totalPage, ticketsWithRouteAndPromotion;
+    var _req$query, _req$query$page, page, _req$query$limit, limit, status, currentTime, query, _ref3, tickets, currentPage, totalPage, ticketsWithRouteAndPromotion;
 
     return regeneratorRuntime.async(function getTickets$(_context8) {
       while (1) {
         switch (_context8.prev = _context8.next) {
           case 0:
             _context8.prev = 0;
-            _req$query = req.query, _req$query$page = _req$query.page, page = _req$query$page === void 0 ? _index.PAGINATION.PAGE : _req$query$page, _req$query$limit = _req$query.limit, limit = _req$query$limit === void 0 ? _index.PAGINATION.LIMIT : _req$query$limit, status = _req$query.status; // Tạo đối tượng điều kiện truy vấn cho vé
+            _req$query = req.query, _req$query$page = _req$query.page, page = _req$query$page === void 0 ? _index.PAGINATION.PAGE : _req$query$page, _req$query$limit = _req$query.limit, limit = _req$query$limit === void 0 ? _index.PAGINATION.LIMIT : _req$query$limit, status = _req$query.status; // Lấy thời gian hiện tại
+
+            currentTime = new Date(); // Tạo đối tượng điều kiện truy vấn cho vé
 
             query = {}; // Nếu có status, thêm điều kiện lọc vào query
 
@@ -1032,18 +1067,18 @@ var TicketController = {
             } // Lấy danh sách vé, trang hiện tại và tổng số trang từ getListTicket
 
 
-            _context8.next = 6;
+            _context8.next = 7;
             return regeneratorRuntime.awrap(getListTicket(page, limit, query // Truy vấn với điều kiện lọc theo status
             ));
 
-          case 6:
+          case 7:
             _ref3 = _context8.sent;
             tickets = _ref3.tickets;
             currentPage = _ref3.currentPage;
             totalPage = _ref3.totalPage;
-            _context8.next = 12;
+            _context8.next = 13;
             return regeneratorRuntime.awrap(Promise.all(tickets.map(function _callee2(ticket) {
-              var trip, busRoute, promotion;
+              var trip, departureTime, timeDifference, discount, busRoute, promotion;
               return regeneratorRuntime.async(function _callee2$(_context7) {
                 while (1) {
                   switch (_context7.prev = _context7.next) {
@@ -1054,35 +1089,94 @@ var TicketController = {
                     case 2:
                       trip = _context7.sent;
 
-                      if (!(trip && trip.route)) {
-                        _context7.next = 16;
+                      if (!(trip && trip.departureTime)) {
+                        _context7.next = 20;
                         break;
                       }
 
-                      _context7.next = 6;
-                      return regeneratorRuntime.awrap(_busRoutes["default"].findById(trip.route));
+                      departureTime = new Date(trip.departureTime); // So sánh thời gian hiện tại với departureTime
 
-                    case 6:
-                      busRoute = _context7.sent;
+                      timeDifference = departureTime - currentTime; // Nếu thời gian còn cách departureTime ít hơn 30 phút và trạng thái vé là PAYMENTPENDING hoặc PENDING
 
+                      if (!(timeDifference < 30 * 60 * 1000 && (ticket.status === _index.TICKET_STATUS.PAYMENTPENDING || ticket.status === _index.TICKET_STATUS.PENDING))) {
+                        _context7.next = 20;
+                        break;
+                      }
+
+                      _context7.next = 9;
+                      return regeneratorRuntime.awrap(ticketUpdateStt({
+                        ticketId: ticket._id,
+                        status: _index.TICKET_STATUS.CANCELED
+                      }));
+
+                    case 9:
                       if (!ticket.promotion) {
-                        _context7.next = 13;
+                        _context7.next = 20;
                         break;
                       }
 
-                      _context7.next = 10;
+                      _context7.next = 12;
                       return regeneratorRuntime.awrap(_promotion["default"].findById(ticket.promotion));
 
-                    case 10:
-                      _context7.t0 = _context7.sent;
-                      _context7.next = 14;
+                    case 12:
+                      discount = _context7.sent;
+
+                      if (!(discount && discount.remainingCount > 0)) {
+                        _context7.next = 19;
+                        break;
+                      }
+
+                      discount.remainingCount += 1;
+                      _context7.next = 17;
+                      return regeneratorRuntime.awrap(discount.save());
+
+                    case 17:
+                      _context7.next = 20;
                       break;
 
-                    case 13:
+                    case 19:
+                      return _context7.abrupt("return", res.status(400).json({
+                        message: "Mã giảm giá đã hết lượt sử dụng"
+                      }));
+
+                    case 20:
+                      if (!(trip && trip.route)) {
+                        _context7.next = 26;
+                        break;
+                      }
+
+                      _context7.next = 23;
+                      return regeneratorRuntime.awrap(_busRoutes["default"].findById(trip.route));
+
+                    case 23:
+                      _context7.t0 = _context7.sent;
+                      _context7.next = 27;
+                      break;
+
+                    case 26:
                       _context7.t0 = null;
 
-                    case 14:
-                      promotion = _context7.t0;
+                    case 27:
+                      busRoute = _context7.t0;
+
+                      if (!ticket.promotion) {
+                        _context7.next = 34;
+                        break;
+                      }
+
+                      _context7.next = 31;
+                      return regeneratorRuntime.awrap(_promotion["default"].findById(ticket.promotion));
+
+                    case 31:
+                      _context7.t1 = _context7.sent;
+                      _context7.next = 35;
+                      break;
+
+                    case 34:
+                      _context7.t1 = null;
+
+                    case 35:
+                      promotion = _context7.t1;
                       return _context7.abrupt("return", _objectSpread({}, ticket.toObject(), {
                         // Bao gồm tất cả các dữ liệu từ ticket
                         busRoute: busRoute || null,
@@ -1091,10 +1185,7 @@ var TicketController = {
 
                       }));
 
-                    case 16:
-                      return _context7.abrupt("return", ticket);
-
-                    case 17:
+                    case 37:
                     case "end":
                       return _context7.stop();
                   }
@@ -1102,7 +1193,7 @@ var TicketController = {
               });
             })));
 
-          case 12:
+          case 13:
             ticketsWithRouteAndPromotion = _context8.sent;
             // Trả về kết quả với dữ liệu về tuyến xe (busRoute) và khuyến mãi (promotion) đã được thêm vào
             res.json({
@@ -1110,23 +1201,23 @@ var TicketController = {
               totalPage: totalPage,
               currentPage: currentPage
             });
-            _context8.next = 19;
+            _context8.next = 20;
             break;
 
-          case 16:
-            _context8.prev = 16;
+          case 17:
+            _context8.prev = 17;
             _context8.t0 = _context8["catch"](0);
             res.status(500).json({
               message: "Internal server error",
               error: _context8.t0.message
             });
 
-          case 19:
+          case 20:
           case "end":
             return _context8.stop();
         }
       }
-    }, null, null, [[0, 16]]);
+    }, null, null, [[0, 17]]);
   },
   getMyTickets: function getMyTickets(req, res) {
     var _req$query2, _req$query2$page, page, _req$query2$limit, limit, queryObj, _ref4, tickets, currentPage, totalPage, ticketsWithRoute;
