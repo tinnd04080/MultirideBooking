@@ -22,32 +22,32 @@ export const payment = [
 export const popularRoutes = [
   {
     title: "Hồ Chí Minh - Đà Nẵng (24P Vip)",
-    price: "450.000 đ",
-    details: "6 giờ 20 phút",
+    price: "686.250 đ",
+    details: "915 km",
   },
   {
     title: "Đà Nẵng - Thừa Thiên Huế (16 Chỗ)",
-    price: "550.000 đ",
-    details: "9 giờ 15 phút",
+    price: "70.000 đ",
+    details: "88 km",
   },
   {
-    title: "Đà Nẵng - Bình Định (24P Vip)",
-    price: "350.000 đ",
-    details: "3 giờ 45 phút",
+    title: "Đà Nẵng - Bình Định (36 giường nằm)",
+    price: "193.000 đ",
+    details: "322 km",
   },
   {
-    title: "Bình Định - Quảng Ngãi (24P Vip)",
-    price: "300.000 đ",
-    details: "2 giờ 30 phút",
+    title: "Bình Định - Quảng Ngãi (16 Chỗ)",
+    price: "140.000 đ",
+    details: "175 km",
   },
   {
-    title: "Thừa Thiên Huế - Quảng Ngãi (24P Vip)",
-    price: "700.000 đ",
-    details: "10 giờ 10 phút",
+    title: "Thừa Thiên Huế - Quảng Ngãi (36 giường nằm)",
+    price: "140.000 đ",
+    details: "234 Km",
   },
   {
     title: "Quảng Ngãi - Đà Nẵng (24P Vip)",
-    price: "400.000 đ",
-    details: "5 giờ 55 phút",
+    price: "121.000 đ",
+    details: "152 Km",
   },
 ];
