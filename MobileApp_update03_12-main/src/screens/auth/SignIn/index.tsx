@@ -110,11 +110,12 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
         <Text style={styles.label}>Mật khẩu</Text>
         <View style={styles.inputContainer}>
           <TextInput
+            style={{ flex: 1 }}
             placeholder="Nhập mật khẩu của bạn"
             value={password}
             onChangeText={setPassword}
             secureTextEntry={!isPasswordVisible}
-            style={{ flex: 1 }}
+            /*  style={{ flex: 1 }} */
           />
           <TouchableOpacity onPress={togglePasswordVisibility}>
             <Text style={{ color: "#007BFF" }}>

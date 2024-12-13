@@ -220,24 +220,60 @@ var TripController = {
       }
     }, null, null, [[0, 26]]);
   },
+
+  /* getTrips: async (req, res) => {
+    try {
+      const { page = PAGINATION.PAGE, limit = PAGINATION.LIMIT } = req.query;
+        const trips = await Trip.find()
+        .populate(["route", "bus"])
+        .sort("-createdAt")
+        .skip((page - 1) * limit)
+        .limit(limit * 1)
+        .exec();
+        const count = await Trip.countDocuments();
+        const totalPage = Math.ceil(count / limit);
+      const currentPage = Number(page);
+      // Tính số ghế trống cho mỗi chuyến xe và thêm vào dữ liệu chuyến xe
+      for (let trip of trips) {
+        const availableSeats = await Seats.countDocuments({
+          trip: trip._id,
+          status: SEAT_STATUS.EMPTY,
+        });
+        // Thêm availableSeats vào mỗi chuyến xe
+        trip.availableSeats = availableSeats;
+      }
+      res.json({
+        data: trips,
+        totalPage,
+        currentPage,
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }, */
   getTrips: function getTrips(req, res) {
-    var _req$query, _req$query$page, page, _req$query$limit, limit, trips, count, totalPage, currentPage, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, trip, availableSeats;
+    var _req$query, _req$query$page, page, _req$query$limit, limit, currentTime, trips, count, totalPage, currentPage, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, trip, availableSeats, arrivalTime;
 
     return regeneratorRuntime.async(function getTrips$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
             _context2.prev = 0;
-            _req$query = req.query, _req$query$page = _req$query.page, page = _req$query$page === void 0 ? _index.PAGINATION.PAGE : _req$query$page, _req$query$limit = _req$query.limit, limit = _req$query$limit === void 0 ? _index.PAGINATION.LIMIT : _req$query$limit;
-            _context2.next = 4;
+            _req$query = req.query, _req$query$page = _req$query.page, page = _req$query$page === void 0 ? _index.PAGINATION.PAGE : _req$query$page, _req$query$limit = _req$query.limit, limit = _req$query$limit === void 0 ? _index.PAGINATION.LIMIT : _req$query$limit; // Lấy thời gian hiện tại
+
+            currentTime = new Date();
+            _context2.next = 5;
             return regeneratorRuntime.awrap(_trips["default"].find().populate(["route", "bus"]).sort("-createdAt").skip((page - 1) * limit).limit(limit * 1).exec());
 
-          case 4:
+          case 5:
             trips = _context2.sent;
-            _context2.next = 7;
+            _context2.next = 8;
             return regeneratorRuntime.awrap(_trips["default"].countDocuments());
 
-          case 7:
+          case 8:
             count = _context2.sent;
             totalPage = Math.ceil(count / limit);
             currentPage = Number(page); // Tính số ghế trống cho mỗi chuyến xe và thêm vào dữ liệu chuyến xe
@@ -245,89 +281,102 @@ var TripController = {
             _iteratorNormalCompletion = true;
             _didIteratorError = false;
             _iteratorError = undefined;
-            _context2.prev = 13;
+            _context2.prev = 14;
             _iterator = trips[Symbol.iterator]();
 
-          case 15:
+          case 16:
             if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-              _context2.next = 24;
+              _context2.next = 30;
               break;
             }
 
             trip = _step.value;
-            _context2.next = 19;
+            _context2.next = 20;
             return regeneratorRuntime.awrap(_seats["default"].countDocuments({
               trip: trip._id,
               status: _index.SEAT_STATUS.EMPTY
             }));
 
-          case 19:
+          case 20:
             availableSeats = _context2.sent;
             // Thêm availableSeats vào mỗi chuyến xe
-            trip.availableSeats = availableSeats;
+            trip.availableSeats = availableSeats; // So sánh thời gian arrivalTime với thời gian hiện tại
 
-          case 21:
+            arrivalTime = new Date(trip.arrivalTime); // Chuyển arrivalTime sang dạng Date
+            // Kiểm tra nếu arrivalTime là quá khứ, thay đổi status
+
+            if (!(arrivalTime < currentTime)) {
+              _context2.next = 27;
+              break;
+            }
+
+            trip.status = "CLOSED"; // Cập nhật status thành CLOSED
+
+            _context2.next = 27;
+            return regeneratorRuntime.awrap(trip.save());
+
+          case 27:
             _iteratorNormalCompletion = true;
-            _context2.next = 15;
+            _context2.next = 16;
             break;
 
-          case 24:
-            _context2.next = 30;
+          case 30:
+            _context2.next = 36;
             break;
 
-          case 26:
-            _context2.prev = 26;
-            _context2.t0 = _context2["catch"](13);
+          case 32:
+            _context2.prev = 32;
+            _context2.t0 = _context2["catch"](14);
             _didIteratorError = true;
             _iteratorError = _context2.t0;
 
-          case 30:
-            _context2.prev = 30;
-            _context2.prev = 31;
+          case 36:
+            _context2.prev = 36;
+            _context2.prev = 37;
 
             if (!_iteratorNormalCompletion && _iterator["return"] != null) {
               _iterator["return"]();
             }
 
-          case 33:
-            _context2.prev = 33;
+          case 39:
+            _context2.prev = 39;
 
             if (!_didIteratorError) {
-              _context2.next = 36;
+              _context2.next = 42;
               break;
             }
 
             throw _iteratorError;
 
-          case 36:
-            return _context2.finish(33);
+          case 42:
+            return _context2.finish(39);
 
-          case 37:
-            return _context2.finish(30);
+          case 43:
+            return _context2.finish(36);
 
-          case 38:
+          case 44:
             res.json({
               data: trips,
               totalPage: totalPage,
               currentPage: currentPage
             });
-            _context2.next = 44;
+            _context2.next = 50;
             break;
 
-          case 41:
-            _context2.prev = 41;
+          case 47:
+            _context2.prev = 47;
             _context2.t1 = _context2["catch"](0);
             res.status(500).json({
               message: "Internal server error",
               error: _context2.t1.message
             });
 
-          case 44:
+          case 50:
           case "end":
             return _context2.stop();
         }
       }
-    }, null, null, [[0, 41], [13, 26, 30, 38], [31,, 33, 37]]);
+    }, null, null, [[0, 47], [14, 32, 36, 44], [37,, 39, 43]]);
   },
   getTrip: function getTrip(req, res) {
     var id, trip;

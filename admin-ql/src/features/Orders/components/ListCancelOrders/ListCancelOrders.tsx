@@ -284,8 +284,8 @@ const ListCancelOrders = () => {
       orderCode: item._id.toUpperCase(),
       paymentMethod: item.paymentMethod,
       TicketDetail: {
-        startProvince: item.busRoute.startProvince,
-        endProvince: item.busRoute.endProvince,
+        /* startProvince: item.busRoute.startProvince,
+        endProvince: item.busRoute.endProvince, */
         boardingPoint: item.boardingPoint,
         dropOffPoint: item.dropOffPoint,
         departureTime: item.trip.departureTime,

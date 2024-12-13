@@ -168,7 +168,7 @@ const TripController = {
     }
   },
 
-  getTrips: async (req, res) => {
+  /* getTrips: async (req, res) => {
     try {
       const { page = PAGINATION.PAGE, limit = PAGINATION.LIMIT } = req.query;
 
@@ -192,6 +192,56 @@ const TripController = {
         // Thêm availableSeats vào mỗi chuyến xe
         trip.availableSeats = availableSeats;
       }
+      res.json({
+        data: trips,
+        totalPage,
+        currentPage,
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }, */
+  getTrips: async (req, res) => {
+    try {
+      const { page = PAGINATION.PAGE, limit = PAGINATION.LIMIT } = req.query;
+
+      // Lấy thời gian hiện tại
+      const currentTime = new Date();
+
+      const trips = await Trip.find()
+        .populate(["route", "bus"])
+        .sort("-createdAt")
+        .skip((page - 1) * limit)
+        .limit(limit * 1)
+        .exec();
+
+      const count = await Trip.countDocuments();
+
+      const totalPage = Math.ceil(count / limit);
+      const currentPage = Number(page);
+
+      // Tính số ghế trống cho mỗi chuyến xe và thêm vào dữ liệu chuyến xe
+      for (let trip of trips) {
+        const availableSeats = await Seats.countDocuments({
+          trip: trip._id,
+          status: SEAT_STATUS.EMPTY,
+        });
+        // Thêm availableSeats vào mỗi chuyến xe
+        trip.availableSeats = availableSeats;
+
+        // So sánh thời gian arrivalTime với thời gian hiện tại
+        const arrivalTime = new Date(trip.arrivalTime); // Chuyển arrivalTime sang dạng Date
+
+        // Kiểm tra nếu arrivalTime là quá khứ, thay đổi status
+        if (arrivalTime < currentTime) {
+          trip.status = "CLOSED"; // Cập nhật status thành CLOSED
+          await trip.save(); // Lưu lại thay đổi
+        }
+      }
+
       res.json({
         data: trips,
         totalPage,
