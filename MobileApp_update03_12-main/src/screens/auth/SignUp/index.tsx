@@ -68,7 +68,7 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
       });
 
       // Nếu đăng ký thành công
-      Alert.alert("Thông báo", "Đăng ký thành công, vui lòng kiểm tra mã OTP.");
+      /* Alert.alert("Thông báo", "Đăng ký thành công, vui lòng kiểm tra mã OTP."); */
 
       // Chuyển hướng tới màn hình OTP
       navigation.navigate("OtpScreen", { email: values.email });
