@@ -12,7 +12,7 @@ import { useRenderCategory } from '../../hooks'
 const ListCategory = () => {
   const [options, setoptions] = useState({
     page: 1,
-    limit: 10
+    limit: 100
   })
   console.log('Sau khi chọn', options)
 

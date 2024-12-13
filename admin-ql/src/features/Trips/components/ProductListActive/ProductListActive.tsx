@@ -10,7 +10,7 @@ import { useRender } from '../../hooks'
 export const ProductListActive = ({ checkPath }: any) => {
   const [options, setoptions] = useState({
     page: 1,
-    limit: 10
+    limit: 100
   })
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
   const [loading, setLoading] = useState(false)

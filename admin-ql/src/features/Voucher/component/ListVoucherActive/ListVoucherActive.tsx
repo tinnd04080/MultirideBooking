@@ -15,7 +15,7 @@ const ListVoucherActive = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [options, setoptions] = useState({
     page: 1,
-    limit: 10
+    limit: 100
   })
 
   const {

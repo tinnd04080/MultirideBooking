@@ -13,7 +13,7 @@ export const ProductListActive = ({ checkPath }: any) => {
   const { user } = useAppSelector((state: RootState) => state.persistedReducer.auth)
   const [options, setoptions] = useState({
     page: 1,
-    limit: 10
+    limit: 100
   })
   console.log('Giá trị người dùng thay đổi:', options)
   /* api */

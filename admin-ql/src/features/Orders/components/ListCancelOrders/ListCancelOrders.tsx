@@ -29,7 +29,7 @@ const ListCancelOrders = () => {
 
   const [options, setoptions] = useState({
     page: 1,
-    limit: 10,
+    limit: 100,
     status: 'CANCELED',
     room: user._id
   })

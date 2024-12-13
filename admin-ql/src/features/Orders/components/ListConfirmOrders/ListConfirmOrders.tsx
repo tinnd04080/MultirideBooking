@@ -42,7 +42,7 @@ const ListConfirmOrders = () => {
 
   const [options, setoptions] = useState({
     page: 1,
-    limit: 10,
+    limit: 100,
     status: 'PAID', // Đảm bảo giá trị PAID có sẵn trong code hoặc từ constants
     room: user._id // Đảm bảo user._id có giá trị hợp lệ
   })
