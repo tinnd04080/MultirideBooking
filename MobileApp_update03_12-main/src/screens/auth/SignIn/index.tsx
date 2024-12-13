@@ -100,7 +100,7 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
 
         <Text style={styles.label}>Email</Text>
         <TextInput
-          style={styles.inputContainer}
+          style={styles.input}
           placeholder="Nhập email của bạn"
           value={email}
           onChangeText={setEmail}
@@ -110,15 +110,14 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
         <Text style={styles.label}>Mật khẩu</Text>
         <View style={styles.inputContainer}>
           <TextInput
-            style={{ flex: 1 }}
+            style={styles.textInput}
             placeholder="Nhập mật khẩu của bạn"
             value={password}
             onChangeText={setPassword}
             secureTextEntry={!isPasswordVisible}
-            /*  style={{ flex: 1 }} */
           />
           <TouchableOpacity onPress={togglePasswordVisibility}>
-            <Text style={{ color: "#007BFF" }}>
+            <Text style={styles.toggleText}>
               {isPasswordVisible ? "Ẩn" : "Hiện"}
             </Text>
           </TouchableOpacity>

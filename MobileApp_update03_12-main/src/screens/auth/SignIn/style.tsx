@@ -33,13 +33,13 @@ export const styles = StyleSheet.create({
     color: textColor,
     marginBottom: 25,
   },
-  label: {
+  /* label: {
     fontSize: 16,
     color: textColor,
     marginBottom: 6,
     marginTop: 10,
-  },
-  inputContainer: {
+  }, */
+  /*  inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: inputBackgroundColor,
@@ -49,7 +49,7 @@ export const styles = StyleSheet.create({
     marginBottom: 15,
     borderColor: borderColor,
     borderWidth: 1,
-  },
+  }, */
   checkboxContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -81,5 +81,40 @@ export const styles = StyleSheet.create({
   logoContainer: {
     alignItems: "center", // Căn giữa logo
     /* backgroundColor: "#000", */
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: inputBackgroundColor,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    marginBottom: 15,
+    borderColor: borderColor,
+    borderWidth: 1,
+    height: 50, // Đảm bảo chiều cao cố định cho ô mật khẩu
+  },
+  input: {
+    backgroundColor: inputBackgroundColor,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    borderColor: borderColor,
+    borderWidth: 1,
+    height: 50, // Đảm bảo chiều cao tương đồng với ô mật khẩu
+    marginBottom: 15,
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 16,
+  },
+  toggleText: {
+    color: "#007BFF",
+    fontSize: 16,
+    marginLeft: 10,
+  },
+  label: {
+    fontSize: 16,
+    color: textColor,
+    marginBottom: 6,
+    marginTop: 10,
   },
 });
