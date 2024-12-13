@@ -12,12 +12,16 @@ import Header from "../../components/header";
 import { useNavigation } from "@react-navigation/native"; // Thêm import useNavigation
 import { string } from "yup";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { FontAwesome } from "@expo/vector-icons"; // Import FontAwesome icons từ Expo
+
 /* import dayjs from "dayjs"; // Sử dụng dayjs để làm việc với thời gian dễ dàng hơn */
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter"; // Plugin để so sánh ngày giờ
 import utc from "dayjs/plugin/utc"; // Plugin hỗ trợ UTC
 import { Dropdown } from "react-native-element-dropdown";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { FontAwesome } from "@expo/vector-icons"; // Sử dụng đúng cách với FontAwesome từ @expo/vector-icons
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+
 // Sử dụng các plugin
 dayjs.extend(isSameOrAfter);
 dayjs.extend(utc);
@@ -112,8 +116,8 @@ const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
   const seatOptions = [
     { label: "Tất cả số ghế", value: null },
     { label: "Xe 16 chỗ - ghế ngồi", value: 16 },
-    { label: "Xe 20 chỗ - giường nằm", value: 20 },
-    { label: "36 chỗ - ghế ngồi ", value: 36 },
+    { label: "Xe 24 chỗ - phòng Vip", value: 24 },
+    { label: "36 chỗ - giường nằm ", value: 36 },
   ];
 
   const formatCurrency = (amount: number) => {
@@ -160,7 +164,7 @@ const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
         </Text>
         <Dropdown
           renderRightIcon={() => (
-            <FontAwesome name="chevron-down" size={15} color="#F8FAFC" />
+            <FontAwesome5 name="chevron-down" size={15} color="#F8FAFC" />
           )}
           style={styles.dropdown}
           placeholderStyle={styles.placeholderStyle}
@@ -192,9 +196,10 @@ const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
             <View style={styles.ticketInfoTop}>
               {/* Khối chiều ngang 1 chứa các biểu tượng và đường kẻ dọc */}
               <View style={styles.iconContainer}>
-                <FontAwesome name="bus" size={20} color="#006A67" />
+                {/* Sử dụng icon */}
+                <FontAwesome5 name="bus" size={20} color="#006A67" />
                 <View style={styles.dividerTop} />
-                <FontAwesome name="map-marker" size={23} color="#F87A53" />
+                <FontAwesome5 name="map-marker-alt" size={23} color="#F87A53" />
               </View>
 
               {/* Khối chiều ngang 2 chứa thông tin thời gian */}

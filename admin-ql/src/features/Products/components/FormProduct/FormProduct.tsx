@@ -211,7 +211,7 @@ const FormProduct = () => {
               /> */}
               <Select>
                 <Select.Option value={16}>16</Select.Option>
-                <Select.Option value={20}>20</Select.Option>
+                <Select.Option value={24}>24</Select.Option>
                 <Select.Option value={36}>36</Select.Option>
               </Select>
             </Form.Item>

@@ -147,24 +147,22 @@ export const styles = StyleSheet.create({
 });
 
 export const pickerSelectStyles = {
-  inputIOS: {
-    fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    backgroundColor: "#f7f7f7",
-    color: "#666",
-    paddingRight: 30,
-  },
   inputAndroid: {
     fontSize: 16,
-    paddingVertical: 8,
     paddingHorizontal: 10,
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 8,
+    borderRadius: 8, // Bo tròn góc
+    backgroundColor: "#f7f7f7",
+    color: "#666",
+    paddingRight: 30, // Để dành chỗ cho mũi tên
+  },
+  inputIOS: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8, // Bo tròn góc
     backgroundColor: "#f7f7f7",
     color: "#666",
     paddingRight: 30, // Để dành chỗ cho mũi tên

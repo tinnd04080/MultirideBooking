@@ -69,14 +69,18 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
           await AsyncStorage.removeItem("password");
         }
 
-        Alert.alert("Thành công", "Đăng nhập thành công!");
+        /*  Alert.alert("Thành công", "Đăng nhập thành công!"); */
         navigation.navigate("MainTabs");
       } else {
         Alert.alert("Lỗi", "Đăng nhập không thành công.");
       }
-    } catch (error) {
-      console.error("Đăng nhập thất bại:", error);
-      Alert.alert("Lỗi", "Thông tin đăng nhập không chính xác.");
+    } catch (error: any) {
+      /* console.error("Đăng nhập thất bại:", error); */
+
+      // Hiển thị lỗi từ backend nếu có
+      const errorMessage =
+        error.response?.data?.message || "Thông tin đăng nhập không chính xác.";
+      Alert.alert("Đăng nhập thất bại !", errorMessage);
     }
   };
 

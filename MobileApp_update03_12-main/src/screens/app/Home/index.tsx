@@ -77,16 +77,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     } catch (error: any) {
       // Log thông báo lỗi chi tiết từ server
       if (error.response) {
-        console.error("Error response:", error.response.data);
+        /*  console.error("Error response:", error.response.data); */
         Alert.alert(
           "Vui lòng thao tác lại",
           error.response.data.message || "Có lỗi xảy ra."
         );
       } else if (error.request) {
-        console.error("No response received:", error.request);
+        /*  console.error("No response received:", error.request); */
         Alert.alert("Không thể kết nối đến server");
       } else {
-        console.error("Unexpected error:", error.message);
+        /*  console.error("Unexpected error:", error.message); */
         Alert.alert("Lỗi không xác định", error.message);
       }
     }
