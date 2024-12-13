@@ -40,13 +40,13 @@ export const useRender = (productsList: IProduct[], deleteReal?: boolean, checkP
     setSearchedColumn(dataIndex.name)
   }
 
-  const getColumnSearchProps = (dataIndex: IProduct): ColumnType<IProduct> => ({
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
-      <div style={{ padding: 8, width: '100%' }} onKeyDown={(e) => e.stopPropagation()}>
+  const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<IUserDataType> => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
         <Input
+          size='middle'
           ref={searchInput}
-          size='large'
-          placeholder={`Search ${dataIndex}`}
+          placeholder={`Tìm kiếm`}
           value={selectedKeys[0]}
           onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
           onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
@@ -57,118 +57,46 @@ export const useRender = (productsList: IProduct[], deleteReal?: boolean, checkP
             type='primary'
             onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
             icon={<SearchOutlined />}
-            size='large'
+            size='small'
+            style={{ width: 90 }}
           >
-            Tìm kiếm Xe
+            Tìm kiếm
+          </ButtonAntd>
+          <ButtonAntd onClick={() => clearFilters && handleReset(clearFilters)} size='small' style={{ width: 90 }}>
+            Làm mới
           </ButtonAntd>
         </Space>
       </div>
     ),
-    filterIcon: () => (
-      <Tooltip title='Tìm kiếm Xe'>
-        <ButtonAntd type='primary' shape='circle' icon={<SearchOutlined />} />
-      </Tooltip>
-    ),
-    onFilter: (value: any, record: any) => {
-      console.log(value, 'valuevalue')
-      console.log(record, 'record')
-      return record[dataIndex as unknown as number]?.toString().toLowerCase().includes(value.toLowerCase())
-    },
+    filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
+    onFilter: (value, record) =>
+      record[dataIndex]
+        .toString()
+        .toLowerCase()
+        .includes((value as string).toLowerCase()),
     onFilterDropdownOpenChange: (visible) => {
       if (visible) {
         setTimeout(() => searchInput.current?.select(), 100)
       }
     },
-    render: (text, product: IProduct) =>
-      searchedColumn === dataIndex.name ? (
-        <div className='gap-x-3 flex items-center justify-start'>
-          <img
-            onClick={() => {
-              dispatch(setOpenDrawer(true))
-              dispatch(setProductDetail(product))
-            }}
-            src={'/bus-bg.jpg'}
-            alt={'/bus-bg.jpg'}
-            className='object-cover w-20 h-20 rounded-lg cursor-pointer'
-          />
-          <div className='flex flex-col gap-0.5 justify-center items-start'>
-            <Tag
-              color={clsxm(
-                { success: !product.is_deleted && product.is_active },
-                { '#333': product.is_deleted },
-                { red: !product.is_deleted && !product.is_active }
-              )}
-            >
-              {product.busTypeName}
-            </Tag>
-            <p
-              onClick={() => {
-                dispatch(setOpenDrawer(true))
-                dispatch(setProductDetail(product))
-              }}
-              className='hover:underline capitalize truncate cursor-pointer w-[215px]'
-            >
-              {/* {product.name} */}
-              <Highlighter
-                highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                searchWords={[searchText]}
-                autoEscape
-                textToHighlight={text ? text.toString() : ''}
-              />
-            </p>
-            {product.sale > 0 && (
-              <p className='flex items-center justify-center gap-1'>
-                <span>
-                  <TbBasketDiscount />
-                </span>
-                <span className=''>{formatCurrency(product.sale)}</span>
-              </p>
-            )}
-          </div>
-        </div>
+    render: (text) =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ''}
+        />
       ) : (
-        // text
-        <div className='gap-x-3 flex items-center justify-start'>
-          <img
-            onClick={() => {
-              dispatch(setOpenDrawer(true))
-              dispatch(setProductDetail(product))
-            }}
-            src={'/bus-bg.jpg'}
-            alt={'/bus-bg.jpg'}
-            className='object-cover w-20 h-20 rounded-lg cursor-pointer'
-          />
-          <div className='flex flex-col gap-0.5 justify-center items-start'>
-            <Tag
-              color={clsxm(
-                { '#333': !product.is_deleted && product.is_active },
-                { '#333': product.is_deleted },
-                { '#333': !product.is_deleted && !product.is_active }
-              )}
-            >
-              {product.busTypeName}
-            </Tag>
-            <p
-              onClick={() => {
-                dispatch(setOpenDrawer(true))
-                dispatch(setProductDetail(product))
-              }}
-              className='hover:underline capitalize truncate cursor-pointer w-[215px]'
-            >
-              {product.name}
-            </p>
-            {product.sale > 0 && (
-              <p className='flex items-center justify-center gap-1'>
-                <span>
-                  <TbBasketDiscount />
-                </span>
-                <span className=''>{formatCurrency(product.sale)}</span>
-              </p>
-            )}
-          </div>
-        </div>
+        text
       )
   })
+  const handleReset = (clearFilters: (() => void) | undefined) => {
+    if (clearFilters) clearFilters() // Xoá bộ lọc
+    setSearchText('') // Reset text tìm kiếm
+    setSearchedColumn('') // Reset cột tìm kiếm
+  }
+
   /* columns staff */
   const columnsStaff: any = [
     {
@@ -186,9 +114,10 @@ export const useRender = (productsList: IProduct[], deleteReal?: boolean, checkP
       title: 'Biển số xe',
       dataIndex: 'licensePlate',
       key: 'licensePlate',
-      filterSearch: true,
+      ...getColumnSearchProps('licensePlate'),
+      /*  filterSearch: true,
       filters: productsList?.map((item: any) => ({ text: item.licensePlate, value: item.licensePlate })),
-      onFilter: (value: any, record: any) => record.licensePlate === value,
+      onFilter: (value: any, record: any) => record.licensePlate === value, */
       render: (category: ICategoryRefProduct) => <p className='capitalize'>{category}</p>
     },
     {
@@ -206,6 +135,12 @@ export const useRender = (productsList: IProduct[], deleteReal?: boolean, checkP
       title: 'Số lượng Ghế  ',
       dataIndex: 'seatCapacity',
       key: 'seatCapacity',
+      filterSearch: true,
+      filters: Array.from(new Set(productsList?.map((item: any) => item.seatCapacity))).map((value) => ({
+        text: value,
+        value: value
+      })),
+      onFilter: (value: any, record: any) => record.seatCapacity === value,
       render: (sizes: ISizeRefProduct[]) => (
         <>
           <p className=''>{sizes} ghế</p>

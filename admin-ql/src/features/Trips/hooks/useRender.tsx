@@ -41,6 +41,62 @@ export const useRender = (productsList: IProduct[], deleteReal?: boolean, checkP
     setSearchText(selectedKeys[0])
     setSearchedColumn(dataIndex.name)
   }
+  const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<IUserDataType> => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+        <Input
+          size='middle'
+          ref={searchInput}
+          placeholder={`Tìm kiếm`}
+          value={selectedKeys[0]}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
+          style={{ marginBottom: 8, display: 'block' }}
+        />
+        <Space>
+          <ButtonAntd
+            type='primary'
+            onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size='small'
+            style={{ width: 90 }}
+          >
+            Tìm kiếm
+          </ButtonAntd>
+          <ButtonAntd onClick={() => clearFilters && handleReset(clearFilters)} size='small' style={{ width: 90 }}>
+            Làm mới
+          </ButtonAntd>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
+    onFilter: (value, record) =>
+      record[dataIndex]
+        .toString()
+        .toLowerCase()
+        .includes((value as string).toLowerCase()),
+    onFilterDropdownOpenChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100)
+      }
+    },
+    render: (text) =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ''}
+        />
+      ) : (
+        text
+      )
+  })
+  const handleReset = (clearFilters: (() => void) | undefined) => {
+    if (clearFilters) clearFilters() // Xoá bộ lọc
+    setSearchText('') // Reset text tìm kiếm
+    setSearchedColumn('') // Reset cột tìm kiếm
+  }
   function formatDateTime(dateString: string): JSX.Element {
     const date = new Date(dateString)
     // Lấy các giá trị giờ, phút, ngày, tháng, năm
@@ -60,135 +116,6 @@ export const useRender = (productsList: IProduct[], deleteReal?: boolean, checkP
     )
   }
 
-  const getColumnSearchProps = (dataIndex: IProduct): ColumnType<IProduct> => ({
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
-      <div style={{ padding: 8, width: '100%' }} onKeyDown={(e) => e.stopPropagation()}>
-        <Input
-          ref={searchInput}
-          size='large'
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0]}
-          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-          onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-          style={{ marginBottom: 8, display: 'block' }}
-        />
-        <Space>
-          <ButtonAntd
-            type='primary'
-            onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-            icon={<SearchOutlined />}
-            size='large'
-          >
-            Tìm kiếm Xe
-          </ButtonAntd>
-        </Space>
-      </div>
-    ),
-    filterIcon: () => (
-      <Tooltip title='Tìm kiếm Xe'>
-        <ButtonAntd type='primary' shape='circle' icon={<SearchOutlined />} />
-      </Tooltip>
-    ),
-    onFilter: (value: any, record: any) => {
-      console.log(value, 'valuevalue')
-      console.log(record, 'record')
-      return record[dataIndex as unknown as number]?.toString().toLowerCase().includes(value.toLowerCase())
-    },
-    onFilterDropdownOpenChange: (visible) => {
-      if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100)
-      }
-    },
-    render: (text, product: IProduct) =>
-      searchedColumn === dataIndex.name ? (
-        <div className='gap-x-3 flex items-center justify-start'>
-          <img
-            onClick={() => {
-              dispatch(setOpenDrawer(true))
-              dispatch(setProductDetail(product))
-            }}
-            src={'/bus-bg.jpg'}
-            alt={'/bus-bg.jpg'}
-            className='object-cover w-20 h-20 rounded-lg cursor-pointer'
-          />
-          <div className='flex flex-col gap-0.5 justify-center items-start'>
-            <Tag
-              color={clsxm(
-                { success: !product.is_deleted && product.is_active },
-                { '#333': product.is_deleted },
-                { red: !product.is_deleted && !product.is_active }
-              )}
-            >
-              {product.busTypeName}
-            </Tag>
-            <p
-              onClick={() => {
-                dispatch(setOpenDrawer(true))
-                dispatch(setProductDetail(product))
-              }}
-              className='hover:underline capitalize truncate cursor-pointer w-[215px]'
-            >
-              {/* {product.name} */}
-              <Highlighter
-                highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                searchWords={[searchText]}
-                autoEscape
-                textToHighlight={text ? text.toString() : ''}
-              />
-            </p>
-            {product.sale > 0 && (
-              <p className='flex items-center justify-center gap-1'>
-                <span>
-                  <TbBasketDiscount />
-                </span>
-                <span className=''>{formatCurrency(product.sale)}</span>
-              </p>
-            )}
-          </div>
-        </div>
-      ) : (
-        // text
-        <div className='gap-x-3 flex items-center justify-start'>
-          <img
-            onClick={() => {
-              dispatch(setOpenDrawer(true))
-              dispatch(setProductDetail(product))
-            }}
-            src={'/bus-bg.jpg'}
-            alt={'/bus-bg.jpg'}
-            className='object-cover w-20 h-20 rounded-lg cursor-pointer'
-          />
-          <div className='flex flex-col gap-0.5 justify-center items-start'>
-            <Tag
-              color={clsxm(
-                { '#333': !product.is_deleted && product.is_active },
-                { '#333': product.is_deleted },
-                { '#333': !product.is_deleted && !product.is_active }
-              )}
-            >
-              {product.busTypeName}
-            </Tag>
-            <p
-              onClick={() => {
-                dispatch(setOpenDrawer(true))
-                dispatch(setProductDetail(product))
-              }}
-              className='hover:underline capitalize truncate cursor-pointer w-[215px]'
-            >
-              {product.name}
-            </p>
-            {product.sale > 0 && (
-              <p className='flex items-center justify-center gap-1'>
-                <span>
-                  <TbBasketDiscount />
-                </span>
-                <span className=''>{formatCurrency(product.sale)}</span>
-              </p>
-            )}
-          </div>
-        </div>
-      )
-  })
   /* columns staff */
   const columnsStaff: any = [
     {
@@ -221,12 +148,33 @@ export const useRender = (productsList: IProduct[], deleteReal?: boolean, checkP
       key: 'departureTime',
       width: 150,
       filterSearch: true,
-      filters: Array.from(new Set(productsList?.map((item: any) => item.departureTime))).map((departureTime: any) => ({
-        text: formatDateTime(departureTime),
-        value: departureTime
-      })),
+      filters: Array.from(
+        new Set(
+          productsList?.map((item: any) => {
+            const date = new Date(item.departureTime)
+            return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1)
+              .toString()
+              .padStart(2, '0')}/${date.getFullYear()}`
+          })
+        )
+      )
+        .sort((a: string, b: string) => {
+          const [dayA, monthA, yearA] = a.split('/').map(Number)
+          const [dayB, monthB, yearB] = b.split('/').map(Number)
+          const dateA = new Date(yearA, monthA - 1, dayA)
+          const dateB = new Date(yearB, monthB - 1, dayB)
+          return dateB.getTime() - dateA.getTime() // Ngày mới nhất trước
+        })
+        .map((date: string) => ({
+          text: date, // Hiển thị ngày trong bộ lọc
+          value: date // Giá trị của bộ lọc
+        })),
       onFilter: (value: any, record: any) => {
-        return record.departureTime === value
+        const recordDate = new Date(record.departureTime)
+        const formattedRecordDate = `${recordDate.getDate().toString().padStart(2, '0')}/${(recordDate.getMonth() + 1)
+          .toString()
+          .padStart(2, '0')}/${recordDate.getFullYear()}`
+        return formattedRecordDate === value
       },
       render: (sizes: any) => (
         <>
@@ -275,6 +223,16 @@ export const useRender = (productsList: IProduct[], deleteReal?: boolean, checkP
       width: 150,
       dataIndex: 'bus',
       key: 'bus',
+      filterSearch: true, // Kích hoạt tìm kiếm
+      filters: Array.from(new Set(productsList?.map((item: any) => item.bus.licensePlate))).map(
+        (licensePlate: any) => ({
+          text: licensePlate, // Hiển thị biển số xe trong bộ lọc
+          value: licensePlate // Giá trị của bộ lọc
+        })
+      ),
+      onFilter: (value: any, record: any) => {
+        return record.bus?.licensePlate.toLowerCase().includes(value.toLowerCase()) // Kiểm tra xem giá trị biển số có chứa từ khóa tìm kiếm không
+      },
       render: (seatCapacity: any) => {
         return (
           <>

@@ -162,8 +162,7 @@ export const useRenderVoucher = () => {
       key: 'description',
       width: '30%',
       render: (name: string) => <p className='uppercase'>{name}</p>,
-      align: 'center',
-      ...getColumnSearchProps('description')
+      align: 'center'
     },
     {
       title: 'Trạng thái',

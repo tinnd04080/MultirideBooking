@@ -1,5 +1,5 @@
 import { BsFillPencilFill, BsFillTrashFill } from 'react-icons/bs'
-import { Button as ButtonAntd, Popconfirm, Space, Tooltip, Tag } from 'antd'
+import { Button as ButtonAntd, Popconfirm, Space, Tooltip, Tag, Input } from 'antd'
 import { ICategory, IRoleUser } from '~/types'
 import { RootState, useAppDispatch } from '~/store/store'
 import { setCategory, setOpenDrawer } from '~/store/slices'
@@ -12,8 +12,10 @@ import { messageAlert } from '~/utils/messageAlert'
 import { pause } from '~/utils/pause'
 import { useAppSelector } from '~/store/hooks'
 import { useRef, useState } from 'react'
+import { SearchOutlined, SyncOutlined } from '@ant-design/icons'
 // export const useRenderCategory = (isDeleted?: boolean) => {
 export const useRenderCategory = (categories: ICategory[], isDeleted?: boolean) => {
+  const searchInput = useRef<InputRef>(null)
   const [deleteFakeCategory] = useDeleteFakeMutation()
   const [restoreCategory] = useRestoreCategoryMutation()
   const [deleteRealCategory] = useDeleteRealMutation()
@@ -23,6 +25,66 @@ export const useRenderCategory = (categories: ICategory[], isDeleted?: boolean) 
 
   const { user } = useAppSelector((state: RootState) => state.persistedReducer.auth)
   console.log(categories, 'categories')
+
+  const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<ICategory> => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+        <Input
+          size='middle'
+          ref={searchInput}
+          placeholder={`Tìm kiếm`}
+          value={selectedKeys[0]}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
+          style={{ marginBottom: 8, display: 'block' }}
+        />
+        <Space>
+          <ButtonAntd
+            type='primary'
+            onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size='small'
+            style={{ width: 90 }}
+          >
+            Tìm kiếm
+          </ButtonAntd>
+          <ButtonAntd onClick={() => clearFilters && handleReset(clearFilters)} size='small' style={{ width: 90 }}>
+            Làm mới
+          </ButtonAntd>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
+    onFilter: (value, record) => {
+      // Kết hợp cả hai trường thành một chuỗi
+      const combinedString = `${record.startProvince} - ${record.endProvince}`
+      return combinedString.toLowerCase().includes((value as string).toLowerCase())
+    },
+    onFilterDropdownOpenChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100)
+      }
+    },
+    render: (text, record) => {
+      const combinedString = `${record.startProvince} - ${record.endProvince}`
+      return searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={combinedString}
+        />
+      ) : (
+        combinedString
+      )
+    }
+  })
+
+  const handleReset = (clearFilters: (() => void) | undefined) => {
+    if (clearFilters) clearFilters() // Xoá bộ lọc
+    setSearchText('') // Reset text tìm kiếm
+    setSearchedColumn('') // Reset cột tìm kiếm
+  }
   /* staff */
   const columnsStaff: ColumnsType<ICategory> = [
     {
@@ -37,11 +99,12 @@ export const useRenderCategory = (categories: ICategory[], isDeleted?: boolean) 
     {
       title: 'Tuyến',
       dataIndex: 'startProvince', // Cột này vẫn giữ dữ liệu của startProvince
-      key: 'tuyen',
+      key: 'startProvince',
       width: 230,
-      filterSearch: true,
+      /*  filterSearch: true,
       filters: categories?.map((item) => ({ text: item.startDistrict, value: item._id })),
-      onFilter: (value: any, record: ICategory) => record._id === value,
+      onFilter: (value: any, record: ICategory) => record._id === value, */
+      ...getColumnSearchProps('startProvince'),
       render: (startProvince: any, record: ICategory) => {
         // Lấy tên tỉnh đích từ cả hai trường startProvince và endProvince
         const endProvince = record.endProvince // Giả sử endProvince là một trường có thông tin tương tự startProvince
@@ -98,11 +161,13 @@ export const useRenderCategory = (categories: ICategory[], isDeleted?: boolean) 
       key: 'status',
       filterSearch: true,
       filters: Array.from(new Set(categories?.map((item: any) => item.status))).map((status: any) => ({
-        text: status,
+        text: status === 'OPEN' ? 'Hoạt động' : 'Ngừng hoạt động',
         value: status
       })),
       onFilter: (value: any, record: any) => {
-        return record.status === value
+        // So sánh trạng thái đã chuyển đổi
+        const statusDisplay = record.status === 'OPEN' ? 'Hoạt động' : 'Ngừng hoạt động'
+        return statusDisplay === value
       },
       render: (status: any) => {
         return (
