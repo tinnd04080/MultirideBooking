@@ -127,7 +127,7 @@ var updateSeatStt = function updateSeatStt(_ref) {
 };
 
 var ticketUpdateStt = function ticketUpdateStt(_ref2) {
-  var ticketId, status, ticket;
+  var ticketId, status, ticket, discount;
   return regeneratorRuntime.async(function ticketUpdateStt$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
@@ -143,7 +143,7 @@ var ticketUpdateStt = function ticketUpdateStt(_ref2) {
         case 3:
           ticket = _context3.sent;
           _context3.t0 = status;
-          _context3.next = _context3.t0 === _index.TICKET_STATUS.CANCELED ? 7 : _context3.t0 === _index.TICKET_STATUS.PAYMENT_FAILED ? 12 : _context3.t0 === _index.TICKET_STATUS.PAID ? 17 : 20;
+          _context3.next = _context3.t0 === _index.TICKET_STATUS.CANCELED ? 7 : _context3.t0 === _index.TICKET_STATUS.PAYMENT_FAILED ? 20 : _context3.t0 === _index.TICKET_STATUS.PAID ? 25 : 28;
           break;
 
         case 7:
@@ -163,42 +163,64 @@ var ticketUpdateStt = function ticketUpdateStt(_ref2) {
           }));
 
         case 11:
-          return _context3.abrupt("break", 20);
+          if (!ticket.promotion) {
+            _context3.next = 19;
+            break;
+          }
 
-        case 12:
           _context3.next = 14;
+          return regeneratorRuntime.awrap(_promotion["default"].findById(ticket.promotion));
+
+        case 14:
+          discount = _context3.sent;
+
+          if (!discount) {
+            _context3.next = 19;
+            break;
+          }
+
+          discount.remainingCount += 1; // Hoàn trả lượt sử dụng
+
+          _context3.next = 19;
+          return regeneratorRuntime.awrap(discount.save());
+
+        case 19:
+          return _context3.abrupt("break", 28);
+
+        case 20:
+          _context3.next = 22;
           return regeneratorRuntime.awrap(new _notifications["default"]({
             ticket: ticket._id,
             type: _index.NOTIFICATION_TYPE.TICKET_BOOK_FAILED,
             user: ticket.user
           }).save());
 
-        case 14:
-          _context3.next = 16;
+        case 22:
+          _context3.next = 24;
           return regeneratorRuntime.awrap(updateSeatStt({
             tripId: ticket.trip._id,
             seatNumber: ticket.seatNumber,
             status: _index.SEAT_STATUS.EMPTY
           }));
 
-        case 16:
-          return _context3.abrupt("break", 20);
+        case 24:
+          return _context3.abrupt("break", 28);
 
-        case 17:
-          _context3.next = 19;
+        case 25:
+          _context3.next = 27;
           return regeneratorRuntime.awrap(new _notifications["default"]({
             ticket: ticket._id,
             type: _index.NOTIFICATION_TYPE.TICKET_BOOK_SUCCESS,
             user: ticket.user
           }).save());
 
-        case 19:
-          return _context3.abrupt("break", 20);
+        case 27:
+          return _context3.abrupt("break", 28);
 
-        case 20:
+        case 28:
           return _context3.abrupt("return", ticket);
 
-        case 21:
+        case 29:
         case "end":
           return _context3.stop();
       }
@@ -568,6 +590,174 @@ var TicketController = {
     }
   }, */
   //  Thêm trường
+
+  /* 13/12 */
+
+  /* createTicket: async (req, res) => {
+    try {
+      const {
+        customerPhone,
+        customerName,
+        note,
+        trip,
+        seatNumber,
+        boardingPoint,
+        dropOffPoint,
+        status,
+        discountCode,
+      } = req.body;
+        // Kiểm tra thông tin các trường bắt buộc
+      if (!customerPhone || !customerName || !boardingPoint || !dropOffPoint) {
+        return res.status(400).json({
+          message: "Vui lòng nhập đầy đủ thông tin yêu cầu.",
+        });
+      }
+        const user = req.user.id;
+        let code;
+      // Hàm tạo mã vé duy nhất
+      const generateUniqueCode = async () => {
+        const randomLetters = () => {
+          const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Bảng chữ cái
+          return (
+            letters.charAt(Math.floor(Math.random() * letters.length)) +
+            letters.charAt(Math.floor(Math.random() * letters.length))
+          ); // Lấy 2 chữ cái ngẫu nhiên
+        };
+          // Lấy ngày, tháng, năm hiện tại (2 số cuối của năm)
+        const today = dayjs();
+        const datePart =
+          today.format("DDMM") + today.year().toString().slice(-2); // Lấy ngày, tháng và 2 số cuối năm
+          let newCode = `${randomLetters()}${datePart}- ${randomNumber(5)}`; // Tạo mã với ngày tháng năm (2 số cuối năm), 2 chữ cái và số ngẫu nhiên
+        const existingTicket = await Tickets.findOne({ code: newCode }).exec();
+        if (existingTicket) {
+          return generateUniqueCode(); // Tạo lại mã nếu mã đã tồn tại
+        }
+        return newCode;
+      };
+      // Tạo mã vé duy nhất
+      code = await generateUniqueCode();
+        // kiểm tra thông tin chuyến xe
+      const tripInfo = await Trip.findById(trip).populate("bus route").exec();
+      if (!tripInfo) {
+        return res.status(404).json({
+          message: "Chuyến xe không tồn tại",
+        });
+      }
+        if (dayjs().isAfter(tripInfo.departureTime)) {
+        return res.status(400).json({
+          message: "Chuyến xe đã khởi hành",
+        });
+      }
+        let totalAmount = tripInfo.price * seatNumber.length;
+        // kiểm tra trạng thái ghế
+      for await (let seat of seatNumber) {
+        const seatInfo = await Seats.findOne({
+          seatNumber: seat,
+          trip: tripInfo._id,
+        }).exec();
+          if (!seatInfo) {
+          return res.status(404).json({
+            message: "Không tìm thấy ghế",
+          });
+        }
+          if (seatInfo.status === SEAT_STATUS.SOLD) {
+          return res.status(406).json({
+            message: `Ghế ${seat} đã có người đặt`,
+          });
+        }
+      }
+        // cập nhật trạng thái ghế
+      await updateSeatStt({
+        tripId: tripInfo._id,
+        seatNumber,
+        status: SEAT_STATUS.SOLD,
+      });
+        let discount;
+      if (discountCode) {
+        discount = await Promotion.findOne({ code: discountCode }).exec();
+        if (!discount) {
+          return res.status(404).json({ message: "Mã giảm giá không tồn tại" });
+        }
+          // Kiểm tra trạng thái mã giảm giá
+        if (discount.status === PROMOTIONT_STATUS.EXPIRED) {
+          return res.status(400).json({ message: "Mã giảm giá đã hết hạn" });
+        }
+          // Tính giảm giá
+        if (discount.discountType === DISCOUNT_TYPE.AMOUNT) {
+          totalAmount -= discount.discountAmount;
+        } else {
+          const decreasePrice = (totalAmount * discount.discountAmount) / 100;
+          totalAmount -= decreasePrice;
+        }
+          totalAmount = totalAmount >= 0 ? totalAmount : 0;
+      }
+        const ticket = await new Tickets({
+        user,
+        customerPhone,
+        customerName,
+        note,
+        trip,
+        code,
+        seatNumber,
+        boardingPoint,
+        dropOffPoint,
+        status,
+        totalAmount,
+        promotion: discount ? discount._id : null, // Lưu mã giảm giá vào trường promotion
+      }).save();
+        // mã giảm giá
+      if (discountCode) {
+        await new PromotionUsage({
+          user,
+          ticket: ticket._id,
+          promotion: discount._id,
+        }).save();
+          // Cập nhật remainingCount
+        if (discount.remainingCount > 0) {
+          discount.remainingCount -= 1;
+          await discount.save();
+        } else {
+          return res
+            .status(400)
+            .json({ message: "Mã giảm giá đã hết lượt sử dụng" });
+        }
+      }
+        // Đặt timeout 10 phút
+      setTimeout(async () => {
+        const ticketInfo = await Tickets.findById(ticket._id).exec();
+          if (ticketInfo.status === TICKET_STATUS.PENDING) {
+          ticketInfo.status = TICKET_STATUS.CANCELED;
+          await ticketInfo.save();
+            await updateSeatStt({
+            tripId: tripInfo._id,
+            seatNumber,
+            status: SEAT_STATUS.EMPTY,
+          });
+        }
+      }, 10 * 60 * 1000);
+      // Lấy thông tin chi tiết vé, bao gồm thông tin mã giảm giá
+      const ticketInfo = await Tickets.findById(ticket._id)
+        .populate({
+          path: "trip",
+          populate: {
+            path: "bus route",
+          },
+        })
+        .populate("promotion") // Populates information from the Promotion model
+        .exec();
+        res.json({
+        message: "Create ticket successfully",
+        ticket: ticketInfo,
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Lỗi tạo vé",
+        error: error.message,
+      });
+    }
+  }, */
+
+  /* 14/12 */
   createTicket: function createTicket(req, res) {
     var _req$body, customerPhone, customerName, note, trip, seatNumber, boardingPoint, dropOffPoint, status, discountCode, user, code, generateUniqueCode, tripInfo, totalAmount, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, _value, seat, seatInfo, discount, decreasePrice, ticket, ticketInfo;
 
@@ -598,17 +788,13 @@ var TicketController = {
                   switch (_context4.prev = _context4.next) {
                     case 0:
                       randomLetters = function randomLetters() {
-                        var letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Bảng chữ cái
-
-                        return letters.charAt(Math.floor(Math.random() * letters.length)) + letters.charAt(Math.floor(Math.random() * letters.length)); // Lấy 2 chữ cái ngẫu nhiên
-                      }; // Lấy ngày, tháng, năm hiện tại (2 số cuối của năm)
-
+                        var letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                        return letters.charAt(Math.floor(Math.random() * letters.length)) + letters.charAt(Math.floor(Math.random() * letters.length));
+                      };
 
                       today = (0, _dayjs["default"])();
-                      datePart = today.format("DDMM") + today.year().toString().slice(-2); // Lấy ngày, tháng và 2 số cuối năm
-
-                      newCode = "".concat(randomLetters()).concat(datePart, "- ").concat((0, _randomNumber["default"])(5)); // Tạo mã với ngày tháng năm (2 số cuối năm), 2 chữ cái và số ngẫu nhiên
-
+                      datePart = today.format("DDMM") + today.year().toString().slice(-2);
+                      newCode = "".concat(randomLetters()).concat(datePart, "-").concat((0, _randomNumber["default"])(5));
                       _context4.next = 6;
                       return regeneratorRuntime.awrap(_tickets["default"].findOne({
                         code: newCode
@@ -633,8 +819,7 @@ var TicketController = {
                   }
                 }
               });
-            }; // Tạo mã vé duy nhất
-
+            };
 
             _context6.next = 8;
             return regeneratorRuntime.awrap(generateUniqueCode());
@@ -806,7 +991,6 @@ var TicketController = {
             }));
 
           case 66:
-            // Tính giảm giá
             if (discount.discountType === _index.DISCOUNT_TYPE.AMOUNT) {
               totalAmount -= discount.discountAmount;
             } else {
@@ -830,8 +1014,7 @@ var TicketController = {
               dropOffPoint: dropOffPoint,
               status: status,
               totalAmount: totalAmount,
-              promotion: discount ? discount._id : null // Lưu mã giảm giá vào trường promotion
-
+              promotion: discount ? discount._id : null
             }).save());
 
           case 70:
@@ -883,38 +1066,30 @@ var TicketController = {
                       ticketInfo = _context5.sent;
 
                       if (!(ticketInfo.status === _index.TICKET_STATUS.PENDING)) {
-                        _context5.next = 9;
+                        _context5.next = 6;
                         break;
                       }
 
-                      ticketInfo.status = _index.TICKET_STATUS.CANCELED;
-                      _context5.next = 7;
-                      return regeneratorRuntime.awrap(ticketInfo.save());
-
-                    case 7:
-                      _context5.next = 9;
-                      return regeneratorRuntime.awrap(updateSeatStt({
-                        tripId: tripInfo._id,
-                        seatNumber: seatNumber,
-                        status: _index.SEAT_STATUS.EMPTY
+                      _context5.next = 6;
+                      return regeneratorRuntime.awrap(ticketUpdateStt({
+                        ticketId: ticket._id,
+                        status: _index.TICKET_STATUS.CANCELED
                       }));
 
-                    case 9:
+                    case 6:
                     case "end":
                       return _context5.stop();
                   }
                 }
               });
-            }, 10 * 60 * 1000); // Lấy thông tin chi tiết vé, bao gồm thông tin mã giảm giá
-
+            }, 10 * 60 * 1000);
             _context6.next = 84;
             return regeneratorRuntime.awrap(_tickets["default"].findById(ticket._id).populate({
               path: "trip",
               populate: {
                 path: "bus route"
               }
-            }).populate("promotion") // Populates information from the Promotion model
-            .exec());
+            }).populate("promotion").exec());
 
           case 84:
             ticketInfo = _context6.sent;
