@@ -35,7 +35,8 @@ export const styles = StyleSheet.create({
   },
   subtitle2: {
     fontSize: 24,
-    color: "red",
+    fontWeight: "bold",
+    color: "#ffffff",
     marginBottom: 10,
   },
   footer: {

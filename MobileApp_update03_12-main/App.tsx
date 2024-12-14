@@ -26,17 +26,38 @@ import EditProfileScreen from "./src/screens/UpdateInfo";
 import ChangePassWord from "./src/screens/UpdateInfo/change-password";
 // RootStackParamList.ts
 export type RootStackParamList = {
-  SplashScreen: undefined;
-  LoginScreen: undefined;
-  RegisterScreen: undefined;
-  OtpScreen: { email: string }; // Ví dụ, truyền email vào màn hình OTP
-  MainTabs: undefined;
   TicketBookingScreen: undefined;
-  SeatSelectionScreen: { tripId: string }; // Thêm kiểu cho tham số tripId
-  PickupDropoffScreen: undefined;
-  PassengerInfoScreen: undefined;
-  PaymentScreen: undefined;
-  BankTransferScreen: undefined;
+  SeatSelectionScreen: { /* tripId: string */ trip: any };
+  OtpScreen: { email: string };
+  LoginScreen: undefined;
+  ConfirmInformation: {
+    // Cập nhật kiểu tham số cho màn hình ConfirmInformation
+    selectedSeats: string[]; // Mảng các ghế đã chọn
+    trip: any; // Hoặc thay 'any' bằng kiểu dữ liệu thực tế của trip
+    seatCapacity: number; // Sức chứa ghế
+  };
+  CreateticketsScreen: {
+    // Thông tin màn hình thành công
+    ticket: {
+      code: string; // Mã vé
+      customerName: string; // Tên khách hàng
+      customerPhone: string; // Số điện thoại khách hàng
+      trip: {
+        route: {
+          startPoint: string; // Điểm bắt đầu
+          endPoint: string; // Điểm kết thúc
+        };
+      };
+      boardingPoint: string; // Điểm đón
+      dropOffPoint: string; // Điểm trả
+      seatNumber: string[]; // Danh sách ghế
+      totalAmount: number; // Tổng tiền
+      status: string; // Trạng thái vé
+    };
+  };
+  Ticket: undefined;
+  Home: undefined;
+  TicketDetails: { ticketId: string }; // Chỉ truyền _id của vé
 };
 
 // BottomTabParamList.ts

@@ -14,18 +14,16 @@ import { styles } from "./style";
 import PaymentComponent from "../../components/payment"; // Sử dụng export theo tên
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack"; // Import StackNavigationProp
-import { RootStackParamList } from "../../screens/App.TicketBookingScreen/index";
+import { RootStackParamList } from "../../../App";
 import {
   formatDateTime,
   formatLicensePlate,
   formatCurrency,
+  getStatusColor,
+  getStatusText,
+  getpaymentMethodText,
 } from "../../utils/formatUtils";
 
-type ItemType = {
-  label: string; // Nếu `label` là chuỗi
-  value: string | number; // Nếu `value` có thể là chuỗi hoặc số
-  icon?: any;
-};
 const SuccessScreen = ({ route }: any) => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const { ticket } = route.params;
@@ -37,78 +35,8 @@ const SuccessScreen = ({ route }: any) => {
   const [isCanceled, setIsCanceled] = useState(false); // Thêm state theo dõi tình trạng vé bị hủy
 
   const token = "your-auth-token";
-  /*  console.log("Dữ liệu trả về", ticketData); */
+  console.log("Dữ liệu trả về", ticketData);
 
-  /* Hàm lấy dữ liệu từ backend (Hàm quan trọng)  -- để lại*/
-  /* const fetchTicket = async () => {
-    try {
-      setLoading(true);
-      const data = await getTicket(idticket, token);
-      setTicketData(data);
-      setLoading(false);
-      setError(null);
-    } catch (err) {
-      setError("Không thể tải thông tin vé.");
-      setLoading(false);
-    }
-  };
-
-  // Xử lý khi kéo để làm mới
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true); // Bật trạng thái refreshing
-    setTicketData(null); // Reset lại dữ liệu vé
-    setError(null); // Reset lỗi
-
-    try {
-      // Gọi lại API để tải lại thông tin vé
-      const data = await getTicket(idticket, token);
-      setTicketData(data); // Cập nhật dữ liệu vé mới
-      setError(null); // Reset lỗi nếu có
-    } catch (err) {
-      setError("Không thể tải lại thông tin vé."); // Hiển thị thông báo lỗi nếu không tải được dữ liệu
-    } finally {
-      setRefreshing(false); // Tắt trạng thái refreshing
-    }
-  }, [idticket, token]);
-
-  useEffect(() => {
-    fetchTicket();
-
-    // Thiết lập timer đếm ngược 10 phút (600 giây)
-    const timer = setInterval(() => {
-      setTimeLeft((prevTime) => {
-        if (prevTime <= 0) {
-          clearInterval(timer); // Dừng đếm ngược khi hết thời gian
-          onRefresh(); // Gọi lại để làm mới trang sau khi hết 10 phút
-          return 0;
-        }
-        return prevTime - 1;
-      });
-    }, 1000); // Cập nhật mỗi giây
-
-    // Cleanup khi component unmount
-    return () => clearInterval(timer);
-  }, [onRefresh]);
-
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.error}>{error}</Text>
-      </View>
-    );
-  }
-
-  if (!ticketData) {
-    return <View style={styles.center}></View>;
-  } */
   // Hàm gọi API để lấy thông tin vé
   const fetchTicket = useCallback(async () => {
     try {
@@ -180,52 +108,7 @@ const SuccessScreen = ({ route }: any) => {
     return <View style={styles.center}></View>;
   }
 
-  // Hàm xử lý hiển thị tình trạng vé
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "PENDING":
-        return "CHƯA XÁC NHẬN THANH TOÁN";
-      case "PAID":
-        return "ĐÃ THANH TOÁN";
-      case "PAYMENTPENDING":
-        return "CHỜ THANH TOÁN";
-      case "CANCELED":
-        return "VÉ BỊ HỦY";
-      case "PAYMENT_FAILED":
-        return "THANH TOÁN THẤT BẠI";
-      default:
-        return "Tình trạng không xác định";
-    }
-  };
-  const getpaymentMethodText = (paymentMethod: string) => {
-    switch (paymentMethod) {
-      case "OFFLINEPAYMENT":
-        return "TẠI BẾN - XE";
-      case "ZALOPAY":
-        return "ZALO PAY";
-      default:
-        return "Tình trạng không xác định";
-    }
-  };
-
-  // Hàm xử lý màu sắc của tình trạng vé
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "PAID":
-        return "#00796b"; // Màu xanh dương cho đã thanh toán
-      case "PENDING":
-        return "#FFB200"; // Màu cam cho chưa thanh toán
-      case "PAYMENTPENDING":
-        return "#EB5B00"; // Màu cam cho chưa thanh toán
-      case "CANCELED":
-        return "#d32f2f"; // Màu đỏ cho bị hủy
-      case "PAYMENT_FAILED":
-        return "#f44336"; // Màu đỏ cho thất bại thanh toán
-      default:
-        return "#000000"; // Màu đen mặc định
-    }
-  };
-  /* Biến tính toán */
+  /* Biến tính toán giảm giá */
   const originalPrice = ticketData.seatNumber.length * ticketData.trip.price;
   const discount =
     ticketData?.promotion?.discountAmount &&
@@ -234,8 +117,6 @@ const SuccessScreen = ({ route }: any) => {
       ? (ticketData.promotion.discountAmount / 100) *
         (ticketData.seatNumber.length * ticketData.trip.price)
       : 0; // Giá trị mặc định nếu không có đủ thông tin
-
-  /* start các hàm của chọn phương thức thanh toán */
 
   return (
     <ScrollView

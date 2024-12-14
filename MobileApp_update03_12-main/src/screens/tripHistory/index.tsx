@@ -11,7 +11,7 @@ import { styles } from "./style";
 import Header from "../../components/header";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../App.TicketBookingScreen";
+import { RootStackParamList } from "../../../App";
 import { getTickets } from "../app/Tickets/myTickets/api";
 import { Dropdown } from "react-native-element-dropdown";
 

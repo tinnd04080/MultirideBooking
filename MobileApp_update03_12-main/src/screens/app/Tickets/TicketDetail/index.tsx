@@ -2,12 +2,9 @@ import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   ActivityIndicator,
   ScrollView,
   RefreshControl,
-  TouchableOpacity,
-  Alert,
 } from "react-native";
 import { getOnTicket, Ticket } from "../TicketDetail/api"; // Đảm bảo import API đúng
 /* import Header from "../../../../components/header/index"; */
@@ -20,79 +17,30 @@ import {
   formatDateTime,
   formatLicensePlate,
   formatCurrency,
+  getStatusColor,
+  getStatusText,
+  getpaymentMethodText,
 } from "../../../../utils/formatUtils";
+import { RootStackParamList } from "../../../../../App";
+import { NavigationProp } from "@react-navigation/native";
 interface TicketDetailsProps {
   route: { params: { ticketId: string } };
 }
 
+export interface CustomHeaderProps {
+  navigation: NavigationProp<RootStackParamList>; // Đảm bảo kiểu này đúng với định nghĩa RootParamList của bạn
+  title: string;
+  backTo: string;
+}
 const TicketDetails: React.FC<TicketDetailsProps> = ({ route }) => {
-  const navigation = useNavigation(); // Lấy đối tượng navigation từ context
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>(); // Đảm bảo kiểu này chính xác
+
+  /*  const navigation = useNavigation(); // Lấy đối tượng navigation từ context */
   const { ticketId } = route.params; // Lấy ticketId từ route.params
   const [ticketData, setTicketData] = useState<Ticket | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false); // State cho RefreshControl
-
-  // Các hàm định dạng
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "PAID":
-        return "#00796b"; // Màu xanh dương cho đã thanh toán
-      case "PENDING":
-        return "#FFB200"; // Màu cam cho chưa thanh toán
-      case "PAYMENTPENDING":
-        return "#EB5B00"; // Màu cam cho chưa thanh toán
-      case "CANCELED":
-        return "#d32f2f"; // Màu đỏ cho bị hủy
-      case "PAYMENT_FAILED":
-        return "#f44336"; // Màu đỏ cho thất bại thanh toán
-      default:
-        return "#000000"; // Màu đen mặc định
-    }
-  };
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "PENDING":
-        return "CHƯA XÁC NHẬN THANH TOÁN";
-      case "PAID":
-        return "ĐÃ THANH TOÁN";
-      case "PAYMENTPENDING":
-        return "CHỜ THANH TOÁN";
-      case "CANCELED":
-        return "VÉ BỊ HỦY";
-      case "PAYMENT_FAILED":
-        return "THANH TOÁN THẤT BẠI";
-      default:
-        return "Tình trạng không xác định";
-    }
-  };
-  const getpaymentMethodText = (paymentMethod: string) => {
-    switch (paymentMethod) {
-      case "OFFLINEPAYMENT":
-        return "TẠI BẾN - XE";
-      case "ZALOPAY":
-        return "ZALO PAY";
-      default:
-        return "Tình trạng không xác định";
-    }
-  };
-
-  /*  useEffect(() => {
-    const fetchTicketData = async () => {
-      try {
-        const data = await getOnTicket(ticketId); // Gọi API để lấy thông tin vé
-        setTicketData(data); // Lưu dữ liệu vào state
-        console.log(data);
-      } catch (err) {
-        setError("Error fetching ticket data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTicketData();
-  }, [ticketId]); */
 
   useEffect(() => {
     const fetchTicketData = async () => {
@@ -118,6 +66,7 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({ route }) => {
     // Cleanup interval khi component unmount
     return () => clearInterval(intervalId);
   }, [ticketId]);
+
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
@@ -147,7 +96,6 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({ route }) => {
         <RefreshControl refreshing={refreshing} /* onRefresh={onRefresh} */ />
       }
     >
-      {/*  <Header title="Chi tiết vé" /> */}
       <CustomHeader
         title="Chi tiết vé"
         navigation={navigation}

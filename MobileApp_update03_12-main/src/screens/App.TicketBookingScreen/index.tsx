@@ -13,13 +13,10 @@ import { useNavigation } from "@react-navigation/native"; // Thêm import useNav
 import { string } from "yup";
 import { StackNavigationProp } from "@react-navigation/stack";
 
-/* import dayjs from "dayjs"; // Sử dụng dayjs để làm việc với thời gian dễ dàng hơn */
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter"; // Plugin để so sánh ngày giờ
 import utc from "dayjs/plugin/utc"; // Plugin hỗ trợ UTC
 import { Dropdown } from "react-native-element-dropdown";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { FontAwesome } from "@expo/vector-icons"; // Sử dụng đúng cách với FontAwesome từ @expo/vector-icons
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import {
   formatDateTime,
@@ -124,13 +121,6 @@ const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
     { label: "Xe 24 chỗ - phòng Vip", value: 24 },
     { label: "36 chỗ - giường nằm ", value: 36 },
   ];
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("vi-VN", {
-      currency: "VND",
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
 
   const handleSelectTrip = (/* tripId: string */ trip: any) => {
     navigation.navigate("SeatSelectionScreen", { trip });

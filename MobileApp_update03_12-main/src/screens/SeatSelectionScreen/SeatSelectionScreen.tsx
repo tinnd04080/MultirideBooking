@@ -9,7 +9,7 @@ import {
 import { fetchSeatsForTrip } from "../controllers/../../screens/SeatSelectionScreen/SeatController";
 import Header from "../../components/header";
 import { styles } from "./style";
-import { RootStackParamList } from "../App.TicketBookingScreen/index";
+import { RootStackParamList } from "../../../App";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native"; // Thêm import useNavigation
 import { FontAwesome } from "@expo/vector-icons"; // Import FontAwesome icons từ Expo

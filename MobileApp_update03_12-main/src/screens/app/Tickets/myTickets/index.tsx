@@ -12,10 +12,16 @@ import { getTickets } from "./api";
 import Header from "../../../../components/header/index";
 import { useNavigation } from "@react-navigation/native"; // Thêm import useNavigation
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../../App.TicketBookingScreen/index";
+import { RootStackParamList } from "../../../../../App";
 import { Dropdown } from "react-native-element-dropdown";
 import { useFocusEffect } from "@react-navigation/native"; // Thêm import useFocusEffect
-
+import {
+  formatCurrency,
+  formatTime,
+  formatTimeDate,
+  formatDate,
+  getStatusTextTicket,
+} from "../../../../utils/formatUtils";
 interface Tickets {
   _id: string;
   time: string;
@@ -45,62 +51,6 @@ const MyTicketsScreen: React.FC = () => {
   const [filteredTickets, setFilteredTickets] = useState<Tickets[]>([]);
   const [refreshing, setRefreshing] = useState(false); // Trạng thái để hiển thị loading khi kéo xuống
 
-  /* useEffect(() => {
-    const fetchTickets = async () => {
-      try {
-        setLoading(true);
-        const response = await getTickets(currentPage); // currentPage đã được khai báo
-        const { data, totalPage } = response;
-        setTickets((prevTickets) => [...prevTickets, ...data]);
-        setTotalPage(totalPage);
-      } catch (error: any) {
-        console.error("Error fetching tickets:", error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTickets();
-  }, [currentPage]); // currentPage là dependency hợp lệ */
-
-  /* useFocusEffect(
-    React.useCallback(() => {
-      const fetchTickets = async () => {
-        try {
-          setLoading(true);
-          const response = await getTickets(1); // Tải lại dữ liệu từ trang 1
-          const { data, totalPage } = response;
-          setTickets(data); // Xóa dữ liệu cũ và chỉ lấy dữ liệu mới
-          setTotalPage(totalPage);
-        } catch (error: any) {
-          console.error("Error fetching tickets:", error.message);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchTickets();
-    }, []) // Chạy khi màn hình được focus
-  );
-  const handleRefresh = () => {
-    setRefreshing(true); // Bật trạng thái loading
-    fetchTickets(); // Gọi lại hàm fetchTickets để tải lại dữ liệu vé
-  }; */
-
-  /* Lấy dữ liệu từ api */
-  /*  const fetchTickets = async (page: number) => {
-    try {
-      setLoading(true);
-      const response = await getTickets(page); // Gọi API để lấy dữ liệu vé
-      const { data, totalPage } = response;
-      setTickets(page === 1 ? data : [...tickets, ...data]); // Nếu là trang 1, thay thế tất cả dữ liệu, nếu không thì nối thêm
-      setTotalPage(totalPage);
-    } catch (error: any) {
-      console.error("Error fetching tickets:", error.message);
-    } finally {
-      setLoading(false);
-    }
-  }; */
   const fetchTickets = async (page: number) => {
     try {
       setLoading(true);
@@ -137,17 +87,6 @@ const MyTicketsScreen: React.FC = () => {
     setRefreshing(false);
   };
 
-  // Lọc vé theo tình trạng
-  /*  useEffect(() => {
-    if (selectedStatus === "ALL") {
-      setFilteredTickets(tickets);
-    } else {
-      const filtered = tickets.filter(
-        (ticket) => ticket.status === selectedStatus
-      );
-      setFilteredTickets(filtered);
-    }
-  }, [selectedStatus, tickets]); */
   useEffect(() => {
     if (selectedStatus === "ALL") {
       setFilteredTickets(tickets);
@@ -166,42 +105,6 @@ const MyTicketsScreen: React.FC = () => {
     navigation.navigate("TicketDetails", { ticketId: ticket._id }); // Truyền _id (hoặc 'code' nếu đó là _id)
   };
 
-  // Các hàm định dạng
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-  const formatTimeDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${hours}:${minutes} - ${day}/${month}/${year}`;
-  };
-
-  const formatCurrency = (amount: number | string) => {
-    const numericAmount =
-      typeof amount === "string" ? parseFloat(amount) : amount;
-    return new Intl.NumberFormat("vi-VN", {
-      currency: "VND",
-      minimumFractionDigits: 0,
-    }).format(numericAmount);
-  };
-
   const getStatusStyle = (status: string) => {
     switch (status) {
       case "PAID":
@@ -212,20 +115,6 @@ const MyTicketsScreen: React.FC = () => {
         return styles.cancelled;
       default:
         return styles.default;
-    }
-  };
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "PAID":
-        return "Đã Thanh Toán";
-      case "PAYMENTPENDING":
-        return "Chờ Thanh Toán";
-      case "CANCELED":
-        return "Bị Hủy";
-      case "PENDING":
-        return "Chưa xác nhận thanh toán";
-      default:
-        return "Vé Lỗi";
     }
   };
   /* Lọc tình trạng ve */
@@ -267,7 +156,7 @@ const MyTicketsScreen: React.FC = () => {
             {/* Phần trạng thái */}
             <View style={[styles.statusContainer, getStatusStyle(item.status)]}>
               <Text style={styles.statusText}>
-                {getStatusText(item.status)}
+                {getStatusTextTicket(item.status)}
               </Text>
             </View>
           </View>

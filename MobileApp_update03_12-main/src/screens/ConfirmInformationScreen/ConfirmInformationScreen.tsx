@@ -19,7 +19,7 @@ import { createTicket } from "./ticketmodel"; // Import hàm API
 import { getPromotionByCode } from "./ticketmodel"; // Import hàm API
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native"; // Thêm import useNavigation
-import { RootStackParamList } from "../App.TicketBookingScreen/index";
+import { RootStackParamList } from "../../../App";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   formatDateTime,

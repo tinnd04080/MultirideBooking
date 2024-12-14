@@ -12,7 +12,7 @@ import * as Yup from "yup";
 import { styles } from "./style";
 import authApi from "../../../services/Auth/authApi";
 import { StackNavigationProp } from "@react-navigation/stack"; // Thêm import này
-import { RootStackParamList } from "../../App.TicketBookingScreen";
+import { RootStackParamList } from "../../../../App";
 
 // Thêm khai báo kiểu cho navigation
 type RegisterScreenNavigationProp = StackNavigationProp<
