@@ -148,8 +148,9 @@ export const FormCustomer = ({ open }: FormCustomerProps) => {
                   <button className='text-gray-500'>&times;</button>
                 </div>
                 <div className='flex flex-col items-center'>
-                  <img src='https://placehold.co/100x100' alt='Phone with gift icon' className='mb-4' />
-                  <p className='text-center text-gray-700 mb-4'>mã otp đã được gửi đến mail của bạn , hãy nhập nó</p>
+                  <img src='/otp.png' alt='OTP Image' className='mb-4' />
+
+                  <p className='text-center text-gray-700 mb-4'>Mã OTP đã được gửi đến Email của bạn, hãy nhập nó</p>
                   <input
                     type='text'
                     placeholder='Nhập mã otp'
@@ -199,7 +200,7 @@ export const FormCustomer = ({ open }: FormCustomerProps) => {
             </Form.Item> */}
 
             {/* {!userData._id && ( */}
-            <Form.Item
+            {/*  <Form.Item
               className='dark:text-white'
               label='Email'
               name='email'
@@ -209,6 +210,22 @@ export const FormCustomer = ({ open }: FormCustomerProps) => {
               ]}
             >
               <Input type='email' size='large' placeholder='Nhập Email' />
+            </Form.Item> */}
+            <Form.Item
+              className='dark:text-white'
+              label='Email'
+              name='email'
+              rules={[
+                { required: true, message: 'Không được bỏ trống tài khoản!' },
+                { type: 'email', message: 'Email sai định dạng' }
+              ]}
+            >
+              <Input
+                type='email'
+                size='large'
+                placeholder='Nhập Email'
+                disabled={userData._id} // Khi có _id tức là đang chỉnh sửa, email sẽ không thể chỉnh sửa
+              />
             </Form.Item>
             {/* )} */}
             <Form.Item

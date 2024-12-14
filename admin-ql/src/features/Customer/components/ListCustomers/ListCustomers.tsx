@@ -244,14 +244,14 @@ export const ListCustomers = () => {
         </div>
       )
     },
-    /* {
+    {
       title: 'Trạng thái xác minh',
       dataIndex: 'isVerified',
       key: 'isVerified',
-      render: (phoneNumber: string) => (
-        <Tag color={phoneNumber ? 'green' : 'error'}>{phoneNumber ? 'Đã xác minh' : 'Chưa xác minh'}</Tag>
+      render: (isVerified: string) => (
+        <Tag color={isVerified ? 'green' : 'error'}>{isVerified ? 'Đã xác minh' : 'Chưa xác minh'}</Tag>
       )
-    }, */
+    },
     {
       title: <span className='block text-center'>Cập nhật</span>,
       key: 'action',
@@ -292,70 +292,11 @@ export const ListCustomers = () => {
     key: customer._id,
     index: index + 1
   }))
-  const showModal = () => {
-    setIsModalOpen(true)
-  }
 
-  const handleOk = () => {
-    setIsModalOpen(false)
-  }
-
-  const handleCancel = () => {
-    setIsModalOpen(false)
-  }
   if (isLoading) return <Loading />
   if (isError) return <NotFound />
   return (
     <>
-      {hasSelected && (
-        <Space className='mb-4'>
-          <Popconfirm
-            title='Bạn thực sự muốn xóa những danh mục này?'
-            description='Hành động này sẽ xóa những danh mục đang được chọn!'
-            onConfirm={handleDeleteMany}
-            onCancel={() => setSelectedRowKeys([])}
-          >
-            <Button variant='danger'>Xóa tất cả</Button>
-          </Popconfirm>
-
-          {/* <Button
-          // size='large'
-          icon={<HiDocumentDownload />}
-          styleClass='bg-[#209E62] text-white text-sm font-semibold capitalize'
-          onClick={() => {
-            if (customers && customers.length === 0) {
-              messageAlert('Không có dũ liệu để xuất', 'error')
-            }
-            exportDataToExcel(customers, 'Customer Data')
-          }}
-        >
-          Xuất excel
-        </Button> */}
-        </Space>
-      )}
-      <Modal title='Basic Modal' open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-        <div className='flex items-center justify-center min-h-screen bg-gray-100'>
-          <div className='bg-white p-6 rounded-lg shadow-lg w-96'>
-            <div className='flex justify-between items-center mb-4'>
-              <h2 className='text-lg font-semibold'>Đăng Nhập Hoặc Tạo Tài Khoản</h2>
-              <button className='text-gray-500'>&times;</button>
-            </div>
-            <div className='flex flex-col items-center'>
-              <img src='https://placehold.co/100x100' alt='Phone with gift icon' className='mb-4' />
-              <p className='text-center text-gray-700 mb-4'>
-                Nhập số điện thoại mua hàng để hưởng đặc quyền riêng tại FPT Shop
-              </p>
-              <input
-                type='text'
-                placeholder='Nhập số điện thoại'
-                className='border border-gray-300 rounded px-4 py-2 mb-4 w-full'
-              />
-              <button className='bg-red-600 text-white px-4 py-2 rounded w-full'>TIẾP TỤC</button>
-            </div>
-          </div>
-        </div>
-      </Modal>
-
       <div className='dark:bg-graydark'>
         <Table
           columns={columns}
