@@ -16,6 +16,11 @@ import { useNavigation } from "@react-navigation/native"; // Import hook từ Re
 import { styles } from "./style";
 import { Image } from "react-native"; // Đảm bảo nhập đúng Image từ react-native
 import PaymentComponent from "../../../../components/payment/index"; // Sử dụng export theo tên
+import {
+  formatDateTime,
+  formatLicensePlate,
+  formatCurrency,
+} from "../../../../utils/formatUtils";
 interface TicketDetailsProps {
   route: { params: { ticketId: string } };
 }
@@ -29,36 +34,7 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({ route }) => {
   const [refreshing, setRefreshing] = useState(false); // State cho RefreshControl
 
   // Các hàm định dạng
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${hours}:${minutes} - ${day}/${month}/${year}`;
-  };
-  const formatLicensePlate = (licensePlate: string) => {
-    // Biểu thức chính quy để chia biển số thành các phần
-    const regex = /^(\d{2})([a-zA-Z])(\d{3})(\d{2})$/;
-    const regexFourDigit = /^(\d{2})([a-zA-Z])(\d{4})$/; // Đối với biển số có 4 chữ số
 
-    const match = licensePlate.match(regex);
-    const matchFourDigit = licensePlate.match(regexFourDigit);
-
-    if (match) {
-      // Định dạng cho trường hợp biển số có 3 chữ số sau
-      return `${match[1]}${match[2].toUpperCase()}-${match[3]}.${match[4]}`;
-    } else if (matchFourDigit) {
-      // Định dạng cho trường hợp biển số có 4 chữ số sau
-      return `${matchFourDigit[1]}${matchFourDigit[2].toUpperCase()}-${
-        matchFourDigit[3]
-      }`;
-    }
-
-    // Nếu không khớp với bất kỳ định dạng nào, trả về biển số gốc
-    return licensePlate;
-  };
   const getStatusColor = (status: string) => {
     switch (status) {
       case "PAID":
@@ -101,13 +77,8 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({ route }) => {
         return "Tình trạng không xác định";
     }
   };
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("vi-VN", {
-      currency: "VND",
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
-  useEffect(() => {
+
+  /*  useEffect(() => {
     const fetchTicketData = async () => {
       try {
         const data = await getOnTicket(ticketId); // Gọi API để lấy thông tin vé
@@ -121,8 +92,32 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({ route }) => {
     };
 
     fetchTicketData();
-  }, [ticketId]);
+  }, [ticketId]); */
 
+  useEffect(() => {
+    const fetchTicketData = async () => {
+      try {
+        const data = await getOnTicket(ticketId); // Gọi API để lấy thông tin vé
+        setTicketData(data); // Lưu dữ liệu vào state
+        console.log(data);
+      } catch (err) {
+        setError("Error fetching ticket data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Lần đầu gọi API ngay khi component mount
+    fetchTicketData();
+
+    // Đặt interval để gọi API mỗi 20s
+    const intervalId = setInterval(() => {
+      fetchTicketData();
+    }, 20000); // 20s
+
+    // Cleanup interval khi component unmount
+    return () => clearInterval(intervalId);
+  }, [ticketId]);
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
@@ -287,10 +282,11 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({ route }) => {
             </View>
           </View>
         </View>
-        {ticketData.status === "PENDING" && (
-          <PaymentComponent dataTickes={ticketData} />
-        )}
       </View>
+
+      {ticketData.status === "PENDING" && (
+        <PaymentComponent dataTickes={ticketData} />
+      )}
     </ScrollView>
   );
 };

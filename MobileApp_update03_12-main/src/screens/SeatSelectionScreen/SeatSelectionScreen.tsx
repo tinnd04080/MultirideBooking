@@ -13,7 +13,11 @@ import { RootStackParamList } from "../App.TicketBookingScreen/index";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native"; // Thêm import useNavigation
 import { FontAwesome } from "@expo/vector-icons"; // Import FontAwesome icons từ Expo
-
+import {
+  formatDateTime,
+  formatLicensePlate,
+  formatCurrency,
+} from "../../utils/formatUtils";
 interface Seat {
   seatNumber: string;
   status: string;
@@ -56,13 +60,6 @@ const SeatSelectionScreen: React.FC = ({ route }: any) => {
 
     loadSeats();
   }, [tripId]);
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("vi-VN", {
-      currency: "VND",
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
 
   // Hàm để xử lý chọn ghế
   const toggleSeatSelection = (seatNumber: string) => {

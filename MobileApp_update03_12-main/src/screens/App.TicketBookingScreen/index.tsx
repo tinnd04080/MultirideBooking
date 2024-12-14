@@ -21,7 +21,12 @@ import { Dropdown } from "react-native-element-dropdown";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { FontAwesome } from "@expo/vector-icons"; // Sử dụng đúng cách với FontAwesome từ @expo/vector-icons
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-
+import {
+  formatDateTime,
+  formatLicensePlate,
+  formatCurrency,
+  formatTime,
+} from "../../utils/formatUtils";
 // Sử dụng các plugin
 dayjs.extend(isSameOrAfter);
 dayjs.extend(utc);
@@ -127,24 +132,6 @@ const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
     }).format(amount);
   };
 
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const hours = date.getHours().toString().padStart(2, "0"); // Lấy giờ hiện tại
-    const minutes = date.getMinutes().toString().padStart(2, "0"); // Lấy phút hiện tại
-    const day = date.getDate().toString().padStart(2, "0"); // Ngày hiện tại
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Tháng hiện tại
-    const year = date.getFullYear(); // Năm hiện tại
-    return `${hours}:${minutes}`; // Trả về ngày giờ đầy đủ
-  };
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const hours = date.getHours().toString().padStart(2, "0"); // Lấy giờ hiện tại
-    const minutes = date.getMinutes().toString().padStart(2, "0"); // Lấy phút hiện tại
-    const day = date.getDate().toString().padStart(2, "0"); // Ngày hiện tại
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Tháng hiện tại
-    const year = date.getFullYear(); // Năm hiện tại
-    return `${hours}:${minutes} - ${day}/${month}/${year}`; // Trả về ngày giờ đầy đủ
-  };
   const handleSelectTrip = (/* tripId: string */ trip: any) => {
     navigation.navigate("SeatSelectionScreen", { trip });
   };
@@ -287,7 +274,7 @@ const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
             </View>
 
             {/* Thông tin ID chuyến và nút chọn chuyến */}
-            {/* <Text style={styles.totalSeats}>id chuyến xe: {item._id}</Text> */}
+
             <TouchableOpacity
               style={styles.selectTripButton}
               onPress={() => handleSelectTrip(item)}

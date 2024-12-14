@@ -21,6 +21,11 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native"; // Thêm import useNavigation
 import { RootStackParamList } from "../App.TicketBookingScreen/index";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  formatDateTime,
+  formatLicensePlate,
+  formatCurrency,
+} from "../../utils/formatUtils";
 const ConfirmInformation: React.FC = ({ route }: any) => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const { selectedSeats, trip } = route.params;
@@ -89,22 +94,6 @@ const ConfirmInformation: React.FC = ({ route }: any) => {
   const handleFullNameChange = (text: string) => {
     setFullName(text);
     validateFullName(text); // Kiểm tra ngay khi nhập
-  };
-
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const hours = date.getHours().toString().padStart(2, "0"); // Lấy giờ hiện tại
-    const minutes = date.getMinutes().toString().padStart(2, "0"); // Lấy phút hiện tại
-    const day = date.getDate().toString().padStart(2, "0"); // Ngày hiện tại
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Tháng hiện tại
-    const year = date.getFullYear(); // Năm hiện tại
-    return `${hours}:${minutes} - ${day}/${month}/${year}`; // Trả về ngày giờ đầy đủ
-  };
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("vi-VN", {
-      currency: "VND",
-      minimumFractionDigits: 0,
-    }).format(amount);
   };
 
   /* const handleDiscount = async () => {

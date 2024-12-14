@@ -2,29 +2,24 @@ import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   ActivityIndicator,
   ScrollView,
   RefreshControl,
-  TouchableOpacity,
   Alert,
 } from "react-native";
-import {
-  getTicket,
-  updatePaymentMethod,
-} from "../../screens/CreateticketsScreen/showticket";
+import { getTicket } from "../../screens/CreateticketsScreen/showticket";
 import { Image } from "react-native"; // Đảm bảo nhập đúng Image từ react-native
 import Header from "../../components/header";
-import { styles, pickerSelectStyles } from "./style";
-import { payment } from "../../../src/data/data";
-import RNPickerSelect from "react-native-picker-select";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import { Dropdown } from "react-native-element-dropdown";
-import { Linking } from "react-native"; // Đảm bảo nhập đúng
+import { styles } from "./style";
 import PaymentComponent from "../../components/payment"; // Sử dụng export theo tên
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack"; // Import StackNavigationProp
 import { RootStackParamList } from "../../screens/App.TicketBookingScreen/index";
+import {
+  formatDateTime,
+  formatLicensePlate,
+  formatCurrency,
+} from "../../utils/formatUtils";
 
 type ItemType = {
   label: string; // Nếu `label` là chuỗi
@@ -39,10 +34,8 @@ const SuccessScreen = ({ route }: any) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false); // State cho RefreshControl
   const [error, setError] = useState<string | null>(null);
-  const [value, setValue] = useState<string>(""); // Đảm bảo giá trị mặc định không phải là null
   const [isCanceled, setIsCanceled] = useState(false); // Thêm state theo dõi tình trạng vé bị hủy
 
-  const [timeLeft, setTimeLeft] = useState(600); // Đếm ngược từ 600 giây (10 phút)
   const token = "your-auth-token";
   /*  console.log("Dữ liệu trả về", ticketData); */
 
@@ -187,44 +180,6 @@ const SuccessScreen = ({ route }: any) => {
     return <View style={styles.center}></View>;
   }
 
-  // Các hàm định dạng
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${hours}:${minutes} - ${day}/${month}/${year}`;
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("vi-VN", {
-      currency: "VND",
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
-  const formatLicensePlate = (licensePlate: string) => {
-    // Biểu thức chính quy để chia biển số thành các phần
-    const regex = /^(\d{2})([a-zA-Z])(\d{3})(\d{2})$/;
-    const regexFourDigit = /^(\d{2})([a-zA-Z])(\d{4})$/; // Đối với biển số có 4 chữ số
-
-    const match = licensePlate.match(regex);
-    const matchFourDigit = licensePlate.match(regexFourDigit);
-
-    if (match) {
-      // Định dạng cho trường hợp biển số có 3 chữ số sau
-      return `${match[1]}${match[2].toUpperCase()}-${match[3]}.${match[4]}`;
-    } else if (matchFourDigit) {
-      // Định dạng cho trường hợp biển số có 4 chữ số sau
-      return `${matchFourDigit[1]}${matchFourDigit[2].toUpperCase()}-${
-        matchFourDigit[3]
-      }`;
-    }
-
-    // Nếu không khớp với bất kỳ định dạng nào, trả về biển số gốc
-    return licensePlate;
-  };
   // Hàm xử lý hiển thị tình trạng vé
   const getStatusText = (status: string) => {
     switch (status) {
@@ -419,53 +374,6 @@ const SuccessScreen = ({ route }: any) => {
           </View>
         </View>
       </View>
-      {/* <View style={styles.viewtwo}>
-        <View style={styles.containerTime}>
-          <View style={styles.sectionTime}>
-            <Text style={styles.lableTime}>Thời gian giữ vé còn lại </Text>
-            <Text style={styles.countdownText}>
-              {minutes < 10 ? `0${minutes}` : minutes}:
-              {seconds < 10 ? `0${seconds}` : seconds}
-            </Text>
-          </View>
-        </View>
-        <View style={styles.sectionPay}>
-          <Text style={styles.sectionTitlePay}>Phương thức thanh toán: </Text>
-          <Dropdown
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            iconStyle={styles.iconStyle}
-            data={payment}
-            maxHeight={300}
-            labelField="label"
-            valueField="value"
-            placeholder="Chọn phương thức thanh toán"
-            value={value}
-            onChange={(item) => {
-              setValue(item.value);
-              console.log("Người dùng đã chọn:", item);
-            }}
-            renderLeftIcon={() =>
-              // Hiển thị icon khi có giá trị được chọn
-              selectedIcon ? (
-                <Image style={styles.selectedIcon} source={selectedIcon} />
-              ) : null
-            }
-            renderItem={renderItem}
-          />
-        </View> */}
-      {/* Phần 4: Đếm ngược */}
-      {/* <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.confirmButton}
-            onPress={handlePaymentUpdate} // Gọi hàm gửi dữ liệu lên API khi nhấn nút
-          >
-            <Text style={styles.buttonText}>Thanh toán</Text>
-          </TouchableOpacity>
-        </View> */}
-      {/* </View> */}
       <PaymentComponent dataTickes={ticket} />
     </ScrollView>
   );
