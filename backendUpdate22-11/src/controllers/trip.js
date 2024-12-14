@@ -10,7 +10,8 @@ import { TRIP_STATUS } from "../constants/index.js";
 import moment from "moment";
 const TripController = {
   /* Thêm chuyến xe mới */
-  /* createTrip: async (req, res) => {
+  /* 13/12 */
+  createTrip: async (req, res) => {
     try {
       const { route, bus, departureTime, arrivalTime, status } = req.body;
 
@@ -18,13 +19,26 @@ const TripController = {
       const busInfo = await Bus.findById(bus).exec();
       const busRouteInfo = await BusRoutes.findById(route).exec();
 
+      // Kiểm tra trạng thái của xe và tuyến xe
+      if (busInfo.status !== "OPEN") {
+        return res.status(400).json({
+          message: "Không thể thêm. Vì xe này hiện tại không hoạt động",
+        });
+      }
+
+      if (busRouteInfo.status !== "OPEN") {
+        return res.status(400).json({
+          message: "Không thể thêm. Vì tuyến đường hiện tại không hoạt động",
+        });
+      }
+
       // Tính toán giá vé
       const ticketPrice =
         busRouteInfo.distance * busRouteInfo.pricePerKM * busInfo.priceFactor;
 
       if (!busInfo || !busRouteInfo) {
         return res.status(404).json({
-          message: "Bus or route not found",
+          message: "Không tìm thấy xe hoặc tuyến đường",
         });
       }
 
@@ -81,7 +95,8 @@ const TripController = {
         error: error.message,
       });
     }
-  }, */
+  },
+  /* 14/12 */
   createTrip: async (req, res) => {
     try {
       const { route, bus, departureTime, arrivalTime, status } = req.body;
@@ -91,6 +106,12 @@ const TripController = {
       const busRouteInfo = await BusRoutes.findById(route).exec();
 
       // Kiểm tra trạng thái của xe và tuyến xe
+      if (!busInfo || !busRouteInfo) {
+        return res.status(404).json({
+          message: "Không tìm thấy xe hoặc tuyến đường",
+        });
+      }
+
       if (busInfo.status !== "OPEN") {
         return res.status(400).json({
           message: "Không thể thêm. Vì xe này hiện tại không hoạt động",
@@ -103,15 +124,38 @@ const TripController = {
         });
       }
 
+      // Kiểm tra các chuyến trùng thời gian
+      const overlappingTrips = await Trip.find({
+        bus: bus,
+        $or: [
+          {
+            departureTime: { $lte: departureTime },
+            arrivalTime: { $gte: departureTime },
+          }, // Chuyến mới bắt đầu trong thời gian của chuyến cũ
+          {
+            departureTime: { $lte: arrivalTime },
+            arrivalTime: { $gte: arrivalTime },
+          }, // Chuyến mới kết thúc trong thời gian của chuyến cũ
+          {
+            departureTime: { $gte: departureTime },
+            arrivalTime: { $lte: arrivalTime },
+          }, // Chuyến mới bao phủ toàn bộ thời gian của chuyến cũ
+          {
+            departureTime: { $lte: departureTime },
+            arrivalTime: { $gte: arrivalTime },
+          }, // Chuyến cũ nằm trong khoảng thời gian của chuyến mới
+        ],
+      });
+
+      if (overlappingTrips.length > 0) {
+        return res.status(400).json({
+          message: "Xe đã được sử dụng trong thời gian này!",
+        });
+      }
+
       // Tính toán giá vé
       const ticketPrice =
         busRouteInfo.distance * busRouteInfo.pricePerKM * busInfo.priceFactor;
-
-      if (!busInfo || !busRouteInfo) {
-        return res.status(404).json({
-          message: "Không tìm thấy xe hoặc tuyến đường",
-        });
-      }
 
       // Tạo chuyến xe
       const trip = await new Trip({
