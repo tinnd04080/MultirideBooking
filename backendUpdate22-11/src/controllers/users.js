@@ -234,7 +234,7 @@ const UserController = {
   },
  */
   /* updateUser 02/12 finish*/
-  updateUser: async (req, res) => {
+  /* updateUser: async (req, res) => {
     try {
       const { id } = req.params; // Lấy ID người dùng từ params
       const { userName, phoneNumber, fullName, cccd, role, status } = req.body; // Lấy dữ liệu từ body
@@ -285,7 +285,72 @@ const UserController = {
         error: error.message,
       });
     }
+  }, */
+  updateUser: async (req, res) => {
+    try {
+      const { id } = req.params; // Lấy ID người dùng từ params
+      const { userName, phoneNumber, fullName, cccd, role, status } = req.body; // Lấy dữ liệu từ body
+
+      // Lấy thông tin người dùng hiện tại từ cơ sở dữ liệu
+      const user = await User.findById(id).exec();
+      if (!user) {
+        return res.status(404).json({ message: "Người dùng không tồn tại" });
+      }
+
+      // Kiểm tra nếu có thay đổi phoneNumber, kiểm tra trùng với các item trong cơ sở dữ liệu
+      if (phoneNumber && phoneNumber !== user.phoneNumber) {
+        const existingUserWithPhoneNumber = await User.findOne({ phoneNumber });
+        if (existingUserWithPhoneNumber) {
+          return res
+            .status(400)
+            .json({ message: "Số điện thoại đã được đăng ký" });
+        }
+      }
+
+      // Kiểm tra vai trò hợp lệ
+      const validRoles = Object.values(ROLE); // ["ADMIN", "STAFF", "CUSTOMER"]
+      const userRole = validRoles.includes(role) ? role : null;
+
+      // Xác định trạng thái, nếu không có, mặc định là 'ACTIVE'
+      const userStatus =
+        status && Object.values(USER_STATUS).includes(status)
+          ? status
+          : USER_STATUS.ACTIVE;
+
+      // Cập nhật thông tin người dùng
+      const updatedUser = await User.findByIdAndUpdate(
+        id,
+        { userName, phoneNumber, fullName, cccd, status: userStatus }, // Cập nhật trạng thái
+        { new: true }
+      );
+
+      // Nếu có role và hợp lệ, cập nhật bảng Permission
+      if (userRole) {
+        const permission = await Permission.findOneAndUpdate(
+          { user: id },
+          { role: userRole },
+          { new: true }
+        );
+
+        if (!permission) {
+          return res
+            .status(404)
+            .json({ message: "Không tìm thấy quyền người dùng" });
+        }
+      }
+
+      res.json({
+        message: "Cập nhật người dùng thành công",
+        user: updatedUser,
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
   },
+
   updateUserRole: async (req, res) => {
     try {
       const { id } = req.params;

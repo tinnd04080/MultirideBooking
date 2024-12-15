@@ -43,7 +43,7 @@ export const FormCustomer = ({ open }: FormCustomerProps) => {
       })
   }, [userData, form])
 
-  const onFinish = async (values: any) => {
+  /* const onFinish = async (values: any) => {
     console.log(values, 'values')
     if (fileList.length <= 0 && !userData._id) {
       setEmailValue(values.email)
@@ -83,7 +83,63 @@ export const FormCustomer = ({ open }: FormCustomerProps) => {
         })
       return
     }
+  } */
+  const onFinish = async (values: any) => {
+    console.log(values, 'values')
+    if (fileList.length <= 0 && !userData._id) {
+      setEmailValue(values.email)
+      addUser({
+        userName: values.userName,
+        email: values.email,
+        phoneNumber: values.phoneNumber,
+        fullName: values.fullName,
+        cccd: values.cccd,
+        status: values.status,
+        password: values.password,
+        role: values?.role
+      })
+        .unwrap()
+        .then(() => {
+          toast.success('Thêm khách hàng thành công')
+          // onClose()
+          setCheckOtp(true)
+        })
+        .catch((error: any) => {
+          const err = error as { data?: { message?: string } }
+
+          // Kiểm tra và hiển thị thông báo lỗi từ backend
+          if (err.data && err.data.message) {
+            toast.error(`Thêm khách hàng thất bại! ${err.data.message}`)
+          } else {
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau!')
+          }
+          onClose()
+        })
+      return
+    }
+
+    if (userData._id && fileList.length === 0) {
+      updateUser({ ...values, _id: userData._id })
+        .unwrap()
+        .then(() => {
+          messageAlert('Cập nhật thành công', 'success')
+          // window.location.reload()
+          onClose()
+        })
+        .catch((error: any) => {
+          const err = error as { data?: { message?: string } }
+
+          // Kiểm tra và hiển thị thông báo lỗi từ backend
+          if (err.data && err.data.message) {
+            messageAlert(`Cập nhật thất bại: ${err.data.message}`, 'error')
+          } else {
+            messageAlert('Cập nhật thất bại, vui lòng thử lại sau!', 'error')
+          }
+        })
+      return
+    }
   }
+
   const onClose = () => {
     setFileList([])
     // userData._id && dispatch(setUser({ _id: '', username: '', gender: '', avatar: '' }))

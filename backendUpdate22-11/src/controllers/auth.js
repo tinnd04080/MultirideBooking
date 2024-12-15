@@ -225,14 +225,21 @@ const AuthController = {
       req.body;
 
     try {
-      // Kiểm tra xem email hoặc số điện thoại đã tồn tại chưa
-      const emailOrPhoneExists = await User.findOne({
-        $or: [{ email }, { phoneNumber }],
-      }).exec();
-
-      if (emailOrPhoneExists) {
+      // Kiểm tra xem email đã tồn tại chưa
+      const existingEmail = await User.findOne({ email }).exec();
+      if (existingEmail) {
+        console.error("Email đã tồn tại:", email); // Log lỗi chi tiết
         return res.status(400).json({
-          message: "Email hoặc số điện thoại đã tồn tại",
+          message: "Email đã tồn tại",
+        });
+      }
+
+      // Kiểm tra xem số điện thoại đã tồn tại chưa
+      const existingPhoneNumber = await User.findOne({ phoneNumber }).exec();
+      if (existingPhoneNumber) {
+        console.error("Số điện thoại đã tồn tại:", phoneNumber); // Log lỗi chi tiết
+        return res.status(400).json({
+          message: "Số điện thoại đã tồn tại",
         });
       }
 

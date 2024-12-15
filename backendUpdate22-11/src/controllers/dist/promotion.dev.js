@@ -417,8 +417,77 @@ var PromotionController = {
       });
     }
   }, */
+
+  /* updatePromotion: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const {
+        code,
+        description,
+        discountAmount,
+        discountType,
+        startDate,
+        endDate,
+        remainingCount, // Thêm trường remainingCount
+        status, // Thêm trường status
+        quantity, // Thêm trường quantity
+      } = req.body;
+        const currentDate = new Date(); // Lấy ngày hiện tại
+      const startDateObj = new Date(startDate); // Chuyển startDate thành đối tượng Date
+        // Kiểm tra nếu startDate là trong tương lai thì tự động đặt status thành "EXPIRED"
+      let finalStatus = status;
+      if (startDateObj > currentDate) {
+        finalStatus = "EXPIRED";
+      } else {
+        // Kiểm tra xem status có hợp lệ không, chỉ khi startDate không phải trong tương lai
+        if (!status || !Object.values(PROMOTIONT_STATUS).includes(status)) {
+          return res.status(400).json({
+            message:
+              "Trạng thái không hợp lệ, vui lòng chọn ACTIVE hoặc EXPIRED.",
+          });
+        }
+      }
+        // Lấy thông tin Promotion hiện tại từ cơ sở dữ liệu
+      const promotion = await Promotion.findById(id).exec();
+        if (!promotion) {
+        return res.status(404).json({ message: "Không tìm thấy khuyến mãi" });
+      }
+        // Kiểm tra nếu quantity thay đổi, tính toán lại remainingCount
+      let updatedRemainingCount = remainingCount;
+        // Nếu quantity thay đổi
+      if (quantity !== undefined && quantity !== promotion.quantity) {
+        // Tính toán lại remainingCount mới theo công thức:
+        // remainingCount mới = quantity mới - (quantity cũ - remainingCount cũ)
+        updatedRemainingCount =
+          quantity - (promotion.quantity - promotion.remainingCount);
+      }
+        // Cập nhật Promotion
+      const updatedPromotion = await Promotion.findByIdAndUpdate(
+        id,
+        {
+          code,
+          description,
+          discountAmount,
+          discountType,
+          startDate,
+          endDate,
+          remainingCount: updatedRemainingCount, // Cập nhật lại remainingCount
+          quantity, // Cập nhật quantity
+          status: finalStatus, // Cập nhật status
+        },
+        { new: true } // Trả về đối tượng mới sau khi cập nhật
+      ).exec();
+        // Trả về thông tin đã cập nhật
+      res.json(updatedPromotion);
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }, */
   updatePromotion: function updatePromotion(req, res) {
-    var id, _req$body2, code, description, discountAmount, discountType, startDate, endDate, remainingCount, status, quantity, currentDate, startDateObj, finalStatus, promotion, updatedRemainingCount, updatedPromotion;
+    var id, _req$body2, code, description, discountAmount, discountType, startDate, endDate, remainingCount, status, quantity, currentDate, startDateObj, finalStatus, promotion, existingPromotionWithCode, updatedRemainingCount, updatedPromotion;
 
     return regeneratorRuntime.async(function updatePromotion$(_context5) {
       while (1) {
@@ -470,6 +539,29 @@ var PromotionController = {
             }));
 
           case 17:
+            if (!(code && code !== promotion.code)) {
+              _context5.next = 23;
+              break;
+            }
+
+            _context5.next = 20;
+            return regeneratorRuntime.awrap(_promotion["default"].findOne({
+              code: code
+            }));
+
+          case 20:
+            existingPromotionWithCode = _context5.sent;
+
+            if (!existingPromotionWithCode) {
+              _context5.next = 23;
+              break;
+            }
+
+            return _context5.abrupt("return", res.status(400).json({
+              message: "Mã khuyến mãi đã có"
+            }));
+
+          case 23:
             // Kiểm tra nếu quantity thay đổi, tính toán lại remainingCount
             updatedRemainingCount = remainingCount; // Nếu quantity thay đổi
 
@@ -480,7 +572,7 @@ var PromotionController = {
             } // Cập nhật Promotion
 
 
-            _context5.next = 21;
+            _context5.next = 27;
             return regeneratorRuntime.awrap(_promotion["default"].findByIdAndUpdate(id, {
               code: code,
               description: description,
@@ -499,27 +591,27 @@ var PromotionController = {
             } // Trả về đối tượng mới sau khi cập nhật
             ).exec());
 
-          case 21:
+          case 27:
             updatedPromotion = _context5.sent;
             // Trả về thông tin đã cập nhật
             res.json(updatedPromotion);
-            _context5.next = 28;
+            _context5.next = 34;
             break;
 
-          case 25:
-            _context5.prev = 25;
+          case 31:
+            _context5.prev = 31;
             _context5.t0 = _context5["catch"](0);
             res.status(500).json({
               message: "Internal server error",
               error: _context5.t0.message
             });
 
-          case 28:
+          case 34:
           case "end":
             return _context5.stop();
         }
       }
-    }, null, null, [[0, 25]]);
+    }, null, null, [[0, 31]]);
   },
   removePromotion: function removePromotion(req, res) {
     var id, promotion;

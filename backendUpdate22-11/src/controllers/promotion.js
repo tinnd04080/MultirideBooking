@@ -332,7 +332,7 @@ Còn nếu qua 2 điều kiện thì giữ nguyên*/
       });
     }
   }, */
-  updatePromotion: async (req, res) => {
+  /* updatePromotion: async (req, res) => {
     try {
       const { id } = req.params;
       const {
@@ -407,7 +407,92 @@ Còn nếu qua 2 điều kiện thì giữ nguyên*/
         error: error.message,
       });
     }
+  }, */
+  updatePromotion: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const {
+        code,
+        description,
+        discountAmount,
+        discountType,
+        startDate,
+        endDate,
+        remainingCount, // Thêm trường remainingCount
+        status, // Thêm trường status
+        quantity, // Thêm trường quantity
+      } = req.body;
+
+      const currentDate = new Date(); // Lấy ngày hiện tại
+      const startDateObj = new Date(startDate); // Chuyển startDate thành đối tượng Date
+
+      // Kiểm tra nếu startDate là trong tương lai thì tự động đặt status thành "EXPIRED"
+      let finalStatus = status;
+      if (startDateObj > currentDate) {
+        finalStatus = "EXPIRED";
+      } else {
+        // Kiểm tra xem status có hợp lệ không, chỉ khi startDate không phải trong tương lai
+        if (!status || !Object.values(PROMOTIONT_STATUS).includes(status)) {
+          return res.status(400).json({
+            message:
+              "Trạng thái không hợp lệ, vui lòng chọn ACTIVE hoặc EXPIRED.",
+          });
+        }
+      }
+
+      // Lấy thông tin Promotion hiện tại từ cơ sở dữ liệu
+      const promotion = await Promotion.findById(id).exec();
+
+      if (!promotion) {
+        return res.status(404).json({ message: "Không tìm thấy khuyến mãi" });
+      }
+
+      // Kiểm tra nếu có thay đổi mã khuyến mãi (code), kiểm tra trùng với các item trong cơ sở dữ liệu
+      if (code && code !== promotion.code) {
+        const existingPromotionWithCode = await Promotion.findOne({ code });
+        if (existingPromotionWithCode) {
+          return res.status(400).json({ message: "Mã khuyến mãi đã có" });
+        }
+      }
+
+      // Kiểm tra nếu quantity thay đổi, tính toán lại remainingCount
+      let updatedRemainingCount = remainingCount;
+
+      // Nếu quantity thay đổi
+      if (quantity !== undefined && quantity !== promotion.quantity) {
+        // Tính toán lại remainingCount mới theo công thức:
+        // remainingCount mới = quantity mới - (quantity cũ - remainingCount cũ)
+        updatedRemainingCount =
+          quantity - (promotion.quantity - promotion.remainingCount);
+      }
+
+      // Cập nhật Promotion
+      const updatedPromotion = await Promotion.findByIdAndUpdate(
+        id,
+        {
+          code,
+          description,
+          discountAmount,
+          discountType,
+          startDate,
+          endDate,
+          remainingCount: updatedRemainingCount, // Cập nhật lại remainingCount
+          quantity, // Cập nhật quantity
+          status: finalStatus, // Cập nhật status
+        },
+        { new: true } // Trả về đối tượng mới sau khi cập nhật
+      ).exec();
+
+      // Trả về thông tin đã cập nhật
+      res.json(updatedPromotion);
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
   },
+
   removePromotion: async (req, res) => {
     try {
       const { id } = req.params;

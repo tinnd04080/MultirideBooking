@@ -113,27 +113,6 @@ export const ListCustomers = () => {
   console.log('Người dùng chọn', options)
   console.log('Dữ liệu trả về', customersData)
 
-  const handleDeleteMany = () => {
-    selectedRowKeys.forEach((selectItem) => {
-      deleteUser(selectItem as string)
-        .unwrap()
-        .then(() => {
-          messageAlert('Xóa thành công', 'success')
-        })
-        .catch(() => messageAlert('Xóa thất bại!', 'error'))
-    })
-    setSelectedRowKeys([])
-  }
-  const handleDelete = async (id: string) => {
-    await pause(1000)
-    deleteUser(id)
-      .unwrap()
-      .then(() => {
-        messageAlert('Xóa thành công', 'success')
-      })
-      .catch(() => messageAlert('Xóa thất bại!', 'error'))
-  }
-
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys)
   }
@@ -268,20 +247,6 @@ export const ListCustomers = () => {
               }}
             />
           </Tooltip>
-          {/* <Tooltip title='Xóa người dùng này'>
-            <Popconfirm
-              title='Bạn có muốn xóa khách hàng này?'
-              okButtonProps={{ style: { backgroundColor: '#3C50E0', color: '#fff' } }}
-              onCancel={cancelDelete}
-              onConfirm={() => handleDelete(customer._id!)}
-            >
-              <ButtonAnt
-                size='large'
-                className='bg-meta-1 hover:!text-white flex items-center justify-center text-white'
-                icon={<BsFillTrashFill />}
-              />
-            </Popconfirm>
-          </Tooltip> */}
         </div>
       )
     }
