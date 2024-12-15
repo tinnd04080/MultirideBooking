@@ -235,8 +235,57 @@ var BusRouteController = {
       });
     }
   }, */
+
+  /*  updateBusRoute: async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log(req.body);
+      const {
+        startProvince,
+        startDistrict,
+        endDistrict,
+        endProvince,
+        status,
+        distance,
+        pricePerKM,
+      } = req.body;
+        // Kiểm tra nếu trạng thái muốn thay đổi là 'CLOSED'
+      if (status === "CLOSED") {
+        // Kiểm tra xem có chuyến xe nào với busRouteId này và có status là 'OPEN'
+        const activeTrip = await Trip.findOne({ route: id, status: "OPEN" });
+          if (activeTrip) {
+          // Nếu có chuyến xe đang hoạt động với status 'OPEN', không cho phép thay đổi status
+          return res.status(400).json({
+            message:
+              "Tuyến xe này đang có chuyến xe hoạt động. Không thể ngừng hoạt động tuyến.",
+          });
+        }
+      }
+        // Cập nhật BusRoute nếu không có chuyến xe đang hoạt động hoặc trạng thái của chuyến xe là 'CLOSED'
+      const busRoute = await BusRoutes.findByIdAndUpdate(
+        id,
+        {
+          startProvince,
+          startDistrict,
+          endDistrict,
+          endProvince,
+          status,
+          distance,
+          pricePerKM,
+        },
+        { new: true }
+      );
+        // Trả về BusRoute đã được cập nhật
+      res.json(busRoute);
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }, */
   updateBusRoute: function updateBusRoute(req, res) {
-    var id, _req$body2, startProvince, startDistrict, endDistrict, endProvince, status, distance, pricePerKM, activeTrip, busRoute;
+    var id, _req$body2, startProvince, startDistrict, endDistrict, endProvince, status, distance, pricePerKM, existingRoute, activeTrip, busRoute;
 
     return regeneratorRuntime.async(function updateBusRoute$(_context4) {
       while (1) {
@@ -245,24 +294,47 @@ var BusRouteController = {
             _context4.prev = 0;
             id = req.params.id;
             console.log(req.body);
-            _req$body2 = req.body, startProvince = _req$body2.startProvince, startDistrict = _req$body2.startDistrict, endDistrict = _req$body2.endDistrict, endProvince = _req$body2.endProvince, status = _req$body2.status, distance = _req$body2.distance, pricePerKM = _req$body2.pricePerKM; // Kiểm tra nếu trạng thái muốn thay đổi là 'CLOSED'
+            _req$body2 = req.body, startProvince = _req$body2.startProvince, startDistrict = _req$body2.startDistrict, endDistrict = _req$body2.endDistrict, endProvince = _req$body2.endProvince, status = _req$body2.status, distance = _req$body2.distance, pricePerKM = _req$body2.pricePerKM; // Kiểm tra xem tuyến xe đã tồn tại hay chưa
 
-            if (!(status === "CLOSED")) {
-              _context4.next = 10;
+            _context4.next = 6;
+            return regeneratorRuntime.awrap(_busRoutes["default"].findOne({
+              startProvince: startProvince,
+              endProvince: endProvince,
+              _id: {
+                $ne: id
+              } // Loại trừ tuyến xe hiện tại (nếu đang cập nhật)
+
+            }));
+
+          case 6:
+            existingRoute = _context4.sent;
+
+            if (!existingRoute) {
+              _context4.next = 9;
               break;
             }
 
-            _context4.next = 7;
+            return _context4.abrupt("return", res.status(400).json({
+              message: "Tuyến xe đã tồn tại. Vui lòng tạo lại"
+            }));
+
+          case 9:
+            if (!(status === "CLOSED")) {
+              _context4.next = 15;
+              break;
+            }
+
+            _context4.next = 12;
             return regeneratorRuntime.awrap(_trips["default"].findOne({
               route: id,
               status: "OPEN"
             }));
 
-          case 7:
+          case 12:
             activeTrip = _context4.sent;
 
             if (!activeTrip) {
-              _context4.next = 10;
+              _context4.next = 15;
               break;
             }
 
@@ -270,8 +342,8 @@ var BusRouteController = {
               message: "Tuyến xe này đang có chuyến xe hoạt động. Không thể ngừng hoạt động tuyến."
             }));
 
-          case 10:
-            _context4.next = 12;
+          case 15:
+            _context4.next = 17;
             return regeneratorRuntime.awrap(_busRoutes["default"].findByIdAndUpdate(id, {
               startProvince: startProvince,
               startDistrict: startDistrict,
@@ -284,27 +356,27 @@ var BusRouteController = {
               "new": true
             }));
 
-          case 12:
+          case 17:
             busRoute = _context4.sent;
             // Trả về BusRoute đã được cập nhật
             res.json(busRoute);
-            _context4.next = 19;
+            _context4.next = 24;
             break;
 
-          case 16:
-            _context4.prev = 16;
+          case 21:
+            _context4.prev = 21;
             _context4.t0 = _context4["catch"](0);
             res.status(500).json({
               message: "Internal server error",
               error: _context4.t0.message
             });
 
-          case 19:
+          case 24:
           case "end":
             return _context4.stop();
         }
       }
-    }, null, null, [[0, 16]]);
+    }, null, null, [[0, 21]]);
   },
   removeBusRoute: function removeBusRoute(req, res) {
     var id, busRoute;

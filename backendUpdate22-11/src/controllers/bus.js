@@ -173,7 +173,7 @@ const BusController = {
         if (tripUsingBus) {
           return res.status(400).json({
             message:
-              "Tuyến xe này có chuyến xe đang hoạt động. Không thể chuyển đổi trạng thái",
+              "Xe đang hoạt động trong một chuyến xe. Không thể chuyển đổi trạng thái",
           });
         }
       }

@@ -89,17 +89,35 @@ var PromotionController = {
 
   /* Tạo mã giảm giá update 02/12 finish */
   createPromotion: function createPromotion(req, res) {
-    var _req$body, code, description, discountAmount, discountType, startDate, endDate, quantity, status, currentDate, startDateObj, finalStatus, promotion;
+    var _req$body, code, description, discountAmount, discountType, startDate, endDate, quantity, status, existingPromotion, currentDate, startDateObj, finalStatus, promotion;
 
     return regeneratorRuntime.async(function createPromotion$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
             _context.prev = 0;
-            _req$body = req.body, code = _req$body.code, description = _req$body.description, discountAmount = _req$body.discountAmount, discountType = _req$body.discountType, startDate = _req$body.startDate, endDate = _req$body.endDate, quantity = _req$body.quantity, status = _req$body.status; // Kiểm tra số lượng hợp lệ
+            _req$body = req.body, code = _req$body.code, description = _req$body.description, discountAmount = _req$body.discountAmount, discountType = _req$body.discountType, startDate = _req$body.startDate, endDate = _req$body.endDate, quantity = _req$body.quantity, status = _req$body.status; // Kiểm tra xem mã khuyến mãi đã tồn tại trong cơ sở dữ liệu chưa
 
+            _context.next = 4;
+            return regeneratorRuntime.awrap(_promotion["default"].findOne({
+              code: code
+            }));
+
+          case 4:
+            existingPromotion = _context.sent;
+
+            if (!existingPromotion) {
+              _context.next = 7;
+              break;
+            }
+
+            return _context.abrupt("return", res.status(400).json({
+              message: "Mã khuyến mãi đã có"
+            }));
+
+          case 7:
             if (!(quantity <= 0)) {
-              _context.next = 4;
+              _context.next = 9;
               break;
             }
 
@@ -107,7 +125,7 @@ var PromotionController = {
               message: "Số lượng phải lớn hơn 0"
             }));
 
-          case 4:
+          case 9:
             // Kiểm tra ngày bắt đầu hợp lệ
             currentDate = new Date(); // Lấy ngày giờ hiện tại
 
@@ -116,17 +134,17 @@ var PromotionController = {
             finalStatus = status;
 
             if (!(startDateObj > currentDate)) {
-              _context.next = 11;
+              _context.next = 16;
               break;
             }
 
             finalStatus = "EXPIRED";
-            _context.next = 13;
+            _context.next = 18;
             break;
 
-          case 11:
+          case 16:
             if (!(!status || !Object.values(_index.PROMOTIONT_STATUS).includes(status))) {
-              _context.next = 13;
+              _context.next = 18;
               break;
             }
 
@@ -134,8 +152,8 @@ var PromotionController = {
               message: "Trạng thái không hợp lệ, vui lòng chọn ACTIVE hoặc EXPIRED."
             }));
 
-          case 13:
-            _context.next = 15;
+          case 18:
+            _context.next = 20;
             return regeneratorRuntime.awrap(new _promotion["default"]({
               code: code,
               description: description,
@@ -149,26 +167,26 @@ var PromotionController = {
               status: finalStatus
             }).save());
 
-          case 15:
+          case 20:
             promotion = _context.sent;
             res.json(promotion);
-            _context.next = 22;
+            _context.next = 27;
             break;
 
-          case 19:
-            _context.prev = 19;
+          case 24:
+            _context.prev = 24;
             _context.t0 = _context["catch"](0);
             res.status(500).json({
               message: "Internal server error",
               error: _context.t0.message
             });
 
-          case 22:
+          case 27:
           case "end":
             return _context.stop();
         }
       }
-    }, null, null, [[0, 19]]);
+    }, null, null, [[0, 24]]);
   },
 
   /*  getPromotions: async (req, res) => {
@@ -448,7 +466,7 @@ var PromotionController = {
             }
 
             return _context5.abrupt("return", res.status(404).json({
-              message: "Promotion not found"
+              message: "Không tìm thấy khuyến mãi"
             }));
 
           case 17:

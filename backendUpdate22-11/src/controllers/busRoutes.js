@@ -183,6 +183,58 @@ const BusRouteController = {
       });
     }
   }, */
+  /*  updateBusRoute: async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log(req.body);
+      const {
+        startProvince,
+        startDistrict,
+        endDistrict,
+        endProvince,
+        status,
+        distance,
+        pricePerKM,
+      } = req.body;
+
+      // Kiểm tra nếu trạng thái muốn thay đổi là 'CLOSED'
+      if (status === "CLOSED") {
+        // Kiểm tra xem có chuyến xe nào với busRouteId này và có status là 'OPEN'
+        const activeTrip = await Trip.findOne({ route: id, status: "OPEN" });
+
+        if (activeTrip) {
+          // Nếu có chuyến xe đang hoạt động với status 'OPEN', không cho phép thay đổi status
+          return res.status(400).json({
+            message:
+              "Tuyến xe này đang có chuyến xe hoạt động. Không thể ngừng hoạt động tuyến.",
+          });
+        }
+      }
+
+      // Cập nhật BusRoute nếu không có chuyến xe đang hoạt động hoặc trạng thái của chuyến xe là 'CLOSED'
+      const busRoute = await BusRoutes.findByIdAndUpdate(
+        id,
+        {
+          startProvince,
+          startDistrict,
+          endDistrict,
+          endProvince,
+          status,
+          distance,
+          pricePerKM,
+        },
+        { new: true }
+      );
+
+      // Trả về BusRoute đã được cập nhật
+      res.json(busRoute);
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }, */
   updateBusRoute: async (req, res) => {
     try {
       const { id } = req.params;
@@ -196,6 +248,19 @@ const BusRouteController = {
         distance,
         pricePerKM,
       } = req.body;
+
+      // Kiểm tra xem tuyến xe đã tồn tại hay chưa
+      const existingRoute = await BusRoutes.findOne({
+        startProvince,
+        endProvince,
+        _id: { $ne: id }, // Loại trừ tuyến xe hiện tại (nếu đang cập nhật)
+      });
+
+      if (existingRoute) {
+        return res.status(400).json({
+          message: "Tuyến xe đã tồn tại. Vui lòng tạo lại",
+        });
+      }
 
       // Kiểm tra nếu trạng thái muốn thay đổi là 'CLOSED'
       if (status === "CLOSED") {

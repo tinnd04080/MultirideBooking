@@ -164,7 +164,7 @@ const PreviewProduct = () => {
           Authorization: `Bearer ${accessToken}`
         }
       })
-      message.success('sửa ghế thành công!')
+      message.success('Sửa ghế thành công!')
       fetchSeat()
       form.resetFields()
       setCheckCreate(!checkCreate)

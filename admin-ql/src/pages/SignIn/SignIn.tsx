@@ -21,17 +21,25 @@ export default function SignIn() {
   const onLogin = (loginData: Login) => {
     loginUser(loginData).then((data: any) => {
       if (data.error) {
-        console.log(data?.error,'data.errordata.error')
-       return toast.error("error login")
+        // Chuyển đổi 'error' sang dạng có 'data' và 'message'
+        const err = data.error as { data?: { message?: string } }
+
+        // Kiểm tra và hiển thị thông báo lỗi từ backend
+        if (err.data && err.data.message) {
+          toast.error(err.data.message) // Hiển thị lỗi từ backend
+        } else {
+          toast.error('Có lỗi xảy ra, vui lòng thử lại sau!')
+        }
+        console.log(err, 'error details')
+        return
       } else {
-        console.log(data.data,'datadatadatadata')
-        localStorage.setItem('token',data?.data?.token)
+        localStorage.setItem('token', data?.data?.token)
         const dataUser = data.data.user.role
-        dataUser == 'ADMIN'
+        dataUser === 'ADMIN'
           ? (navigate('/manager/orders'), toast.success('Đăng nhập thành công'))
-          : dataUser == 'STAFF'
-          ? (navigate('/manager/orders'), toast.success('Đăng nhập thành công'))
-          : toast.error('Bạn không có quyền truy cập')
+          : dataUser === 'STAFF'
+            ? (navigate('/manager/orders'), toast.success('Đăng nhập thành công'))
+            : toast.error('Bạn không có quyền truy cập')
       }
     })
   }

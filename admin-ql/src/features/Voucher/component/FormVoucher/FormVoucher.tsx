@@ -80,12 +80,19 @@ const VoucherAdd = ({ open }: VoucherAddProps) => {
         messageAlert('Thêm voucher thành công', 'success')
         onClose()
       }
-    } catch (error: any) {
-      // Lấy thông báo lỗi từ backend và hiển thị
-      const errorMessage = error?.message || error?.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại!'
-      messageAlert(errorMessage, 'error')
+    } catch (error) {
+      // Chuyển đổi 'error' sang dạng có 'data' và 'message'
+      const err = error as { data?: { message?: string } }
+
+      // Kiểm tra và hiển thị thông báo lỗi từ backend
+      if (err.data && err.data.message) {
+        messageAlert(err.data.message, 'error')
+      } else {
+        messageAlert('Có lỗi xảy ra, vui lòng thử lại!', 'error')
+      }
     }
   }
+
   const onClose = () => {
     dispatch(setOpenDrawer(false))
     dispatch(setVoucher({ _id: '', code: '', title: '', discount: 0, sale: 0 }))

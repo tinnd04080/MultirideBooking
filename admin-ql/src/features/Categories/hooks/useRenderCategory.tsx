@@ -97,7 +97,7 @@ export const useRenderCategory = (categories: ICategory[], isDeleted?: boolean) 
       }
     },
     {
-      title: 'Tuyến',
+      title: 'Tuyến xe',
       dataIndex: 'startProvince', // Cột này vẫn giữ dữ liệu của startProvince
       key: 'startProvince',
       width: 230,
@@ -116,7 +116,7 @@ export const useRenderCategory = (categories: ICategory[], isDeleted?: boolean) 
       }
     },
     {
-      title: 'Điểm lên xe',
+      title: 'Điểm xuất phát',
       dataIndex: 'startDistrict', // Trường hiển thị tên tỉnh điểm đến
       key: 'startDistrict',
       width: 250,
@@ -214,7 +214,7 @@ export const useRenderCategory = (categories: ICategory[], isDeleted?: boolean) 
     {
       title: <span className='block text-center'>Cập nhật</span>,
       key: 'action',
-      width: 200,
+      width: 100,
       render: (_: string, category: ICategory) => {
         if (!isDeleted) {
           return (

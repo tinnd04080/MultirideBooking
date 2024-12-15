@@ -263,7 +263,7 @@ var BusController = {
             }
 
             return _context4.abrupt("return", res.status(400).json({
-              message: "Tuyến xe này có chuyến xe đang hoạt động. Không thể chuyển đổi trạng thái"
+              message: "Xe đang hoạt động trong một chuyến xe. Không thể chuyển đổi trạng thái"
             }));
 
           case 10:

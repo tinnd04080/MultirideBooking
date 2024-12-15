@@ -75,37 +75,23 @@ export const ProductListActive = ({ checkPath }: any) => {
             </ButtonAntd>
           </Tooltip>
         )}
-        {/* <ButtonAntd
-          icon={<HiDocumentDownload />}
-          size='large'
-          className='bg-[#209E62] text-white hover:!text-white text-sm font-semibold capitalize flex items-center'
-          onClick={() => {
-            if (data?.docs?.length === 0) {
-              message.warning('Không có Khách sạn nào để xuất')
-              return
-            }
-            exportDataToExcel(data?.docs, 'products-active')
-          }}
-        >
-          Xuất excel
-        </ButtonAntd> */}
       </div>
       <Table
         rowSelection={user.role === IRoleUser.ADMIN ? rowSelection : undefined}
         columns={columnsData}
         dataSource={products}
-        scroll={{ x: 1300 }}
         pagination={{
           current: options.page, // Trang hiện tại
           pageSize: options.limit, // Kích thước trang (số lượng items trên mỗi trang)
           showSizeChanger: false,
-          /* total: dataProducts?.totalPage * 10, // Tổng số bản ghi */
           total: dataProducts?.totalPage ? dataProducts?.totalPage * options.limit : 0,
           showQuickJumper: true, // Cho phép nhảy đến trang
+          // chỉnh sửa cuộn ngang
           onChange(page, pageSize) {
             setoptions((prev) => ({ ...prev, page, limit: pageSize }))
           }
         }}
+        scroll={{ y: '55vh', x: 'max-content' }}
         bordered={true}
       />
     </div>

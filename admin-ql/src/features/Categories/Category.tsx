@@ -18,7 +18,7 @@ const Category = () => {
 
   return (
     <div>
-      <Breadcrumb pageName='Tuyến đường '>
+      <Breadcrumb pageName='Quản Lý Tuyến Đường '>
         <Button icon={<PlusIcon />} onClick={() => dispatch(setOpenDrawer(true))}>
           Thêm
         </Button>

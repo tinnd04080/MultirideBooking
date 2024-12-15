@@ -212,8 +212,9 @@ export const useRender = (productsList: IProduct[], deleteReal?: boolean, checkP
       },
       render: (sizes: any) => (
         <>
-          <p className=''>
-            {sizes?.startProvince} đến <br /> {sizes?.endProvince}
+          <p className='text-center'>
+            {sizes?.startProvince}
+            <br /> đến <br /> {sizes?.endProvince}
           </p>
         </>
       )
@@ -248,8 +249,19 @@ export const useRender = (productsList: IProduct[], deleteReal?: boolean, checkP
       title: 'Ghế trống',
       dataIndex: 'availableSeats',
       key: 'availableSeats',
-      width: 120,
-      render: (category: ICategoryRefProduct) => <p className='capitalize'>{category}</p>
+      width: 110,
+      render: (category: ICategoryRefProduct) => <p className='capitalize text-center'>{category} ghế</p>
+    },
+    {
+      title: 'Giá vé',
+      dataIndex: 'price',
+      key: 'price',
+      width: 100,
+      render: (price: any) => (
+        <p className='capitalize text-center'>
+          {price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+        </p>
+      )
     },
     {
       title: 'Trạng thái',
@@ -264,27 +276,10 @@ export const useRender = (productsList: IProduct[], deleteReal?: boolean, checkP
         </>
       )
     }
-    // {
-    //   title: 'Ghế đã bán',
-    //   dataIndex: 'licensePlate',
-    //   key: 'licensePlate',
-    //   width: 120,
-    //   render: (category: ICategoryRefProduct) => <p className='capitalize'>{category}</p>
-    // }
   ]
   /* column admin */
   /* handle delete product */
   /*Xoa mem Xe đi */
-  const handleDeleteProduct = async (id: string) => {
-    try {
-      const response = await deleteFakeProduct({ id }).unwrap()
-      if (response.message === 'success') {
-        message.success('Xe đã được chuyển vào thùng rác!')
-      }
-    } catch (error) {
-      message.error('Xóa Xe thất bại')
-    }
-  }
 
   const handleRestoreProduct = async (id: string) => {
     try {
@@ -306,30 +301,6 @@ export const useRender = (productsList: IProduct[], deleteReal?: boolean, checkP
     } catch (error) {
       message.error('Khôi phục Xe thất bại')
     }
-  }
-
-  const handleChangeStatusProduct = async (product: IProduct) => {
-    // console.log(product)
-    // return
-
-    const newProduct: any = {
-      name: product.name,
-      category: product.category._id,
-      is_active: product.is_active ? false : true,
-      description: product.description,
-      sale: product.sale,
-      size: product.sizes
-        .filter((size) => !size.is_default)
-        .map((size) => ({ _id: size._id, name: size.name, price: size.price })),
-      sizeDefault: product.sizes.filter((size) => size.is_default).map((size) => size._id),
-      toppings: product.toppings.map((topping) => topping._id)
-    }
-    changeStatusProduct({ id: product._id, product: newProduct })
-      .unwrap()
-      .then(() => {
-        message.success('Thay đổi trạng thái thành công')
-      })
-      .catch(() => message.error('Thay đổi trạng thái thất bại'))
   }
 
   const columnsAdmin: any = [

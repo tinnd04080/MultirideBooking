@@ -237,21 +237,13 @@ const FormCategory = ({ open }: FormCategoryProps) => {
           </Select>
         </Form.Item>
 
-        <Form.Item label='Ngày' name='duration' rules={[{ required: true, message: 'Vui lòng chọn ngày!' }]}>
+        {/*  <Form.Item label='Ngày' name='duration' rules={[{ required: true, message: 'Vui lòng chọn ngày!' }]}>
           <DatePicker
             size='large'
             style={{ width: '100%' }}
             disabledDate={(current) => current && current.isBefore(dayjs(), 'day')} // Disable ngày quá khứ
           />
-        </Form.Item>
-
-        <Form.Item label='Trạng thái' name='status' rules={[{ required: true, message: 'Vui lòng nhập trạng thái!' }]}>
-          {/* <Input size='large' placeholder='Trạng thái (OPEN/CLOSED)' /> */}
-          <Select placeholder='Vui lòng chọn trạng thái'>
-            <Select.Option value={'OPEN'}>OPEN</Select.Option>
-            <Select.Option value={'CLOSED'}>CLOSED</Select.Option>
-          </Select>
-        </Form.Item>
+        </Form.Item> */}
 
         <Form.Item
           label='Khoảng cách (km)'
@@ -273,7 +265,6 @@ const FormCategory = ({ open }: FormCategoryProps) => {
             parser={(value) => value?.replace(/[^\d]/g, '')} // Loại bỏ ký tự không phải số
           />
         </Form.Item>
-
         <Form.Item
           label='Giá mỗi km'
           name='pricePerKM'
@@ -282,7 +273,7 @@ const FormCategory = ({ open }: FormCategoryProps) => {
             {
               type: 'number',
               min: 1,
-              message: 'phải là số không âm!'
+              message: 'Phải là số không âm!'
             }
           ]}
         >
@@ -293,6 +284,18 @@ const FormCategory = ({ open }: FormCategoryProps) => {
             min={1} // Giá trị tối thiểu là 0
             parser={(value) => value?.replace(/[^\d]/g, '')} // Loại bỏ ký tự không phải số
           />
+        </Form.Item>
+
+        <Form.Item
+          label='Trạng thái hoạt động'
+          name='status'
+          rules={[{ required: true, message: 'Vui lòng nhập trạng thái!' }]}
+        >
+          {/* <Input size='large' placeholder='Trạng thái (OPEN/CLOSED)' /> */}
+          <Select placeholder='Vui lòng chọn trạng thái'>
+            <Select.Option value={'OPEN'}>Hoạt Động</Select.Option>
+            <Select.Option value={'CLOSED'}>Ngừng Hoạt Động</Select.Option>
+          </Select>
         </Form.Item>
 
         <Form.Item>

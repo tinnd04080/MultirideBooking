@@ -65,8 +65,8 @@ const ListCategory = () => {
 
   return (
     <>
-      <Space>
-        {user && user.role === IRoleUser.ADMIN && hasSelected && (
+      {/* <Space> */}
+      {/* {user && user.role === IRoleUser.ADMIN && hasSelected && (
           <Popconfirm
             title='Bạn muốn xóa những danh mục này?'
             description='Hành động này sẽ xóa những danh mục đang được chọn!'
@@ -77,8 +77,8 @@ const ListCategory = () => {
               Xóa tất cả
             </ButtonAntd>
           </Popconfirm>
-        )}
-        {/* <ButtonAntd
+        )} */}
+      {/* <ButtonAntd
           icon={<HiDocumentDownload />}
           size='large'
           className='bg-[#209E62] text-white hover:!text-white text-sm font-semibold capitalize flex items-center'
@@ -92,8 +92,8 @@ const ListCategory = () => {
         >
           Xuất excel
         </ButtonAntd> */}
-      </Space>
-      <div className='dark:bg-graydark mt-3'>
+      {/* </Space> */}
+      <div className='dark:bg-graydark'>
         <Table
           // columns={columns}
           columns={columnsData}

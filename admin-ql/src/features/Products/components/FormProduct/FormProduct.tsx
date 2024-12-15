@@ -27,7 +27,7 @@ const FormProduct = () => {
   const { product } = useAppSelector((state: RootState) => state.products)
   const [infoPage, _] = useState({
     _page: 1,
-    _limit: 10
+    _limit: 100
   })
   const [categories, setCategories] = useState<ICategory[]>([])
   const [sizeDefault, setSizeDefault] = useState<ISize[]>([])
@@ -53,12 +53,53 @@ const FormProduct = () => {
     }
   }, [dataCategories, dataToppings, dataSizeDefault])
 
-  const handleOnChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const urls = await handleUploadImage(e, setIsLoading)
-    setIsUpload(true)
-    setImages(urls as IImage[])
-  }
+  // const handleSubmitForm = async (values: any) => {
+  //   console.log(values, 'cccc')
 
+  //   if (productId && productEdit) {
+  //     const data = {
+  //       ...values
+  //     }
+  //     try {
+  //       const response = await editProduct({ id: productEdit._id, product: data }).unwrap()
+  //       if (response.message === 'success') {
+  //         message.success('Cập nhật Xe thành công!')
+  //       }
+  //       dispatch(setOpenDrawer(false))
+  //       dispatch(setProductId(null))
+  //       setIsUpload(false)
+  //       /* reset form */
+  //       form.resetFields()
+  //       setImages([])
+  //     } catch (error) {
+  //       // Chuyển đổi 'error' sang dạng có 'data' và 'message'
+  //       const err = error as { data?: { message?: string } }
+
+  //       // Kiểm tra và hiển thị thông báo lỗi từ backend
+  //       if (err.data && err.data.message) {
+  //         message.error(err.data.message)
+  //       } else {
+  //         message.error('Có lỗi xảy ra, vui lòng thử lại sau!')
+  //       }
+  //     }
+  //     return
+  //   }
+
+  //   try {
+  //     const response = await createProduct({ ...values }).unwrap()
+  //     if (response.message === 'success' || response.message === 'succes') {
+  //       message.success('Thêm Xe thành công!')
+  //     }
+  //     dispatch(setOpenDrawer(false))
+  //     dispatch(setProductId(null))
+  //     setIsUpload(false)
+  //     /* reset form */
+  //     form.resetFields()
+  //     setImages([])
+  //   } catch (error) {
+  //     message.error('Có lỗi xảy ra, vui lòng thử lại sau!')
+  //   }
+  // }
   const handleSubmitForm = async (values: any) => {
     console.log(values, 'cccc')
 
@@ -82,11 +123,12 @@ const FormProduct = () => {
         const err = error as { data?: { message?: string } }
 
         // Kiểm tra và hiển thị thông báo lỗi từ backend
-        if (err.data && err.data.message) {
-          message.error(err.data.message)
+        if (err.data?.message) {
+          message.error(err.data.message) // Hiển thị lỗi cụ thể từ backend
         } else {
-          message.error('Có lỗi xảy ra, vui lòng thử lại sau!')
+          message.error('Có lỗi xảy ra, vui lòng thử lại sau!') // Lỗi fallback
         }
+        console.error(err, 'Error details') // Ghi log lỗi chi tiết
       }
       return
     }
@@ -103,7 +145,16 @@ const FormProduct = () => {
       form.resetFields()
       setImages([])
     } catch (error) {
-      message.error('Có lỗi xảy ra, vui lòng thử lại sau!')
+      // Chuyển đổi 'error' sang dạng có 'data' và 'message'
+      const err = error as { data?: { message?: string } }
+
+      // Kiểm tra và hiển thị thông báo lỗi từ backend
+      if (err.data?.message) {
+        message.error(err.data.message) // Hiển thị lỗi cụ thể từ backend
+      } else {
+        message.error('Có lỗi xảy ra, vui lòng thử lại sau!') // Lỗi fallback
+      }
+      console.error(err, 'Error details') // Ghi log lỗi chi tiết
     }
   }
 

@@ -35,11 +35,6 @@ const FeatureProducts = ({ data }: FeatureProductsProps) => {
   return (
     <div>
       <Breadcrumb pageName={checkPath ? 'Bảng giá' : 'Xe'}>
-        {/* {isAdmin && !checkPath && (
-          <Button icon={<PlusIcon />} onClick={() => dispatch(setOpenDrawer(true))}>
-            Thêm
-          </Button>
-        )} */}
         <Button icon={<PlusIcon />} onClick={() => dispatch(setOpenDrawer(true))}>
           Thêm
         </Button>

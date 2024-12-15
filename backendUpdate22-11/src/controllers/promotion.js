@@ -94,6 +94,12 @@ const PromotionController = {
         status, // Thêm trường status
       } = req.body;
 
+      // Kiểm tra xem mã khuyến mãi đã tồn tại trong cơ sở dữ liệu chưa
+      const existingPromotion = await Promotion.findOne({ code });
+      if (existingPromotion) {
+        return res.status(400).json({ message: "Mã khuyến mãi đã có" });
+      }
+
       // Kiểm tra số lượng hợp lệ
       if (quantity <= 0) {
         return res.status(400).json({ message: "Số lượng phải lớn hơn 0" });
@@ -362,7 +368,7 @@ Còn nếu qua 2 điều kiện thì giữ nguyên*/
       const promotion = await Promotion.findById(id).exec();
 
       if (!promotion) {
-        return res.status(404).json({ message: "Promotion not found" });
+        return res.status(404).json({ message: "Không tìm thấy khuyến mãi" });
       }
 
       // Kiểm tra nếu quantity thay đổi, tính toán lại remainingCount

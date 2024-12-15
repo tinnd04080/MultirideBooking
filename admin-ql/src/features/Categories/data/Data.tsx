@@ -1,6 +1,6 @@
 import ListCategory from '../components/ListCategory/ListCategory'
 
-export const items = [{ key: '1', label: 'Tất cả Tuyến đường', children: <ListCategory /> }]
+export const items = [{ key: '1' /* , label: 'Tất cả Tuyến đường' */, children: <ListCategory /> }]
 
 export const provinces = [
   { _id: '1', name: 'Hồ Chí Minh' },
