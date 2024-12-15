@@ -43,7 +43,6 @@ const BusRouteController = {
         startDistrict,
         endDistrict,
         endProvince,
-        duration,
         status,
         distance,
         pricePerKM,
@@ -67,7 +66,6 @@ const BusRouteController = {
         startDistrict,
         endDistrict,
         endProvince,
-        duration,
         status,
         distance,
         pricePerKM,
@@ -92,7 +90,6 @@ const BusRouteController = {
         endProvince,
         endDistrict,
         status,
-        duration,
       } = req.query;
 
       const queryObj = {};
@@ -102,12 +99,12 @@ const BusRouteController = {
       endProvince && (queryObj.endProvince = endProvince);
       endDistrict && (queryObj.endDistrict = endDistrict);
       status && (queryObj.status = status);
-      if (duration) {
+      /*  if (duration) {
         queryObj.duration = {
           $gte: dayjs(duration).startOf("day").toDate(),
           $lte: dayjs(duration).endOf("day").toDate(),
         };
-      }
+      } */
 
       const busRoutes = await BusRoutes.find(queryObj)
         .sort("-createdAt")
@@ -195,7 +192,6 @@ const BusRouteController = {
         startDistrict,
         endDistrict,
         endProvince,
-        duration,
         status,
         distance,
         pricePerKM,
@@ -223,7 +219,6 @@ const BusRouteController = {
           startDistrict,
           endDistrict,
           endProvince,
-          duration,
           status,
           distance,
           pricePerKM,

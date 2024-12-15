@@ -19,10 +19,6 @@ const busRoutesSchema = new Schema(
       type: String,
       required: true,
     },
-    duration: {
-      type: Date,
-      required: true,
-    },
     status: {
       type: String,
       enum: Object.values(ROUTES_STATUS),
