@@ -207,9 +207,7 @@ const TicketBookingScreen: React.FC<TicketBookingScreenProps> = ({ route }) => {
                   </Text>
                 </View>
                 <View style={styles.ticketInfo}>
-                  <Text style={styles.District}>
-                    {item.route.startDistrict}
-                  </Text>
+                  <Text style={styles.District}>{item.route.endDistrict}</Text>
                   <Text>
                     <Text
                       style={{

@@ -15,9 +15,9 @@ const FeatureDashboard = () => {
   return (
     <div>
       <Breadcrumb pageName='Thống kê'>
-        <Button icon={<PlusIcon />} onClick={() => dispatch(setOpenDrawer(true))}>
+        {/* <Button icon={<PlusIcon />} onClick={() => dispatch(setOpenDrawer(true))}>
           Thêm
-        </Button>
+        </Button> */}
       </Breadcrumb>
 
       {/* <Tabs defaultActiveKey='1' items={items} className='text-white' /> */}
@@ -25,7 +25,7 @@ const FeatureDashboard = () => {
       <FormCustomer open={openDrawer} /> */}
       <div className='site-layout-content'>
         <RevenueStats title='Thống kê doanh thu' apiEndpoint={`${import.meta.env.VITE_API}/tickets/revenue-stats`} />
-        <TripStats title='Thống kê chuyến xe' apiEndpoint={`${import.meta.env.VITE_API}/trips/trip-stats`} />
+        {/*  <TripStats title='Thống kê chuyến xe' apiEndpoint={`${import.meta.env.VITE_API}/trips/trip-stats`} /> */}
         <TopRoutesLeaderboard />
         <TopUsers />
       </div>
