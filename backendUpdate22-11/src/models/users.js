@@ -3,10 +3,6 @@ import { USER_STATUS } from "../constants/index.js";
 
 const userSchema = new Schema(
   {
-    /*  userName: {
-      type: String,
-      default: null,
-    }, */
     password: {
       type: String,
       required: true,
@@ -33,9 +29,9 @@ const userSchema = new Schema(
     },
     status: {
       type: String, // kiểu dữ liệu được định nghĩa là : Chuỗi
-      enum: Object.values(USER_STATUS), // giới hạn giá trị chi trường status. chỉ được nằm trong danh sách các giá trị của USER_STATUS (ở đây là "ACTIVE" và "INACTIVE")
-      required: true, // Trường status bắt buộc phải có giá trị khi tạo một bản ghi mới.
+      enum: Object.values(USER_STATUS), // giới hạn giá trị cho trường status. chỉ được nằm trong danh sách các giá trị của USER_STATUS (ở đây là "ACTIVE" và "INACTIVE")
       default: USER_STATUS.ACTIVE, // Nếu không chỉ định giá trị status khi tạo, mặc định giá trị sẽ là "ACTIVE".
+      required: true, // Trường status bắt buộc phải có giá trị khi tạo một bản ghi mới.
     },
   },
   { timestamps: true }
