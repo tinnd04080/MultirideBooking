@@ -1542,7 +1542,7 @@ const TicketController = {
       res.status(500).json({ error: error.message });
     }
   },
-  getRevenue: async (req, res) => {
+  /* getRevenue: async (req, res) => {
     try {
       const { type, startDate, endDate } = req.query;
 
@@ -1636,8 +1636,102 @@ const TicketController = {
         error: error.message,
       });
     }
-  },
+  }, */
+  getRevenue: async (req, res) => {
+    try {
+      const { type, startDate, endDate } = req.query;
 
+      if (!type || !startDate || !endDate) {
+        return res.status(400).json({
+          success: false,
+          message: "Missing required parameters: type, startDate, or endDate",
+        });
+      }
+
+      const start = moment(startDate);
+      const end = moment(endDate);
+      if (!start.isValid() || !end.isValid()) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid date format",
+        });
+      }
+      // $lte: new Date(endDate + "T23:59:59Z"),
+
+      const matchStage = {
+        status: "PAID",
+        updatedAt: {
+          $gte: new Date(startDate),
+          $lte: new Date(endDate),
+        },
+      };
+
+      let groupByField;
+      let dateFormat;
+      let timeRange = [];
+
+      if (type === "day") {
+        groupByField = {
+          $dateToString: { format: "%Y-%m-%d", date: "$updatedAt" },
+        };
+        dateFormat = "YYYY-MM-DD";
+        for (let m = moment(start); m.isSameOrBefore(end); m.add(1, "days")) {
+          timeRange.push(m.format(dateFormat));
+        }
+      } else if (type === "month") {
+        groupByField = {
+          $dateToString: { format: "%Y-%m", date: "$updatedAt" },
+        };
+        dateFormat = "YYYY-MM";
+        for (let m = moment(start); m.isSameOrBefore(end); m.add(1, "months")) {
+          timeRange.push(m.format(dateFormat));
+        }
+      } else if (type === "year") {
+        groupByField = {
+          $year: "$updatedAt",
+        };
+        dateFormat = "YYYY";
+        for (let year = start.year(); year <= end.year(); year++) {
+          timeRange.push(year.toString());
+        }
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid type parameter. Use "day", "month", or "year".',
+        });
+      }
+
+      const revenueStats = await Tickets.aggregate([
+        { $match: matchStage },
+        {
+          $group: {
+            _id: groupByField,
+            totalAmount: { $sum: "$totalAmount" },
+          },
+        },
+        { $sort: { _id: 1 } },
+      ]);
+
+      // Bổ sung dữ liệu bị thiếu và định dạng đúng với `RevenueStats.tsx`
+      const mappedData = timeRange.map((time) => {
+        const found = revenueStats.find((item) => item._id.toString() === time);
+        return {
+          label: time, // Field `label` để phù hợp với component React
+          totalAmount: found ? found.totalAmount : 0,
+        };
+      });
+
+      res.json({
+        success: true,
+        data: mappedData, // Định dạng đúng cho `RevenueStats.tsx`
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  },
   getTopUsers: async (req, res) => {
     try {
       // Truy vấn 1: Tính số lượng vé đã đặt cho từng người dùng
