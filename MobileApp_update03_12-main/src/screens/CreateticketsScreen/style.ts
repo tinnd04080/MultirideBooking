@@ -77,6 +77,11 @@ export const styles = StyleSheet.create({
     flexWrap: "wrap",
     marginBottom: 10,
     // backgroundColor: "#000",
+  },
+  infoRow3: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginBottom: 10,
     alignItems: "center",
   },
   infoRow2: {
@@ -86,7 +91,7 @@ export const styles = StyleSheet.create({
   label: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#000",
+    color: "#555",
     textAlign: "right",
   },
   value: {
@@ -100,6 +105,7 @@ export const styles = StyleSheet.create({
   discount: {
     fontSize: 15,
     color: "#000",
+    flex: 1,
     flexWrap: "wrap",
     textAlign: "right",
     fontWeight: "600",
@@ -170,10 +176,21 @@ export const styles = StyleSheet.create({
   },
   seatContainer2: { textAlign: "center" },
   numberSeat: {
+    width: "60%",
+    flexDirection: "row-reverse", // Đảo chiều các item con từ phải sang trái
+    textAlign: "right",
+    marginLeft: "auto",
+    alignItems: "center",
+    flexWrap: "wrap",
+  },
+  voucherCode: {
+    width: "60%",
     flexDirection: "row",
     textAlign: "right",
     marginLeft: "auto",
+    alignItems: "center",
     flexWrap: "wrap",
+    /*   backgroundColor: "#000", */
   },
   selectedSeatText: {
     color: "#fff", // Màu chữ trắng
@@ -187,6 +204,8 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center", // Căn giữa nội dung
     borderRadius: 5, // Bo góc nhẹ
+    marginRight: 5, // Thêm khoảng cách giữa các ô ghế
+    marginBottom: 5, // Khoảng cách giữa các dòng ghế nếu có
   },
   picker: {
     height: 50,

@@ -77,7 +77,11 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     marginBottom: 10,
-    // backgroundColor: "#000",
+  },
+  infoRow3: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginBottom: 10,
     alignItems: "center",
   },
   infoRow2: {
@@ -164,9 +168,19 @@ export const styles = StyleSheet.create({
   },
   seatContainer2: { textAlign: "center" },
   numberSeat: {
+    width: "70%",
+    flexDirection: "row-reverse", // Đảo chiều các item con từ phải sang trái
+    textAlign: "right",
+    marginLeft: "auto",
+    alignItems: "center",
+    flexWrap: "wrap",
+  },
+  voucherCode: {
+    width: "60%",
     flexDirection: "row",
     textAlign: "right",
     marginLeft: "auto",
+    alignItems: "center",
     flexWrap: "wrap",
   },
   discount: {
@@ -188,6 +202,8 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center", // Căn giữa nội dung
     borderRadius: 5, // Bo góc nhẹ
+    marginRight: 5, // Thêm khoảng cách giữa các ô ghế
+    marginBottom: 5, // Khoảng cách giữa các dòng ghế nếu có
   },
   picker: {
     height: 50,

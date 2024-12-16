@@ -174,8 +174,8 @@ const SuccessScreen = ({ route }: any) => {
             </View>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.label}>Sử dụng mã giảm giá:</Text>
-            <View style={styles.numberSeat}>
+            <Text style={styles.label}>Sử dụng mã giảm:</Text>
+            <View style={styles.voucherCode}>
               <Text style={styles.discount}>
                 {ticketData?.promotion?.code ?? "Không có"}
               </Text>
@@ -229,14 +229,14 @@ const SuccessScreen = ({ route }: any) => {
         {/* Phần 3: Chi phí chuyến xe */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Chi phí chuyến xe</Text>
-          <View style={styles.infoRow}>
+          <View style={styles.infoRow3}>
             <View style={styles.infoRow}>
               <Text style={styles.label}>Tạm tính ban đầu:</Text>
               <Text style={styles.value}>
                 {`${formatCurrency(originalPrice)} VNĐ`}
               </Text>
             </View>
-            <View style={styles.infoRow}>
+            <View style={styles.infoRow3}>
               <Text style={styles.label}>Giảm giá:</Text>
               <Text style={styles.value}>
                 - {`${formatCurrency(discount)} VNĐ`}
@@ -246,7 +246,7 @@ const SuccessScreen = ({ route }: any) => {
             <Text style={styles.valueHighlight}>
               {formatCurrency(ticketData.totalAmount)} VNĐ
             </Text>
-            <View style={styles.infoRow}>
+            <View style={styles.infoRow3}>
               <Text style={styles.label}>Phương thức thanh toán:</Text>
               <Text style={styles.value}>
                 {getpaymentMethodText(ticketData.paymentMethod) || "Không có"}

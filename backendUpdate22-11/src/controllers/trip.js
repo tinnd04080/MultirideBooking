@@ -11,7 +11,7 @@ import moment from "moment";
 const TripController = {
   /* Thêm chuyến xe mới */
   /* 13/12 */
-  createTrip: async (req, res) => {
+  /*  createTrip: async (req, res) => {
     try {
       const { route, bus, departureTime, arrivalTime, status } = req.body;
 
@@ -33,8 +33,12 @@ const TripController = {
       }
 
       // Tính toán giá vé
-      const ticketPrice =
+      const ticketprice =
         busRouteInfo.distance * busRouteInfo.pricePerKM * busInfo.priceFactor;
+      console.log("Giá vé trước làm tròn:", ticketPrice);
+      // Làm tròn giá vé theo quy tắc làm tròn chục | Quy tắc: lớn hơn 5 làm tròn lên, nhỏ hơn hoặc bằng 5 làm tròn xuống
+      const ticketPrice = Math.round(ticketprice / 10) * 10;
+      console.log("Giá vé sau làm tròn:", ticketPrice);
 
       if (!busInfo || !busRouteInfo) {
         return res.status(404).json({
@@ -95,7 +99,7 @@ const TripController = {
         error: error.message,
       });
     }
-  },
+  }, */
   /* 14/12 */
   createTrip: async (req, res) => {
     try {
@@ -154,8 +158,17 @@ const TripController = {
       }
 
       // Tính toán giá vé
-      const ticketPrice =
+
+      // Tính toán từng bước để dễ kiểm tra
+      const rawPrice =
         busRouteInfo.distance * busRouteInfo.pricePerKM * busInfo.priceFactor;
+
+      console.log("Raw Price (before rounding):", rawPrice);
+
+      // Làm tròn giá vé thành bội số của 10.000
+      const ticketPrice = Math.round(rawPrice / 10000) * 10000;
+
+      console.log("Final Ticket Price (after rounding):", ticketPrice);
 
       // Tạo chuyến xe
       const trip = await new Trip({

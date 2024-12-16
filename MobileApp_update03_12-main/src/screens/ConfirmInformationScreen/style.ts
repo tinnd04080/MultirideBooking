@@ -246,6 +246,12 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
+    overflow: "hidden", // Đảm bảo nội dung không bị tràn ra ngoài
+  },
+  inputText: {
+    flex: 1, // Chiếm hết không gian trống còn lại trong inputWrapper
+    height: "100%", // Đảm bảo chiều cao của TextInput khớp với container
+    fontSize: 14, // Đảm bảo font size phù hợp
   },
 
   inputField: {

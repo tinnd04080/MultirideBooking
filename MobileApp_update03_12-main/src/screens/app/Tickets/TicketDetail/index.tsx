@@ -115,7 +115,7 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({ route }) => {
           <View style={styles.infoRow}>
             <Text style={styles.label}>Chuyến xe:</Text>
             <Text style={styles.value}>
-              {ticketData.trip.route.startProvince} -{" "}
+              {ticketData.trip.route.startProvince} -
               {ticketData.trip.route.endProvince}
             </Text>
           </View>
@@ -150,9 +150,9 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({ route }) => {
             </View>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.label}>Sử dụng mã giảm giá:</Text>
-            <View style={styles.numberSeat}>
-              <Text style={styles.discount}>
+            <Text style={styles.label}>Sử dụng mã giảm:</Text>
+            <View style={styles.voucherCode}>
+              <Text style={styles.value}>
                 {ticketData?.promotion?.code ?? "Không có"}
               </Text>
             </View>
@@ -179,7 +179,7 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({ route }) => {
         {/* Đoạn đường gạch nét đứt với logo */}
         <View style={styles.dashedLineContainer}>
           <Image
-            source={require("../../../../assets/logoSplash.png")} // Thay thế bằng đường dẫn tới logo của bạn
+            source={require("../../../../assets/logo.png")} // Thay thế bằng đường dẫn tới logo của bạn
             style={styles.watermarkLogo}
           />
           <View style={styles.dashedLine}></View>
@@ -205,8 +205,8 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({ route }) => {
         {/* Phần 3: Chi phí chuyến xe */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Chi phí chuyến xe</Text>
-          <View style={styles.infoRow}>
-            <View style={styles.infoRow}>
+          <View style={styles.infoRow3}>
+            <View style={styles.infoRow3}>
               <Text style={styles.label}>Tạm tính ban đầu:</Text>
               <Text style={styles.value}>
                 {`${formatCurrency(originalPrice)} VNĐ`}

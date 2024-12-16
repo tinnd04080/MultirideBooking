@@ -231,35 +231,8 @@ const ConfirmInformation: React.FC = ({ route }: any) => {
     if (fullNameError || phoneNumberError) {
       return;
     }
-    // Kiểm tra validate cho boardingPoint và dropOffPoint khi checkbox được tick
-    let valid = true;
 
-    // Kiểm tra validate cho boardingPoint và dropOffPoint khi checkbox được tick
-    if (showTransferInputs) {
-      // Kiểm tra nếu một trong hai ô nhập không có dữ liệu
-      if (!inputBoardingPoint) {
-        setBoardingPointError("Vui lòng nhập địa chỉ đón chi tiết.");
-        return; // Dừng lại nếu ô nhập địa chỉ đón trống
-      }
-      if (!inputDropOffPoint) {
-        setDropOffPointError("Vui lòng nhập địa chỉ trả chi tiết.");
-        return; // Dừng lại nếu ô nhập địa chỉ trả trống
-      }
-    }
-
-    if (!valid) {
-      return; // Nếu có lỗi, không tiếp tục
-    }
     try {
-      // Xử lý giá trị của boardingPoint và dropOffPoint
-      const boardingPoint =
-        showTransferInputs && inputBoardingPoint
-          ? inputBoardingPoint
-          : trip.route.startDistrict;
-      const dropOffPoint =
-        showTransferInputs && inputDropOffPoint
-          ? inputDropOffPoint
-          : trip.route.endDistrict;
       // Dữ liệu gửi tới API
       const ticketData = {
         customerPhone: phoneNumber,
@@ -267,8 +240,8 @@ const ConfirmInformation: React.FC = ({ route }: any) => {
         note,
         trip: trip._id, // ID chuyến xe
         seatNumber: selectedSeats, // Danh sách ghế
-        boardingPoint,
-        dropOffPoint,
+        boardingPoint: trip.route.startDistrict,
+        dropOffPoint: trip.route.endDistrict,
         discountCode: isDiscountApplied ? discountCode : "", // Mã giảm giá
       };
 
@@ -310,6 +283,7 @@ const ConfirmInformation: React.FC = ({ route }: any) => {
                 value={fullName}
                 onChangeText={handleFullNameChange}
                 autoCapitalize="words"
+                style={styles.inputText}
               />
             </View>
             {fullNameError && (
@@ -346,152 +320,15 @@ const ConfirmInformation: React.FC = ({ route }: any) => {
                 style={styles.icon}
               />
               <TextInput
-                style={[{ height: 80 }]}
                 placeholder="Nhập Ghi chú"
                 value={note}
                 onChangeText={setNote}
-                multiline
+                multiline={false}
+                style={styles.inputText}
+                numberOfLines={1}
+                autoCapitalize="words"
               />
             </View>
-            {/* Trung chuyến */}
-            <View style={styles.transferCheckboxWrapper}>
-              {/* Tùy chỉnh Checkbox */}
-              <TouchableOpacity
-                style={[
-                  styles.checkbox,
-                  showTransferInputs && styles.checkboxChecked,
-                ]}
-                onPress={() => setShowTransferInputs(!showTransferInputs)}
-              >
-                {showTransferInputs && (
-                  <Ionicons name="checkmark" size={15} color="#fff" />
-                )}
-              </TouchableOpacity>
-              <Text
-                style={[
-                  styles.transferButtonText,
-                  { color: showTransferInputs ? "#86A789" : "#005C78" },
-                ]}
-              >
-                {showTransferInputs
-                  ? "Vui lòng nhập địa chỉ đón trả"
-                  : "Trung chuyển - Đón trả khách tận nơi"}
-              </Text>
-            </View>
-
-            {/* Hiển thị các trường nhập địa chỉ khi checkbox bật */}
-            {showTransferInputs && (
-              <>
-                {/* Dòng chữ "Bấm vào đây để xem thức trung chuyển" */}
-                {/* Dialog Modal */}
-                <Modal
-                  visible={showDialog}
-                  animationType="slide"
-                  transparent={true}
-                >
-                  <View style={styles.modalBackground}>
-                    <View style={styles.modalContainer}>
-                      <Text style={styles.modalTitle}>
-                        Chính sách trung chuyển
-                      </Text>
-                      <View style={styles.modalContainerCH}>
-                        <Text style={styles.modalInfo}>
-                          <Text style={styles.infoHeading}>Chi phí: </Text>
-                          Đây là dịch vụ miễn phí. Nhà xe sẽ không thu bất kỳ
-                          chi phí phát sinh nào cho chuyến xe này.
-                        </Text>
-                        <Text style={styles.modalInfo}>
-                          <Text style={styles.infoHeading}>
-                            Bán kính trung chuyển:{" "}
-                          </Text>
-                          Nhà xe sẽ trung chuyển trong bán kính{" "}
-                          <Text style={styles.highlightText}>8km</Text> kể từ
-                          bến xe.
-                        </Text>
-                        {/* Thông tin thời gian trung chuyển */}
-                        <Text style={styles.modalInfo}>
-                          <Text style={styles.infoHeading}>
-                            Thời gian trung chuyển:{" "}
-                          </Text>
-                          Nhà xe sẽ chủ động liên hệ và sắp xếp thời gian trung
-                          chuyển với bạn sau khi đặt vé
-                        </Text>
-                        <Text style={styles.modalInfo}>
-                          <Text style={styles.infoHeading}>Khiếu nại: </Text>
-                          Nếu nhân viên hay bất kỳ ai thu thêm chi phí trung
-                          chuyển của quý khách.
-                        </Text>
-                      </View>
-                      <Text style={styles.modalInfo}>
-                        <Text style={styles.infoHeading}>
-                          Vui lòng liên hệ hotine để khiếu nại
-                        </Text>
-                      </Text>
-                      <View style={styles.hotlineContainer}>
-                        <TouchableOpacity
-                          style={styles.hotlineButton}
-                          onPress={() => Linking.openURL("tel:0769861234")}
-                        >
-                          <Ionicons
-                            name="call-outline"
-                            size={20}
-                            color="#FEEE91"
-                          />
-                          <Text style={styles.hotlineText}>07.6986.1234</Text>
-                        </TouchableOpacity>
-                      </View>
-                      <Button
-                        title="Đã hiểu"
-                        onPress={() => setShowDialog(false)}
-                        color="#003161" // Đặt màu nền cho nút
-                      />
-                    </View>
-                  </View>
-                </Modal>
-                <Text style={styles.inputTitle}>Địa chỉ đón chi tiết</Text>
-                <View style={styles.inputWrapper}>
-                  <Ionicons
-                    name="navigate-outline"
-                    size={24}
-                    color="#FF6347"
-                    style={styles.icon}
-                  />
-                  <TextInput
-                    placeholder="Nhập địa chỉ đón chi tiết"
-                    value={inputBoardingPoint}
-                    onChangeText={setInputBoardingPoint}
-                    onFocus={() => setBoardingPointError("")} // Xóa thông báo lỗi khi focus vào ô nhập
-                  />
-                </View>
-                {boardingPointError ? (
-                  <Text style={styles.errorText}>{boardingPointError}</Text>
-                ) : null}
-
-                <Text style={styles.inputTitle}>Địa chỉ trả chi tiết</Text>
-                <View style={styles.inputWrapper}>
-                  <Ionicons
-                    name="location-outline"
-                    size={24}
-                    color="#FF6347"
-                    style={styles.icon}
-                  />
-                  <TextInput
-                    placeholder="Nhập địa chỉ trả chi tiết"
-                    value={inputDropOffPoint}
-                    onChangeText={setInputDropOffPoint}
-                    onFocus={() => setDropOffPointError("")} // Xóa thông báo lỗi khi focus vào ô nhập
-                  />
-                </View>
-                {dropOffPointError ? (
-                  <Text style={styles.errorText}>{dropOffPointError}</Text>
-                ) : null}
-                <TouchableOpacity onPress={() => setShowDialog(true)}>
-                  <Text style={styles.linkText}>
-                    Xem chính sách trung chuyển
-                  </Text>
-                </TouchableOpacity>
-              </>
-            )}
 
             <Text style={styles.inputTitle}>Mã giảm giá</Text>
             <View style={styles.discountSection}>

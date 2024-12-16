@@ -13,8 +13,9 @@ import * as Yup from "yup";
 import { styles } from "./style";
 import Header from "../../components/header";
 import profileApi from "../../services/updateUser/updateAPI";
-
+import { useNavigation } from "@react-navigation/native";
 const EditProfileScreen = () => {
+  const navigation = useNavigation();
   const [initialValues, setInitialValues] = useState({
     email: "",
     phoneNumber: "",
@@ -95,7 +96,13 @@ const EditProfileScreen = () => {
 
       Alert.alert(
         "Cập nhật thành công",
-        "Thông tin và mật khẩu đã được cập nhật."
+        "Thông tin và mật khẩu đã được cập nhật.",
+        [
+          {
+            text: "OK",
+            onPress: () => navigation.navigate("Profile"),
+          },
+        ]
       );
     } catch (error) {
       Alert.alert(
