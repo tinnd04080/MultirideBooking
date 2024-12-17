@@ -73,7 +73,6 @@ const SeatSelectionScreen: React.FC = ({ route }: any) => {
     });
   };
 
-  // Hàm vẽ sơ đồ ghế cho loại 36 chỗ
   const render36SeatLayout = (seats: Seat[]) => {
     const rows: JSX.Element[] = [];
     let currentRow: JSX.Element[] = [];
@@ -133,7 +132,6 @@ const SeatSelectionScreen: React.FC = ({ route }: any) => {
     return rows;
   };
 
-  // Hàm vẽ sơ đồ ghế cho loại 24 chỗ
   const render24SeatLayout = (seats: Seat[]) => {
     const rows: JSX.Element[] = [];
     let currentRow: JSX.Element[] = [];
@@ -342,7 +340,6 @@ const SeatSelectionScreen: React.FC = ({ route }: any) => {
     return rows;
   };
 
-  // Hàm để render sơ đồ ghế tùy thuộc vào seatCapacity
   const renderSeatLayout = (seats: Seat[]) => {
     switch (seatCapacity) {
       case 36:
