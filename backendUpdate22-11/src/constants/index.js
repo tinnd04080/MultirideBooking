@@ -62,6 +62,7 @@ export const NOTIFICATION_TYPE = {
   TICKET_BOOK_SUCCESS: "TICKET_BOOK_SUCCESS", // thanh toán thành công
   TICKET_BOOK_FAILED: "TICKET_BOOK_FAILED", // thanh toán thất bại
   TICKET_CANCELED: "TICKET_CANCELED", // vé bị huỷ
+  TICKET_PAYMENT_PENDING: "TICKET_PAYMENT_PENDING" // vé chưa thanh toán
 };
 
 export const PAGINATION = {
