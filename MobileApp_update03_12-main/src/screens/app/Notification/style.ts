@@ -23,14 +23,19 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   successBox: {
-    backgroundColor: "#e0f7e9", // Màu xanh nhạt cho thành công
+    backgroundColor: "#e0f7e9", // Light green for success
     borderLeftWidth: 4,
-    borderLeftColor: "#34c759", // Màu xanh thành công
+    borderLeftColor: "#34c759", // Green for success
   },
   failedBox: {
-    backgroundColor: "#fde8e8", // Màu đỏ nhạt cho thất bại
+    backgroundColor: "#fde8e8", // Light red for failure
     borderLeftWidth: 4,
-    borderLeftColor: "#ff3b30", // Màu đỏ thất bại
+    borderLeftColor: "#ff3b30", // Red for failure
+  },
+  pendingBox: {
+    backgroundColor: "#fff3cd", // Light yellow for pending
+    borderLeftWidth: 4,
+    borderLeftColor: "#ffcc00", // Yellow for pending
   },
   icon: {
     width: 40,
@@ -43,12 +48,17 @@ export const styles = StyleSheet.create({
   successText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#34c759", // Màu xanh cho trạng thái thành công
+    color: "#34c759", // Green for success status
   },
   failedText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#ff3b30", // Màu đỏ cho trạng thái thất bại
+    color: "#ff3b30", // Red for failure status
+  },
+  pendingText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#ffcc00", // Yellow for pending status
   },
   route: {
     fontSize: 14,
@@ -69,6 +79,19 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#ff3b30", // Red for error
+    textAlign: "center",
+    margin: 16,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#555",
+    textAlign: "center",
     marginTop: 20,
   },
 });

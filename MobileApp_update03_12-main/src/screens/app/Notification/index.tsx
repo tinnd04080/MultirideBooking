@@ -8,8 +8,9 @@ import {
 import { styles } from "./style";
 import { FlashList } from "@shopify/flash-list";
 import Header from "../../../components/headerApp";
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { getNotifications } from "../../../services/Notification/notificationApi";
+import { useFocusEffect } from "@react-navigation/native";
 
 interface Notification {
   date: string;
@@ -22,7 +23,8 @@ interface Notification {
 
 const NotificationScreen = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState<boolean>(true); // Hiển thị loading ban đầu
+  const [loading, setLoading] = useState<boolean>(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const renderItem = ({ item }: { item: Notification }) => (
     <View style={styles.notificationContainer}>
@@ -30,27 +32,38 @@ const NotificationScreen = () => {
       <View
         style={[
           styles.notificationBox,
-          item.success ? styles.successBox : styles.failedBox,
+          item.success
+            ? styles.successBox
+            : item.status === "Vé chưa thanh toán"
+            ? styles.pendingBox
+            : styles.failedBox,
         ]}
       >
         <Image
           source={
             item.success
               ? require("../../../assets/pass.png")
+              : item.status === "Vé chưa thanh toán"
+              ? require("../../../assets/pass.png")
               : require("../../../assets/false.png")
           }
           style={styles.icon}
         />
         <View style={styles.infoContainer}>
-          <Text style={item.success ? styles.successText : styles.failedText}>
+          <Text
+            style={
+              item.success
+                ? styles.successText
+                : item.status === "Vé chưa thanh toán"
+                ? styles.pendingText
+                : styles.failedText
+            }
+          >
             {item.status}
           </Text>
-          {/* Uncomment nếu cần hiển thị thêm thông tin */}
-          {/* 
           <Text style={styles.route}>Tuyến: {item.route}</Text>
           <Text style={styles.time}>Thời gian: {item.time}</Text>
-          <Text style={styles.seats}>Ghế: {item.seats}</Text> 
-          */}
+          <Text style={styles.seats}>Ghế: {item.seats}</Text>
         </View>
       </View>
     </View>
@@ -69,6 +82,7 @@ const NotificationScreen = () => {
             TICKET_BOOK_SUCCESS: "Đặt vé thành công",
             TICKET_BOOK_FAILED: "Đặt vé thất bại",
             TICKET_CANCELED: "Vé đã bị hủy",
+            TICKET_PAYMENT_PENDING: "Vé chưa thanh toán",
           };
 
           return {
@@ -104,17 +118,17 @@ const NotificationScreen = () => {
     }
   };
 
-  useEffect(() => {
-    fetchNotifications(); // Lấy dữ liệu lần đầu
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchNotifications(); // Tải lại dữ liệu từ trang 1
+    }, [])
+  );
 
-    const intervalId = setInterval(() => {
-      fetchNotifications(); // Gọi lại API mỗi 10 giây
-    }, 10000); // 10 giây
-
-    return () => {
-      clearInterval(intervalId); // Dọn dẹp interval khi unmount
-    };
-  }, [notifications]); // Theo dõi notifications để cập nhật nếu cần
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchNotifications();
+    setRefreshing(false);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -124,6 +138,8 @@ const NotificationScreen = () => {
       ) : (
         <FlashList
           data={notifications}
+          onRefresh={handleRefresh}
+          refreshing={refreshing}
           renderItem={renderItem}
           keyExtractor={(item, index) => index.toString()}
           estimatedItemSize={50}
