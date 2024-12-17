@@ -2,7 +2,6 @@ import { model, Schema } from "mongoose";
 import { BUSES_STATUS } from "../constants/index.js";
 const busSchema = new Schema(
   {
-    // Các trường gộp từ busTypes
     busTypeName: {
       type: String,
       required: true,
