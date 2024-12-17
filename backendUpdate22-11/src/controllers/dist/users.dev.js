@@ -13,6 +13,10 @@ var _users = _interopRequireDefault(require("../models/users.js"));
 
 var _bcrypt = _interopRequireDefault(require("bcrypt"));
 
+var _tickets = _interopRequireDefault(require("../models/tickets.js"));
+
+var _mongoose = _interopRequireDefault(require("mongoose"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
@@ -473,8 +477,74 @@ var UserController = {
       });
     }
   }, */
+
+  /* updateUser: async (req, res) => {
+    try {
+      const { id } = req.params; // Lấy ID người dùng từ params
+      const { userName, phoneNumber, fullName, cccd, role, status } = req.body; // Lấy dữ liệu từ body
+        // Lấy thông tin người dùng hiện tại từ cơ sở dữ liệu
+      const user = await User.findById(id).exec();
+      if (!user) {
+        return res.status(404).json({ message: "Người dùng không tồn tại" });
+      }
+        // Kiểm tra nếu có thay đổi phoneNumber, kiểm tra trùng với các item trong cơ sở dữ liệu
+      if (phoneNumber && phoneNumber !== user.phoneNumber) {
+        const existingUserWithPhoneNumber = await User.findOne({ phoneNumber });
+        if (existingUserWithPhoneNumber) {
+          return res
+            .status(400)
+            .json({ message: "Số điện thoại đã được đăng ký" });
+        }
+      }
+        // Kiểm tra vai trò hợp lệ và đảm bảo người dùng không thể thay đổi vai trò của chính mình
+      const validRoles = Object.values(ROLE); // ["ADMIN", "STAFF", "CUSTOMER"]
+      let userRole = null;
+      if (role && validRoles.includes(role)) {
+        if (user._id.toString() === req.user.id) {
+          // Nếu người dùng là chính họ, không cho phép thay đổi vai trò
+          return res.status(400).json({
+            message: "Bạn không thể thay đổi phân quyền của chính mình",
+          });
+        }
+        userRole = role;
+      }
+        // Xác định trạng thái, nếu không có, mặc định là 'ACTIVE'
+      const userStatus =
+        status && Object.values(USER_STATUS).includes(status)
+          ? status
+          : USER_STATUS.ACTIVE;
+        // Cập nhật thông tin người dùng
+      const updatedUser = await User.findByIdAndUpdate(
+        id,
+        { userName, phoneNumber, fullName, cccd, status: userStatus }, // Cập nhật trạng thái
+        { new: true }
+      );
+        // Nếu có role và hợp lệ, cập nhật bảng Permission
+      if (userRole) {
+        const permission = await Permission.findOneAndUpdate(
+          { user: id },
+          { role: userRole },
+          { new: true }
+        );
+          if (!permission) {
+          return res
+            .status(404)
+            .json({ message: "Không tìm thấy quyền người dùng" });
+        }
+      }
+        res.json({
+        message: "Cập nhật người dùng thành công",
+        user: updatedUser,
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }, */
   updateUser: function updateUser(req, res) {
-    var id, _req$body3, userName, phoneNumber, fullName, cccd, role, status, user, existingUserWithPhoneNumber, validRoles, userRole, userStatus, updatedUser, permission;
+    var id, originalId, _req$body3, userName, phoneNumber, fullName, cccd, role, status, user, existingUserWithPhoneNumber, objectId, today, activeTickets, validRoles, userRole, userStatus, updatedUser, permission;
 
     return regeneratorRuntime.async(function updateUser$(_context6) {
       while (1) {
@@ -483,17 +553,18 @@ var UserController = {
             _context6.prev = 0;
             id = req.params.id; // Lấy ID người dùng từ params
 
+            originalId = id;
             _req$body3 = req.body, userName = _req$body3.userName, phoneNumber = _req$body3.phoneNumber, fullName = _req$body3.fullName, cccd = _req$body3.cccd, role = _req$body3.role, status = _req$body3.status; // Lấy dữ liệu từ body
             // Lấy thông tin người dùng hiện tại từ cơ sở dữ liệu
 
-            _context6.next = 5;
+            _context6.next = 6;
             return regeneratorRuntime.awrap(_users["default"].findById(id).exec());
 
-          case 5:
+          case 6:
             user = _context6.sent;
 
             if (user) {
-              _context6.next = 8;
+              _context6.next = 9;
               break;
             }
 
@@ -501,22 +572,22 @@ var UserController = {
               message: "Người dùng không tồn tại"
             }));
 
-          case 8:
+          case 9:
             if (!(phoneNumber && phoneNumber !== user.phoneNumber)) {
-              _context6.next = 14;
+              _context6.next = 15;
               break;
             }
 
-            _context6.next = 11;
+            _context6.next = 12;
             return regeneratorRuntime.awrap(_users["default"].findOne({
               phoneNumber: phoneNumber
             }));
 
-          case 11:
+          case 12:
             existingUserWithPhoneNumber = _context6.sent;
 
             if (!existingUserWithPhoneNumber) {
-              _context6.next = 14;
+              _context6.next = 15;
               break;
             }
 
@@ -524,34 +595,96 @@ var UserController = {
               message: "Số điện thoại đã được đăng ký"
             }));
 
-          case 14:
+          case 15:
+            if (!(status === "INACTIVE")) {
+              _context6.next = 24;
+              break;
+            }
+
+            objectId = new _mongoose["default"].Types.ObjectId(originalId); // Kiểm tra xem có vé xe nào còn hoạt động khôngkhông
+
+            today = new Date(); // Kiểm tra xem có chuyến xe nào với busRouteId này và có status là 'OPEN'
+            // const activeTickets = await Tickets.find({ user: id, status: "PAID"});
+
+            _context6.next = 20;
+            return regeneratorRuntime.awrap(_tickets["default"].aggregate([{
+              $match: {
+                user: objectId,
+                status: "PAID" // Chỉ lấy vé đã thanh toán
+
+              }
+            }, {
+              $lookup: {
+                from: "trips",
+                // Tên collection Trip
+                localField: "trip",
+                // Trường tham chiếu trong Tickets
+                foreignField: "_id",
+                // Trường _id của Trip
+                as: "tripDetails" // Kết quả join sẽ lưu vào tripDetails
+
+              }
+            }, {
+              $unwind: "$tripDetails" // Giải nén mảng tripDetails thành object
+
+            }, {
+              $match: {
+                "tripDetails.departureTime": {
+                  $gte: today
+                } // Chỉ lấy vé có thời gian khởi hành >= hiện tại
+
+              }
+            }, {
+              $limit: 1 // Chỉ cần lấy 1 kết quả rồi dừng lại
+
+            }]));
+
+          case 20:
+            activeTickets = _context6.sent;
+            console.log("activeTickets:", activeTickets);
+
+            if (!(activeTickets.length > 0)) {
+              _context6.next = 24;
+              break;
+            }
+
+            return _context6.abrupt("return", res.status(400).json({
+              message: "Người này còn vé xe chưa đi nên không thể thay đổi trạng thái sang ngừng hoạt động"
+            }));
+
+          case 24:
             // Kiểm tra vai trò hợp lệ và đảm bảo người dùng không thể thay đổi vai trò của chính mình
             validRoles = Object.values(_index.ROLE); // ["ADMIN", "STAFF", "CUSTOMER"]
 
             userRole = null;
 
+            if (!(role !== user.role)) {
+              _context6.next = 31;
+              break;
+            }
+
             if (!(role && validRoles.includes(role))) {
-              _context6.next = 20;
+              _context6.next = 31;
               break;
             }
 
             if (!(user._id.toString() === req.user.id)) {
-              _context6.next = 19;
+              _context6.next = 30;
               break;
             }
 
             return _context6.abrupt("return", res.status(400).json({
-              message: "Bạn không thể thay đổi phân quyền của chính mình"
+              message: "Bạn không thể thay đổi phân quyền hoặc trạng thái của chính mình"
             }));
 
-          case 19:
+          case 30:
             userRole = role;
 
-          case 20:
+          case 31:
             // Xác định trạng thái, nếu không có, mặc định là 'ACTIVE'
             userStatus = status && Object.values(_index.USER_STATUS).includes(status) ? status : _index.USER_STATUS.ACTIVE; // Cập nhật thông tin người dùng
 
-            _context6.next = 23;
+            _context6.next = 34;
             return regeneratorRuntime.awrap(_users["default"].findByIdAndUpdate(id, {
               userName: userName,
               phoneNumber: phoneNumber,
@@ -563,15 +696,15 @@ var UserController = {
               "new": true
             }));
 
-          case 23:
+          case 34:
             updatedUser = _context6.sent;
 
             if (!userRole) {
-              _context6.next = 30;
+              _context6.next = 41;
               break;
             }
 
-            _context6.next = 27;
+            _context6.next = 38;
             return regeneratorRuntime.awrap(_permissions["default"].findOneAndUpdate({
               user: id
             }, {
@@ -580,11 +713,11 @@ var UserController = {
               "new": true
             }));
 
-          case 27:
+          case 38:
             permission = _context6.sent;
 
             if (permission) {
-              _context6.next = 30;
+              _context6.next = 41;
               break;
             }
 
@@ -592,28 +725,28 @@ var UserController = {
               message: "Không tìm thấy quyền người dùng"
             }));
 
-          case 30:
+          case 41:
             res.json({
               message: "Cập nhật người dùng thành công",
               user: updatedUser
             });
-            _context6.next = 36;
+            _context6.next = 47;
             break;
 
-          case 33:
-            _context6.prev = 33;
+          case 44:
+            _context6.prev = 44;
             _context6.t0 = _context6["catch"](0);
             res.status(500).json({
               message: "Internal server error",
               error: _context6.t0.message
             });
 
-          case 36:
+          case 47:
           case "end":
             return _context6.stop();
         }
       }
-    }, null, null, [[0, 33]]);
+    }, null, null, [[0, 44]]);
   },
   updateUserRole: function updateUserRole(req, res) {
     var id, role, user;
