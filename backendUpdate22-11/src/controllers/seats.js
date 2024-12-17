@@ -3,28 +3,7 @@ import Seats from "../models/seats.js";
 import Bus from "../models/bus.js";
 
 const SeatController = {
-  // createSeat: async (req, res) => {
-  //   try {
-  //     const { bus, seatNumber, status } = req.body;
 
-  //     const busInfo = await Bus.findById(bus).exec();
-
-  //     if (!busInfo) {
-  //       return res.status(404).json({
-  //         message: "An error occurred, please try again",
-  //       });
-  //     }
-
-  //     const seat = await new Seats({ bus, seatNumber, status }).save();
-
-  //     res.json(seat);
-  //   } catch (error) {
-  //     res.status(500).json({
-  //       message: "Internal server error",
-  //       error: error.message,
-  //     });
-  //   }
-  // },
   createSeat: async (req, res) => {
     try {
       const { bus, seats } = req.body; // `seats` là mảng chứa thông tin về các ghế
