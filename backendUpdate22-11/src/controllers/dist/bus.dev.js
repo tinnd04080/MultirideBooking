@@ -14,33 +14,6 @@ var _trips = _interopRequireDefault(require("../models/trips.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var BusController = {
-  // Hàm tạo mới một bus
-
-  /*  createBus: async (req, res) => {
-    try {
-      // Lấy thông tin từ body request
-      const { busTypeName, seatCapacity, priceFactor, licensePlate } = req.body;
-        // Kiểm tra nếu biển số đã tồn tại
-      const existingBus = await Bus.findOne({ licensePlate });
-      if (existingBus) {
-        return res.status(400).json({ message: "Biển số xe đã tồn tại" });
-      }
-        // Tạo mới một xe bus
-      const bus = await new Bus({
-        busTypeName,
-        seatCapacity,
-        priceFactor,
-        licensePlate,
-      }).save();
-        res.json(bus);
-    } catch (error) {
-      res.status(500).json({
-        message: "Internal server error",
-        error: error.message,
-      });
-    }
-  }, */
-
   /* Hàm tạo xe. Cập nhật ngày 01/12 */
   createBus: function createBus(req, res) {
     var _req$body, busTypeName, seatCapacity, priceFactor, licensePlate, status, existingBus, bus;
@@ -192,45 +165,7 @@ var BusController = {
       }
     }, null, null, [[0, 10]]);
   },
-  // updateBus: async (req, res) => {
-  //   try {
-  //     const { id } = req.params;
-  //     const { busTypeName, seatCapacity, priceFactor, licensePlate, status } =
-  //       req.body;
-  //     /*   // Kiểm tra xem xe bus này có đang tham gia chuyến xe nào không
-  //     const tripUsingBus = await Trip.findOne({ busId: id });
-  //     // Nếu xe đang tham gia chuyến xe và chuyến xe có status là OPEN
-  //     if (tripUsingBus && tripUsingBus.status === "OPEN") {
-  //       return res.status(400).json({
-  //         message:
-  //           "Xe không thể thay đổi trạng thái khi đang tham gia chuyến xe mở",
-  //       });
-  //     } */
-  //     // Cập nhật thông tin xe bus, bao gồm trường status nếu có
-  //     const bus = await Bus.findByIdAndUpdate(
-  //       id,
-  //       {
-  //         busTypeName,
-  //         seatCapacity,
-  //         priceFactor,
-  //         licensePlate,
-  //         status, // Cập nhật trường status
-  //       },
-  //       { new: true }
-  //     ).exec();
-  //     // Kiểm tra nếu không tìm thấy bus
-  //     if (!bus) {
-  //       return res.status(404).json({ message: "Bus not found" });
-  //     }
-  //     // Trả về thông tin bus đã cập nhật
-  //     res.json(bus);
-  //   } catch (error) {
-  //     res.status(500).json({
-  //       message: "Internal server error",
-  //       error: error.message,
-  //     });
-  //   }
-  // },
+
   updateBus: function updateBus(req, res) {
     var id, _req$body2, busTypeName, seatCapacity, priceFactor, licensePlate, status, tripUsingBus, bus;
 
