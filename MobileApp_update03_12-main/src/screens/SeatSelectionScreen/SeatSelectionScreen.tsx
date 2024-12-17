@@ -455,14 +455,10 @@ const SeatSelectionScreen: React.FC = ({ route }: any) => {
   };
 
   const goToConfirmInformation = () => {
-    // Kiểm tra nếu người dùng chưa chọn ghế
     if (selectedSeats.length === 0) {
-      // Hiển thị thông báo với tiêu đề "Thông báo"
-      // Hiển thị thông báo cho người dùng
       alert("Thông báo: Vui lòng chọn ghế trước khi tiếp tục!");
-      return; // Không thực hiện điều hướng
+      return;
     }
-    // Truyền các thông tin cần thiết qua navigation
     navigation.navigate("ConfirmInformation", {
       selectedSeats,
       trip,

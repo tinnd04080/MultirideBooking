@@ -96,55 +96,6 @@ const ConfirmInformation: React.FC = ({ route }: any) => {
     validateFullName(text); // Kiểm tra ngay khi nhập
   };
 
-  /* const handleDiscount = async () => {
-    if (!discountCode.trim()) {
-      // Kiểm tra mã giảm giá có rỗng hay không
-      alert("Vui lòng nhập mã giảm giá!"); // Hiển thị thông báo yêu cầu nhập mã
-      return; // Dừng thực hiện nếu mã giảm giá trống
-    }
-
-    try {
-      const token = "người dùng của bạn"; // Thay bằng cách lấy token thực tế
-      const promotionData = await getPromotionByCode(discountCode, token);
-      console.log(promotionData);
-      // kiểm tra status của mã là gì . Nếu ACTIVE thì tiếp tục. Nếu là ... thì trả về mã đã hết hạn
-      if (promotionData) {
-        let discount = 0;
-        if (promotionData.discountType === "AMOUNT") {
-          discount = promotionData.discountAmount;
-        } else if (promotionData.discountType === "PERCENT") {
-          discount =
-            (promotionData.discountAmount / 100) *
-            (selectedSeats.length * trip.price);
-        }
-
-        setFinalDiscountValue(discount); // Lưu giá trị giảm giá vào state
-        setIsDiscountApplied(true); // Đánh dấu đã áp dụng mã giảm giá
-        console.log("Giá trị giảm giá cuối cùng: ", discount);
-      }
-    } catch (error: any) {
-      // Kiểm tra nếu lỗi có response từ server
-      if (error.response) {
-        // Lỗi từ server, in ra thông báo lỗi từ server
-        console.error("Lỗi từ server: ", error.response.data);
-        alert(
-          `Lỗi: ${
-            error.response.data.message ||
-            "Đã xảy ra lỗi khi áp dụng mã giảm giá."
-          }`
-        );
-      } else if (error.request) {
-        // Nếu không có phản hồi từ server (lỗi mạng, timeout, v.v.)
-        console.error("Không có phản hồi từ server: ", error.request);
-        alert("Không thể kết nối đến server. Vui lòng thử lại.");
-      } else {
-        // Lỗi khác (ví dụ lỗi cú pháp hoặc lỗi không xác định)
-        console.error("Lỗi không xác định: ", error.message);
-        alert("Đã xảy ra lỗi không xác định. Vui lòng thử lại.");
-      }
-    }
-  }; */
-
   const handleDiscount = async () => {
     if (!discountCode.trim()) {
       // Kiểm tra mã giảm giá có rỗng hay không
@@ -261,6 +212,7 @@ const ConfirmInformation: React.FC = ({ route }: any) => {
       alert(error.message);
     }
   };
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}

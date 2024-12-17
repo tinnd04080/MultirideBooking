@@ -64,7 +64,6 @@ const Popup: React.FC<PopupProps> = ({
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (value === "OFFLINEPAYMENT" && paymentStatus === "PAYMENTPENDING") {
-      // Trường hợp thanh toán offline và đang chờ thanh toán
       setStatusTitle("Đặt vé thành công");
       setDescribe("Vui lòng thanh toán tại bến xe");
       setImageSource(require("../../assets/tick.gif"));
@@ -162,17 +161,6 @@ const Popup: React.FC<PopupProps> = ({
         navigation.navigate("Home");
         break;
 
-      /*  case "Hủy giao dịch":
-        console.log("Cancelling transaction...");
-        await axiosClient.put(`/tickets/update-status/${IdTickets}`, {
-          status: "PAYMENTPENDING",
-        });
-        if (IdTickets) {
-          navigation.navigate("TicketDetails", { ticketId: IdTickets });
-        } else {
-          console.error("IdTickets is undefined.");
-        }
-        break; */
       case "Hủy giao dịch":
         Alert.alert(
           "Giao dịch của bạn đã được hủy", // Tiêu đề (title)
