@@ -9,6 +9,11 @@ const ticketSchema = new Schema(
       ref: "users",
       required: true,
     },
+    trip: {
+      type: Schema.Types.ObjectId,
+      ref: "trip",
+      required: true,
+    },
     promotion: {
       type: Schema.Types.ObjectId,
       ref: "promotions",
@@ -24,11 +29,6 @@ const ticketSchema = new Schema(
     note: {
       type: String,
       default: null,
-    },
-    trip: {
-      type: Schema.Types.ObjectId,
-      ref: "trip",
-      required: true,
     },
     code: {
       type: String,

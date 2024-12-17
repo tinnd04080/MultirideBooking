@@ -187,10 +187,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               style={styles.routeTouchable}
             >
               <Text style={styles.routeTitle}>{item.title}</Text>
+<<<<<<< HEAD
               <Text style={styles.routePrice}>{item.price}</Text>
               <Text style={styles.routeDetails}>
                 Khoảng cách: {item.details}
+=======
+              <Text style={styles.routePrice}>
+                Giá vé tham khảo: {item.price}
+>>>>>>> 36bb7cab071d2bf064e002c166b72e0de0096ed9
               </Text>
+              {/*  <Text style={styles.routeDetails}>
+                Khoản cách: {item.details}
+              </Text> */}
             </TouchableOpacity>
           </Animated.View>
         )}

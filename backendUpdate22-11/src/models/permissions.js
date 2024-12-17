@@ -5,6 +5,7 @@ const permissionSchema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
+      ref: "users",
       required: true,
     },
     role: {
