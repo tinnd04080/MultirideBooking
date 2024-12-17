@@ -193,65 +193,6 @@ const SeatSelectionScreen: React.FC = ({ route }: any) => {
     return rows;
   };
 
-  // // Hàm vẽ sơ đồ ghế cho loại 16 chỗ
-  // const render16SeatLayout = (seats: Seat[]) => {
-  //   const rows: JSX.Element[] = [];
-  //   let currentRow: JSX.Element[] = [];
-
-  //   seats.forEach((seat, index) => {
-  //     const isSelected = selectedSeats.includes(seat.seatNumber);
-
-  //     const seatView = (
-  //       <TouchableOpacity
-  //         key={index}
-  //         style={[
-  //           styles.seat,
-  //           seat.status === "EMPTY"
-  //             ? styles.availableSeat
-  //             : seat.status === "SOLD"
-  //             ? styles.soldSeat
-  //             : styles.unavailableSeat,
-  //           isSelected && styles.selectedSeat,
-  //         ]}
-  //         onPress={() => {
-  //           if (seat.status === "EMPTY") {
-  //             toggleSeatSelection(seat.seatNumber);
-  //           }
-  //         }}
-  //         disabled={seat.status === "SOLD"}
-  //       >
-  //         <Text
-  //           style={[
-  //             styles.seatText,
-  //             seat.status === "EMPTY" && !isSelected
-  //               ? styles.availableSeatText
-  //               : seat.status === "SOLD"
-  //               ? styles.soldSeatText
-  //               : isSelected
-  //               ? styles.selectedSeatText
-  //               : {},
-  //           ]}
-  //         >
-  //           {seat.seatNumber}
-  //         </Text>
-  //       </TouchableOpacity>
-  //     );
-
-  //     currentRow.push(seatView);
-
-  //     // Tạo hàng mới khi đủ 4 ghế (mỗi hàng có 4 ghế)
-  //     if ((index + 1) % 4 === 0 || index === seats.length - 1) {
-  //       rows.push(
-  //         <View style={styles.row} key={rows.length}>
-  //           {currentRow}
-  //         </View>
-  //       );
-  //       currentRow = []; // Reset currentRow để tạo hàng mới
-  //     }
-  //   });
-
-  //   return rows;
-  // };
   const render16SeatLayout = (seats: Seat[]) => {
     const rows: JSX.Element[] = [];
     let seatIndex = 0; // Biến đếm để lấy số thứ tự từ `seats`
